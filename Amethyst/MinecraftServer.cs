@@ -6,7 +6,7 @@ namespace Amethyst;
 internal sealed class MinecraftServer(MinecraftServerConfiguration configuration) : IMinecraftServer
 {
     private readonly ILogger<MinecraftServer> logger = configuration.LoggerFactory.CreateLogger<MinecraftServer>();
-    private readonly IPEndPoint endPoint = configuration.ListeningEndPoint;
+    private readonly IPEndPoint listeningEndPoint = configuration.ListeningEndPoint;
 }
 
 internal interface IMinecraftServer;
