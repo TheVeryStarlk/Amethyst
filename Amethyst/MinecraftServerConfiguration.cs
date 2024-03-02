@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Amethyst.Components;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -12,6 +13,16 @@ internal sealed class MinecraftServerConfiguration
     /// The remote <see cref="IPEndPoint"/> the <see cref="MinecraftServer"/> should listen to.
     /// </summary>
     public required IPEndPoint ListeningEndPoint { get; init; }
+
+    /// <summary>
+    /// Sets the message of the day of the <see cref="MinecraftServer"/> as known as MOTD.
+    /// </summary>
+    public required Chat MessageOfTheDay { get; init; }
+
+    /// <summary>
+    /// Sets the maximum amount of players that can join the <see cref="MinecraftServer"/>.
+    /// </summary>
+    public required int MaximumPlayerCount { get; init; }
 
     /// <summary>
     /// The logger factory which <see cref="MinecraftServer"/> uses to create loggers.
