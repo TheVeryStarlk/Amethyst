@@ -14,6 +14,11 @@ internal sealed class MinecraftClient(
         return Task.CompletedTask;
     }
 
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     public async ValueTask DisposeAsync()
     {
         await connection.DisposeAsync();

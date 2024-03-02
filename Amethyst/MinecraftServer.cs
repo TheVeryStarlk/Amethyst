@@ -22,7 +22,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
         set => throw new NotImplementedException();
     }
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
         if (listener is not null)
         {
@@ -30,13 +30,25 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
         }
 
         logger.LogDebug("Starting the server");
-        return Task.WhenAll(ListeningAsync(), TickingAsync());
+        await Task.WhenAll(ListeningAsync(), TickingAsync());
+        await ShutdownAsync();
     }
 
-    public void Shutdown()
+    public async Task ShutdownAsync()
     {
         logger.LogDebug("Shutting down the server");
-        source.Cancel();
+
+        if (listener is not null)
+        {
+            await listener.UnbindAsync();
+        }
+
+        await source.CancelAsync();
+
+        foreach (var client in clients)
+        {
+            await client.Value.StopAsync();
+        }
     }
 
     private async Task ListeningAsync()
@@ -63,7 +75,6 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
                         connection);
 
                     clients[identifier++] = client;
-
                     _ = Task.Run(client.StartAsync, source.Token);
                 }
                 else
@@ -112,5 +123,5 @@ internal interface IMinecraftServer : IAsyncDisposable
     /// <summary>
     /// Stops listening for connections & shutdowns the server's tasks.
     /// </summary>
-    public void Shutdown();
+    public Task ShutdownAsync();
 }
