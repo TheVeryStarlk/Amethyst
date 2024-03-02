@@ -9,4 +9,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
     private readonly IPEndPoint listeningEndPoint = configuration.ListeningEndPoint;
 }
 
+/// <summary>
+/// Represents a Minecraft server.
+/// </summary>
 internal interface IMinecraftServer;
