@@ -45,7 +45,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             Options.Create(new SocketTransportOptions()),
             configuration.LoggerFactory);
 
-        listener = await factory.BindAsync(configuration.ListeningEndPoint);
+        listener = await factory.BindAsync(configuration.ListeningEndPoint, source.Token);
         logger.LogInformation("Listening for connection at {Port}", configuration.ListeningEndPoint.Port);
 
         var identifier = 0;
@@ -64,7 +64,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
 
                     clients[identifier++] = client;
 
-                    _ = Task.Run(client.StartAsync);
+                    _ = Task.Run(client.StartAsync, source.Token);
                 }
                 else
                 {
