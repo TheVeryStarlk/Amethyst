@@ -71,7 +71,8 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
                 {
                     var client = new MinecraftClient(
                         configuration.LoggerFactory.CreateLogger<MinecraftClient>(),
-                        connection);
+                        connection,
+                        identifier);
 
                     clients[identifier++] = client;
                     _ = Task.Run(client.StartAsync, source.Token);

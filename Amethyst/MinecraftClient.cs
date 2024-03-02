@@ -5,8 +5,11 @@ namespace Amethyst;
 
 internal sealed class MinecraftClient(
     ILogger<MinecraftClient> logger,
-    ConnectionContext connection) : IAsyncDisposable
+    ConnectionContext connection,
+    int identifier) : IAsyncDisposable
 {
+    public int Identifier => identifier;
+
     private MinecraftClientState state;
 
     public Task StartAsync()
