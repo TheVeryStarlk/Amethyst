@@ -9,6 +9,11 @@ internal sealed class MinecraftClient(
 {
     private MinecraftClientState state;
 
+    public Task StartAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     public async ValueTask DisposeAsync()
     {
         await connection.DisposeAsync();

@@ -50,7 +50,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
 
         var identifier = 0;
 
-        while (true)
+        while (!source.IsCancellationRequested)
         {
             try
             {
@@ -58,9 +58,13 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
 
                 if (connection is not null)
                 {
-                    clients[identifier++] = new MinecraftClient(
+                    var client = new MinecraftClient(
                         configuration.LoggerFactory.CreateLogger<MinecraftClient>(),
                         connection);
+
+                    clients[identifier++] = client;
+
+                    _ = Task.Run(client.StartAsync);
                 }
                 else
                 {
