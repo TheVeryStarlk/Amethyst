@@ -22,7 +22,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
         set => throw new NotImplementedException();
     }
 
-    public async Task StartAsync()
+    public Task StartAsync()
     {
         if (listener is not null)
         {
@@ -30,8 +30,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
         }
 
         logger.LogDebug("Starting the server");
-        await Task.WhenAll(ListeningAsync(), TickingAsync());
-        await ShutdownAsync();
+        return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
     public async Task ShutdownAsync()
