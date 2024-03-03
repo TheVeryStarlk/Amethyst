@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Amethyst.Api;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.Logging;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Amethyst;
 
-internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFactory loggerFactory) : IAsyncDisposable
+internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFactory loggerFactory) : IMinecraftServer
 {
     private IConnectionListener? listener;
 
@@ -21,7 +22,7 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
             throw new InvalidOperationException("Server has already started.");
         }
 
-        logger.LogInformation("Starting the server");
+        logger.LogInformation("Starting the server tasks");
         return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
@@ -81,9 +82,11 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
                     break;
                 }
             }
-            catch (OperationCanceledException)
+            catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                break;
+                logger.LogError(
+                    "Unexpected exception while listening for connections: \"{Message}\"",
+                    exception.Message);
             }
         }
 
