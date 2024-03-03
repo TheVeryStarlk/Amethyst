@@ -79,7 +79,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
                     clients[identifier] = client;
                     identifier++;
 
-                    _ = Task.Run(client.StartAsync, source.Token);
+                    _ = ExecuteAsync(client);
                 }
                 else
                 {
@@ -90,6 +90,24 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             {
                 break;
             }
+        }
+
+        return;
+
+        async Task ExecuteAsync(MinecraftClient client)
+        {
+            await Task.Yield();
+
+            try
+            {
+                await client.StartAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                // The client has stopped, ignore this.
+            }
+
+            clients.Remove(client.Identifier);
         }
     }
 
