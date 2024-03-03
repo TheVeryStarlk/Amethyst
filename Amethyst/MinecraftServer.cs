@@ -5,8 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Amethyst;
 
-internal sealed class MinecraftServer(MinecraftServerConfiguration configuration)
-    : IAsyncDisposable
+internal sealed class MinecraftServer(MinecraftServerConfiguration configuration) : IAsyncDisposable
 {
     private IConnectionListener? listener;
 
