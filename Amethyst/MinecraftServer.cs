@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Connections;
+﻿using System.Net;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Amethyst;
 
-internal sealed class MinecraftServer(MinecraftServerConfiguration configuration) : IAsyncDisposable
+internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFactory loggerFactory) : IAsyncDisposable
 {
     private IConnectionListener? listener;
 
-    private readonly ILogger<MinecraftServer> logger = configuration.LoggerFactory.CreateLogger<MinecraftServer>();
+    private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
     private readonly CancellationTokenSource source = new CancellationTokenSource();
     private readonly Dictionary<int, MinecraftClient> clients = [];
 
@@ -50,10 +51,10 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
     {
         var factory = new SocketTransportFactory(
             Options.Create(new SocketTransportOptions()),
-            configuration.LoggerFactory);
+            loggerFactory);
 
-        listener = await factory.BindAsync(configuration.ListeningEndPoint, source.Token);
-        logger.LogInformation("Started listening for connections at port {Port}", configuration.ListeningEndPoint.Port);
+        listener = await factory.BindAsync(listeningEndPoint, source.Token);
+        logger.LogInformation("Started listening for connections at port {Port}", listeningEndPoint.Port);
 
         var identifier = 0;
 
@@ -66,7 +67,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
                 if (connection is not null)
                 {
                     var client = new MinecraftClient(
-                        configuration.LoggerFactory.CreateLogger<MinecraftClient>(),
+                        loggerFactory.CreateLogger<MinecraftClient>(),
                         connection,
                         identifier);
 
