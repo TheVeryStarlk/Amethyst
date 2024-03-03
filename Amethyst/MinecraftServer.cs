@@ -8,8 +8,6 @@ namespace Amethyst;
 
 internal sealed class MinecraftServer(MinecraftServerConfiguration configuration) : IMinecraftServer
 {
-    private const int ProtocolVersion = 47;
-
     private IConnectionListener? listener;
 
     private readonly ILogger<MinecraftServer> logger = configuration.LoggerFactory.CreateLogger<MinecraftServer>();
@@ -33,9 +31,9 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
         return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
-    public async Task ShutdownAsync()
+    public async Task StopAsync()
     {
-        logger.LogDebug("Shutting down the server");
+        logger.LogDebug("Stopping the server");
 
         if (listener is not null)
         {
@@ -44,10 +42,14 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
 
         await source.CancelAsync();
 
-        foreach (var client in clients)
+        var tasks = new Task[clients.Count];
+
+        for (var index = 0; index < clients.Count; index++)
         {
-            await client.Value.StopAsync();
+            tasks[index] = clients[index].StopAsync();
         }
+
+        await Task.WhenAll(tasks);
     }
 
     private async Task ListeningAsync()
@@ -57,7 +59,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             configuration.LoggerFactory);
 
         listener = await factory.BindAsync(configuration.ListeningEndPoint, source.Token);
-        logger.LogInformation("Listening for connection at {Port}", configuration.ListeningEndPoint.Port);
+        logger.LogInformation("Listening for connections at {Port}", configuration.ListeningEndPoint.Port);
 
         var identifier = 0;
 
@@ -74,7 +76,9 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
                         connection,
                         identifier);
 
-                    clients[identifier++] = client;
+                    clients[identifier] = client;
+                    identifier++;
+
                     _ = Task.Run(client.StartAsync, source.Token);
                 }
                 else
@@ -119,9 +123,4 @@ internal interface IMinecraftServer : IAsyncDisposable
     /// Stores the server's status, contains player information and MOTD.
     /// </summary>
     public Status Status { get; }
-
-    /// <summary>
-    /// Stops listening for connections & shutdowns the server's tasks.
-    /// </summary>
-    public Task ShutdownAsync();
 }
