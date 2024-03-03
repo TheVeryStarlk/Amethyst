@@ -1,24 +1,18 @@
-﻿using Amethyst.Components;
-using Microsoft.AspNetCore.Connections;
+﻿using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Amethyst;
 
-internal sealed class MinecraftServer(MinecraftServerConfiguration configuration) : IMinecraftServer
+internal sealed class MinecraftServer(MinecraftServerConfiguration configuration)
+    : IAsyncDisposable
 {
     private IConnectionListener? listener;
 
     private readonly ILogger<MinecraftServer> logger = configuration.LoggerFactory.CreateLogger<MinecraftServer>();
     private readonly CancellationTokenSource source = new CancellationTokenSource();
     private readonly Dictionary<int, MinecraftClient> clients = [];
-
-    public Status Status
-    {
-        get => throw new NotImplementedException();
-        set => throw new NotImplementedException();
-    }
 
     public Task StartAsync()
     {
@@ -27,13 +21,13 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             throw new InvalidOperationException("Server has already started.");
         }
 
-        logger.LogDebug("Starting the server");
+        logger.LogInformation("Starting the server");
         return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
     public async Task StopAsync()
     {
-        logger.LogDebug("Stopping the server");
+        logger.LogInformation("Stopping the server");
 
         if (listener is not null)
         {
@@ -49,6 +43,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             tasks[index] = clients[index].StopAsync();
         }
 
+        logger.LogDebug("Stopping clients");
         await Task.WhenAll(tasks);
     }
 
@@ -59,7 +54,7 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             configuration.LoggerFactory);
 
         listener = await factory.BindAsync(configuration.ListeningEndPoint, source.Token);
-        logger.LogInformation("Listening for connections at {Port}", configuration.ListeningEndPoint.Port);
+        logger.LogInformation("Started listening for connections at port {Port}", configuration.ListeningEndPoint.Port);
 
         var identifier = 0;
 
@@ -102,17 +97,22 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
             {
                 await client.StartAsync();
             }
-            catch (OperationCanceledException)
+            catch (Exception exception) when (exception is not OperationCanceledException)
             {
-                // The client has stopped, ignore this.
+                logger.LogError(
+                    "Unexpected exception from client {Identifier}: \"{Message}\"",
+                    client.Identifier,
+                    exception.Message);
             }
 
+            logger.LogDebug("Removing client {Identifier}", client.Identifier);
             clients.Remove(client.Identifier);
         }
     }
 
     private Task TickingAsync()
     {
+        logger.LogInformation("Started ticking");
         return Task.CompletedTask;
     }
 
@@ -125,20 +125,13 @@ internal sealed class MinecraftServer(MinecraftServerConfiguration configuration
 
         source.Dispose();
 
-        foreach (var client in clients)
-        {
-            await client.Value.DisposeAsync();
-        }
-    }
-}
+        var tasks = new Task[clients.Count];
 
-/// <summary>
-/// Represents a Minecraft server.
-/// </summary>
-internal interface IMinecraftServer : IAsyncDisposable
-{
-    /// <summary>
-    /// Stores the server's status, contains player information and MOTD.
-    /// </summary>
-    public Status Status { get; }
+        for (var index = 0; index < clients.Count; index++)
+        {
+            tasks[index] = clients[index].DisposeAsync().AsTask();
+        }
+
+        await Task.WhenAll(tasks);
+    }
 }
