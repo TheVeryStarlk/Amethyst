@@ -3,10 +3,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class MinecraftClient(
-    ILogger<MinecraftClient> logger,
-    ConnectionContext connection,
-    int identifier) : IAsyncDisposable
+internal sealed class MinecraftClient(ILogger<MinecraftClient> logger, ConnectionContext connection, int identifier)
+    : IAsyncDisposable
 {
     public int Identifier => identifier;
 
