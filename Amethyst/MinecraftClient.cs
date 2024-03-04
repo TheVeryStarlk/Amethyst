@@ -9,22 +9,30 @@ internal sealed class MinecraftClient(ILogger<MinecraftClient> logger, Connectio
 
     private MinecraftClientState state;
 
+    private readonly CancellationTokenSource source = new CancellationTokenSource();
+
     public Task StartAsync()
     {
         return Task.CompletedTask;
     }
 
-    public Task StopAsync()
+    public async Task StopAsync()
     {
-        logger.LogDebug("Stopping client, aborting the underlying connection");
-        state = MinecraftClientState.Disconnected;
-        connection.Abort();
+        if (state is MinecraftClientState.Disconnected)
+        {
+            return;
+        }
 
-        return Task.CompletedTask;
+        logger.LogDebug("Stopping client, aborting the underlying connection");
+
+        state = MinecraftClientState.Disconnected;
+        await source.CancelAsync();
+        connection.Abort();
     }
 
     public async ValueTask DisposeAsync()
     {
+        source.Dispose();
         await connection.DisposeAsync();
     }
 }
