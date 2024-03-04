@@ -16,6 +16,8 @@ internal sealed class MinecraftClient(ILogger<MinecraftClient> logger, Connectio
 
     public Task StopAsync()
     {
+        logger.LogDebug("Stopping client, aborting the underlying connection");
+        connection.Abort();
         return Task.CompletedTask;
     }
 

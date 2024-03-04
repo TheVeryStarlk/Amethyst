@@ -39,12 +39,13 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
 
         var tasks = new Task[clients.Count];
 
+        logger.LogDebug("Stopping clients");
+
         for (var index = 0; index < clients.Count; index++)
         {
             tasks[index] = clients[index].StopAsync();
         }
 
-        logger.LogDebug("Stopping clients");
         await Task.WhenAll(tasks);
     }
 
@@ -55,7 +56,7 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
             loggerFactory);
 
         listener = await factory.BindAsync(listeningEndPoint, source.Token);
-        logger.LogInformation("Started listening for connections at port {Port}", listeningEndPoint.Port);
+        logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", listeningEndPoint);
 
         var identifier = 0;
 
@@ -103,13 +104,17 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 logger.LogError(
-                    "Unexpected exception from client {Identifier}: \"{Message}\"",
-                    client.Identifier,
+                    "Unexpected exception from client: \"{Message}\"",
                     exception.Message);
             }
+            finally
+            {
+                logger.LogDebug("Removing client");
+                clients.Remove(client.Identifier);
 
-            logger.LogDebug("Removing client {Identifier}", client.Identifier);
-            clients.Remove(client.Identifier);
+                await client.StopAsync();
+                await client.DisposeAsync();
+            }
         }
     }
 

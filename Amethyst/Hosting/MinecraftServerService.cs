@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Hosting;
 
-internal sealed class MinecraftServerService(ILogger<MinecraftServerService> logger, MinecraftServer server) : BackgroundService
+internal sealed class MinecraftServerService(ILogger<MinecraftServerService> logger, MinecraftServer server) : BackgroundService, IAsyncDisposable
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -23,5 +23,10 @@ internal sealed class MinecraftServerService(ILogger<MinecraftServerService> log
     {
         await server.StopAsync();
         await base.StopAsync(CancellationToken.None);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await server.DisposeAsync();
     }
 }

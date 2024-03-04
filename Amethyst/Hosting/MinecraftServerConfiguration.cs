@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Amethyst;
+namespace Amethyst.Hosting;
 
 public sealed class MinecraftServerConfiguration
 {
