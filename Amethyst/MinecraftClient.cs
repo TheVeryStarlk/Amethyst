@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Connections;
+﻿using Amethyst.Networking;
+using Amethyst.Networking.Packets.Handshaking;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -14,9 +16,12 @@ internal sealed class MinecraftClient(
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
-        return Task.CompletedTask;
+        var message = await connection.Transport.Input.ReadMessageAsync(source.Token);
+        var handshake = message!.As<HandshakePacket>();
+        state = handshake.NextState;
+        logger.LogInformation("Client switched state to {State}", state);
     }
 
     public async Task StopAsync()

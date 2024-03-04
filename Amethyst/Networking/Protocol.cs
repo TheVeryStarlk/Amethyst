@@ -75,4 +75,11 @@ internal static class Protocol
     }
 }
 
-internal sealed record Message(int Identifier, Memory<byte> Memory);
+internal sealed record Message(int Identifier, Memory<byte> Memory)
+{
+    public T As<T>() where T : IIngoingPacket<T>
+    {
+        var reader = new MemoryReader(Memory);
+        return T.Read(reader);
+    }
+}
