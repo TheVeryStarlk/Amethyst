@@ -23,7 +23,7 @@ internal sealed class MinecraftClient(ILogger<MinecraftClient> logger, Connectio
             return;
         }
 
-        logger.LogDebug("Stopping client, aborting the underlying connection");
+        logger.LogDebug("Stopping client");
 
         await source.CancelAsync();
         connection.Abort();

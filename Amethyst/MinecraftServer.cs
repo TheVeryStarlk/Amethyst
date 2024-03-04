@@ -66,22 +66,23 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
             {
                 var connection = await listener.AcceptAsync(source.Token);
 
-                if (connection is not null)
+                if (connection is null)
                 {
-                    var client = new MinecraftClient(
-                        loggerFactory.CreateLogger<MinecraftClient>(),
-                        connection,
-                        identifier);
-
-                    clients[identifier] = client;
-                    identifier++;
-
-                    _ = ExecuteAsync(client);
-                }
-                else
-                {
+                    logger.LogInformation("No longer accepting connections");
                     break;
                 }
+
+                logger.LogDebug("Accepted connection from: \"{EndPoint}\"", connection.RemoteEndPoint!.ToString());
+
+                var client = new MinecraftClient(
+                    loggerFactory.CreateLogger<MinecraftClient>(),
+                    connection,
+                    identifier);
+
+                clients[identifier] = client;
+                identifier++;
+
+                _ = ExecuteAsync(client);
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
