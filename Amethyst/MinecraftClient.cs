@@ -21,7 +21,7 @@ internal sealed class MinecraftClient(
         var message = await connection.Transport.Input.ReadMessageAsync(source.Token);
         var handshake = message!.As<HandshakePacket>();
         state = handshake.NextState;
-        logger.LogInformation("Client switched state to {State}", state);
+        logger.LogDebug("Client switched state to {State}", state);
     }
 
     public async Task StopAsync()
