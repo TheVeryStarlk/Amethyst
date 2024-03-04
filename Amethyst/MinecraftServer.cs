@@ -47,15 +47,8 @@ internal sealed class MinecraftServer(
             await listener.UnbindAsync();
         }
 
-        var tasks = new Task[clients.Count];
-
+        var tasks = clients.Select(client => client.Value.StopAsync());
         logger.LogDebug("Stopping clients");
-
-        for (var index = 0; index < clients.Count; index++)
-        {
-            tasks[index] = clients[index].StopAsync();
-        }
-
         await Task.WhenAll(tasks);
     }
 
@@ -140,13 +133,7 @@ internal sealed class MinecraftServer(
             await listener.DisposeAsync();
         }
 
-        var tasks = new Task[clients.Count];
-
-        for (var index = 0; index < clients.Count; index++)
-        {
-            tasks[index] = clients[index].DisposeAsync().AsTask();
-        }
-
+        var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
         await Task.WhenAll(tasks);
     }
 }
