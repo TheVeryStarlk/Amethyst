@@ -11,9 +11,11 @@ internal sealed class MinecraftServer(
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory) : IMinecraftServer
 {
+    public const int ProtocolVersion = 47;
+
     public ServerStatus Status => ServerStatus.Create(
-        "Amethyst",
-        47,
+        nameof(Amethyst),
+        ProtocolVersion,
         configuration.MaximumPlayerCount,
         configuration.Description);
 
