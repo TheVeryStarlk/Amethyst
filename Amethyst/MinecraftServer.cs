@@ -1,15 +1,22 @@
-﻿using System.Net;
-using Amethyst.Api;
+﻿using Amethyst.Api;
+using Amethyst.Api.Components;
+using Amethyst.Hosting;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
 internal sealed class MinecraftServer(
-    IPEndPoint listeningEndPoint,
+    MinecraftServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory) : IMinecraftServer
 {
+    public ServerStatus Status => ServerStatus.Create(
+        "Amethyst",
+        47,
+        configuration.MaximumPlayerCount,
+        configuration.Description);
+
     private IConnectionListener? listener;
 
     private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
@@ -52,8 +59,8 @@ internal sealed class MinecraftServer(
 
     private async Task ListeningAsync()
     {
-        listener = await listenerFactory.BindAsync(listeningEndPoint, source.Token);
-        logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", listeningEndPoint);
+        listener = await listenerFactory.BindAsync(configuration.ListeningEndPoint, source.Token);
+        logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", configuration.ListeningEndPoint);
 
         var identifier = 0;
 

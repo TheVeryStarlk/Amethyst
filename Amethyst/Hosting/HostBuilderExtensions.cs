@@ -20,7 +20,7 @@ public static class HostBuilderExtensions
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
 
             services.AddTransient(provider => new MinecraftServer(
-                configuration.ListeningEndPoint,
+                configuration,
                 provider.GetRequiredService<IConnectionListenerFactory>(),
                 provider.GetRequiredService<ILoggerFactory>()));
 

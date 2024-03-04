@@ -1,3 +1,8 @@
-﻿namespace Amethyst.Api;
+﻿using Amethyst.Api.Components;
 
-public interface IMinecraftServer : IAsyncDisposable;
+namespace Amethyst.Api;
+
+public interface IMinecraftServer : IAsyncDisposable
+{
+    public ServerStatus Status { get; }
+}
