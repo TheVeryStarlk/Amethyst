@@ -25,9 +25,10 @@ internal sealed class MinecraftClient(ILogger<MinecraftClient> logger, Connectio
 
         logger.LogDebug("Stopping client, aborting the underlying connection");
 
-        state = MinecraftClientState.Disconnected;
         await source.CancelAsync();
         connection.Abort();
+
+        state = MinecraftClientState.Disconnected;
     }
 
     public async ValueTask DisposeAsync()

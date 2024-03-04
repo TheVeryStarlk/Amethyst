@@ -30,12 +30,12 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
     {
         logger.LogInformation("Stopping the server");
 
+        await source.CancelAsync();
+
         if (listener is not null)
         {
             await listener.UnbindAsync();
         }
-
-        await source.CancelAsync();
 
         var tasks = new Task[clients.Count];
 
@@ -126,12 +126,12 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
 
     public async ValueTask DisposeAsync()
     {
+        source.Dispose();
+
         if (listener is not null)
         {
             await listener.DisposeAsync();
         }
-
-        source.Dispose();
 
         var tasks = new Task[clients.Count];
 
