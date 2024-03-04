@@ -1,13 +1,14 @@
 ﻿using System.Net;
 using Amethyst.Api;
 using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Amethyst;
 
-internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFactory loggerFactory) : IMinecraftServer
+internal sealed class MinecraftServer(
+    IPEndPoint listeningEndPoint,
+    IConnectionListenerFactory listenerFactory,
+    ILoggerFactory loggerFactory) : IMinecraftServer
 {
     private IConnectionListener? listener;
 
@@ -51,11 +52,7 @@ internal sealed class MinecraftServer(IPEndPoint listeningEndPoint, ILoggerFacto
 
     private async Task ListeningAsync()
     {
-        var factory = new SocketTransportFactory(
-            Options.Create(new SocketTransportOptions()),
-            loggerFactory);
-
-        listener = await factory.BindAsync(listeningEndPoint, source.Token);
+        listener = await listenerFactory.BindAsync(listeningEndPoint, source.Token);
         logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", listeningEndPoint);
 
         var identifier = 0;

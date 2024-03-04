@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Amethyst.Hosting;
 
@@ -15,9 +17,19 @@ public static class HostBuilderExtensions
             var configuration = new MinecraftServerConfiguration();
             configure.Invoke(context, configuration);
 
-            services.AddTransient(provider => new MinecraftServer(
-                configuration.ListeningEndPoint,
-                provider.GetRequiredService<ILoggerFactory>()));
+            services.AddTransient(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                var listenerFactory = new SocketTransportFactory(
+                    Options.Create(new SocketTransportOptions()),
+                    loggerFactory);
+
+                return new MinecraftServer(
+                    configuration.ListeningEndPoint,
+                    listenerFactory,
+                    loggerFactory);
+            });
 
             services.AddHostedService<MinecraftServerService>();
         });
