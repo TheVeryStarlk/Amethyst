@@ -1,11 +1,12 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Status;
 
-namespace Amethyst.Networking.Packets.Login;
+namespace Amethyst.Networking;
 
-internal sealed class DisconnectPacket: IOutgoingPacket
+internal sealed class DisconnectPacket(MinecraftClientState state) : IOutgoingPacket
 {
-    public int Identifier => 0x00;
+    public int Identifier => state is MinecraftClientState.Login ? 0x00 : 0x40;
 
     public required ChatMessage Reason { get; init; }
 

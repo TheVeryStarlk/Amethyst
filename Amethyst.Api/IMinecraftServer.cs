@@ -11,5 +11,5 @@ public interface IMinecraftServer : IAsyncDisposable
 
     public Task BroadcastChatMessage(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
 
-    public Task KickPlayer(IPlayer player, ChatMessage reason);
+    public Task KickPlayerAsync(IPlayer player, ChatMessage reason);
 }

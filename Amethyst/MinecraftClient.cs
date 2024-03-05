@@ -5,7 +5,6 @@ using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
-using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -101,7 +100,7 @@ internal sealed class MinecraftClient(
             logger.LogDebug("Not supported protocol version");
 
             await Transport.Output.WritePacketAsync(
-                new DisconnectPacket
+                new DisconnectPacket(MinecraftClientState.Login)
                 {
                     Reason = ChatMessage.Create(
                         handshake.ProtocolVersion > MinecraftServer.ProtocolVersion

@@ -7,6 +7,8 @@ public interface IPlayer : IEntity
 {
     public IMinecraftServer Server { get; }
 
+    public string Username { get; }
+
     public Vector3 Position { get; set; }
 
     public Vector2 Rotation { get; set; }

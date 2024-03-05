@@ -56,7 +56,7 @@ internal sealed class MinecraftServer(
 
         var tasks = clients.Select(
             client => client.Value.Player is not null
-                ? client.Value.Player!.DisconnectAsync(reason)
+                ? KickPlayerAsync(client.Value.Player, reason)
                 : client.Value.StopAsync());
 
         logger.LogDebug("Stopping clients");
@@ -84,8 +84,12 @@ internal sealed class MinecraftServer(
         }
     }
 
-    public async Task KickPlayer(IPlayer player, ChatMessage reason)
+    public async Task KickPlayerAsync(IPlayer player, ChatMessage reason)
     {
+        logger.LogInformation("Kicked player: \"{Username}\", for: \"{Reason}\"",
+            player.Username,
+            reason.Text);
+
         await player.DisconnectAsync(reason);
     }
 

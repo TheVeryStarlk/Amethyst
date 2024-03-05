@@ -55,6 +55,13 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
 
     public async Task DisconnectAsync(ChatMessage reason)
     {
+        await client.Transport.Output.WritePacketAsync(
+            new DisconnectPacket(MinecraftClientState.Playing)
+            {
+                Reason = reason
+            },
+            client.CancellationToken);
+
         await client.StopAsync();
     }
 }
