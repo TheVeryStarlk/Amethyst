@@ -5,6 +5,7 @@ using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
+using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -33,7 +34,7 @@ internal sealed class MinecraftClient(
     {
         while (!source.IsCancellationRequested)
         {
-            var message = await connection.Transport.Input.ReadMessageAsync(source.Token);
+            var message = await Transport.Input.ReadMessageAsync(source.Token);
 
             if (message is null)
             {
@@ -55,6 +56,7 @@ internal sealed class MinecraftClient(
                     break;
 
                 case MinecraftClientState.Playing:
+                    await HandlePlayingAsync(message);
                     break;
 
                 case MinecraftClientState.Disconnected:
@@ -96,7 +98,7 @@ internal sealed class MinecraftClient(
         {
             logger.LogDebug("Not supported protocol version");
 
-            await connection.Transport.Output.WritePacketAsync(
+            await Transport.Output.WritePacketAsync(
                 new DisconnectPacket
                 {
                     Reason = ChatMessage.Create(
@@ -119,7 +121,7 @@ internal sealed class MinecraftClient(
     {
         if (message.Identifier == StatusRequestPacket.Identifier)
         {
-            await connection.Transport.Output.WritePacketAsync(
+            await Transport.Output.WritePacketAsync(
                 new StatusResponsePacket
                 {
                     Status = server.Status
@@ -133,7 +135,7 @@ internal sealed class MinecraftClient(
         {
             var ping = message.As<PingRequestPacket>();
 
-            await connection.Transport.Output.WritePacketAsync(
+            await Transport.Output.WritePacketAsync(
                 new PongResponsePacket
                 {
                     Payload = ping.Payload
@@ -154,7 +156,7 @@ internal sealed class MinecraftClient(
 
         Player = new Player(this, loginStart.Username);
 
-        await connection.Transport.Output.WritePacketAsync(
+        await Transport.Output.WritePacketAsync(
             new LoginSuccessPacket
             {
                 Guid = Player.Guid,
@@ -163,6 +165,29 @@ internal sealed class MinecraftClient(
             source.Token);
 
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
+        state = MinecraftClientState.Playing;
+
+        await Transport.Output.WritePacketAsync(
+            new JoinGamePacket
+            {
+                Player = Player
+            },
+            source.Token);
+
+        await Transport.Output.WritePacketAsync(
+            new PlayerPositionAndLookPacket
+            {
+                Player = Player
+            },
+            source.Token);
+    }
+
+    private async Task HandlePlayingAsync(Message message)
+    {
+        while (true)
+        {
+            
+        }
     }
 }
 

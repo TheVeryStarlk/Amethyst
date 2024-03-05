@@ -37,4 +37,29 @@ internal ref struct MemoryWriter(Memory<byte> memory)
     {
         BinaryPrimitives.WriteInt64BigEndian(span[Position..(Position += sizeof(long))], value);
     }
+
+    public void WriteInteger(int value)
+    {
+        BinaryPrimitives.WriteInt32BigEndian(span[Position..(Position += sizeof(int))], value);
+    }
+
+    public void WriteByte(byte value)
+    {
+        span[Position++] = value;
+    }
+
+    public void WriteBoolean(bool value)
+    {
+        WriteByte((byte) (value ? 1 : 0));
+    }
+
+    public void WriteDouble(double value)
+    {
+        BinaryPrimitives.WriteDoubleBigEndian(span[Position..(Position += sizeof(double))], value);
+    }
+
+    public void WriteFloat(float value)
+    {
+        BinaryPrimitives.WriteSingleBigEndian(span[Position..(Position += sizeof(float))], value);
+    }
 }
