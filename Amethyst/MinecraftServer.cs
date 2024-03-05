@@ -80,6 +80,8 @@ internal sealed class MinecraftServer(
 
     public async Task BroadcastChatMessage(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
+        logger.LogInformation("Broadcasting: \"{Message}\"", message.Text);
+
         foreach (var player in Players)
         {
             await player.SendChatMessageAsync(message, position);
