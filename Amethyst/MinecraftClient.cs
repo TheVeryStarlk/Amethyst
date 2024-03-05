@@ -1,5 +1,7 @@
-﻿using Amethyst.Api;
+﻿using System.IO.Pipelines;
+using Amethyst.Api;
 using Amethyst.Api.Components;
+using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
@@ -16,6 +18,12 @@ internal sealed class MinecraftClient(
     int identifier) : IAsyncDisposable
 {
     public int Identifier => identifier;
+
+    public IMinecraftServer Server => server;
+
+    public IDuplexPipe Transport => connection.Transport;
+
+    public Player? Player { get; private set; }
 
     private MinecraftClientState state;
 
@@ -43,6 +51,7 @@ internal sealed class MinecraftClient(
                     break;
 
                 case MinecraftClientState.Login:
+                    await HandleLoginAsync(message);
                     break;
 
                 case MinecraftClientState.Playing:
@@ -137,6 +146,23 @@ internal sealed class MinecraftClient(
         }
 
         await StopAsync();
+    }
+
+    private async Task HandleLoginAsync(Message message)
+    {
+        var loginStart = message.As<LoginStartPacket>();
+
+        Player = new Player(this, loginStart.Username);
+
+        await connection.Transport.Output.WritePacketAsync(
+            new LoginSuccessPacket
+            {
+                Guid = Player.Guid,
+                Username = Player.Username
+            },
+            source.Token);
+
+        logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }
 }
 
