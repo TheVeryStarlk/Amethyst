@@ -2,7 +2,7 @@
 
 internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 {
-    public int Identifier => 0x00;
+    public static int Identifier => 0x00;
 
     public required int ProtocolVersion { get; init; }
 

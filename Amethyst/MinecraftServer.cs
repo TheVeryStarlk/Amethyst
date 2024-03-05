@@ -11,7 +11,7 @@ internal sealed class MinecraftServer(
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory) : IMinecraftServer
 {
-    private const int ProtocolVersion = 47;
+    public const int ProtocolVersion = 47;
 
     public ServerStatus Status => ServerStatus.Create(
         nameof(Amethyst),

@@ -5,7 +5,7 @@ using Amethyst.Networking.Packets;
 
 namespace Amethyst.Networking;
 
-internal static class Protocol
+internal static class PipeExtensions
 {
     public static async Task<Message?> ReadMessageAsync(this PipeReader reader, CancellationToken cancellationToken)
     {
@@ -28,11 +28,11 @@ internal static class Protocol
 
                 if (result.IsCompleted)
                 {
-                    // if (buffer.Length > 0)
-                    // {
-                    //     // The message is incomplete and there's no more data to process.
-                    //     throw new InvalidDataException("Incomplete message.");
-                    // }
+                    if (buffer.Length > 0)
+                    {
+                        // The message is incomplete and there's no more data to process.
+                        throw new InvalidDataException("Incomplete message.");
+                    }
 
                     break;
                 }
@@ -79,6 +79,11 @@ internal sealed record Message(int Identifier, Memory<byte> Memory)
 {
     public T As<T>() where T : IIngoingPacket<T>
     {
+        if (T.Identifier != Identifier)
+        {
+            throw new ArgumentException($"Expected {T.Identifier} but got {Identifier} instead.");
+        }
+
         var reader = new MemoryReader(Memory);
         return T.Read(reader);
     }

@@ -18,10 +18,37 @@ internal sealed class MinecraftClient(
 
     public async Task StartAsync()
     {
-        var message = await connection.Transport.Input.ReadMessageAsync(source.Token);
-        var handshake = message!.As<HandshakePacket>();
-        state = handshake.NextState;
-        logger.LogDebug("Client switched state to {State}", state);
+        while (!source.IsCancellationRequested)
+        {
+            var message = await connection.Transport.Input.ReadMessageAsync(source.Token);
+
+            if (message is null)
+            {
+                break;
+            }
+
+            switch (state)
+            {
+                case MinecraftClientState.Handshaking:
+                    await HandleHandshakingAsync(message);
+                    break;
+
+                case MinecraftClientState.Status:
+                    break;
+
+                case MinecraftClientState.Login:
+                    break;
+
+                case MinecraftClientState.Playing:
+                    break;
+
+                case MinecraftClientState.Disconnected:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 
     public async Task StopAsync()
@@ -43,6 +70,21 @@ internal sealed class MinecraftClient(
     {
         source.Dispose();
         await connection.DisposeAsync();
+    }
+
+    private async Task HandleHandshakingAsync(Message message)
+    {
+        var handshake = message.As<HandshakePacket>();
+
+        if (handshake.ProtocolVersion != MinecraftServer.ProtocolVersion
+            || handshake.NextState is not (MinecraftClientState.Status or MinecraftClientState.Login))
+        {
+            logger.LogDebug("Not supported protocol version or invalid next state");
+            await StopAsync();
+        }
+
+        state = handshake.NextState;
+        logger.LogDebug("Client switched state to {State}", state);
     }
 }
 

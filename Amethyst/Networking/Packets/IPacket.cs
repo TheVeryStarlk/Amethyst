@@ -2,7 +2,7 @@
 
 internal interface IPacket
 {
-    public int Identifier { get; }
+    public static abstract int Identifier { get; }
 }
 
 internal interface IIngoingPacket<out TSelf> : IPacket where TSelf : IIngoingPacket<TSelf>
