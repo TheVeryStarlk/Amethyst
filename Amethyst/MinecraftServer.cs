@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api;
 using Amethyst.Api.Components;
+using Amethyst.Api.Entities;
 using Amethyst.Hosting;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -47,9 +48,33 @@ internal sealed class MinecraftServer(
             await listener.UnbindAsync();
         }
 
-        var tasks = clients.Select(client => client.Value.StopAsync());
+        var reason = ChatMessage.Create("Server stopped", Color.Red);
+
+        var tasks = clients.Select(
+            client => client.Value.Player is not null
+                ? client.Value.Player!.DisconnectAsync(reason)
+                : client.Value.StopAsync());
+
         logger.LogDebug("Stopping clients");
         await Task.WhenAll(tasks);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        source.Dispose();
+
+        if (listener is not null)
+        {
+            await listener.DisposeAsync();
+        }
+
+        var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
+        await Task.WhenAll(tasks);
+    }
+
+    public async Task KickPlayer(IPlayer player, ChatMessage reason)
+    {
+        await player.DisconnectAsync(reason);
     }
 
     private async Task ListeningAsync()
@@ -123,18 +148,5 @@ internal sealed class MinecraftServer(
     {
         logger.LogInformation("Started ticking");
         return Task.CompletedTask;
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        source.Dispose();
-
-        if (listener is not null)
-        {
-            await listener.DisposeAsync();
-        }
-
-        var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
-        await Task.WhenAll(tasks);
     }
 }
