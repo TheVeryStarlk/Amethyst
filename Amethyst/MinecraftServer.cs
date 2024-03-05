@@ -18,6 +18,7 @@ internal sealed class MinecraftServer(
     public ServerStatus Status => ServerStatus.Create(
         nameof(Amethyst),
         ProtocolVersion,
+        Players.Count(),
         configuration.MaximumPlayerCount,
         configuration.Description);
 
@@ -157,6 +158,11 @@ internal sealed class MinecraftServer(
 
                 await client.StopAsync();
                 await client.DisposeAsync();
+
+                if (client.Player is not null)
+                {
+                    await BroadcastChatMessage(ChatMessage.Create($"{client.Player.Username} left the server", Color.Yellow));
+                }
             }
         }
     }
