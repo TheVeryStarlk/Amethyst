@@ -7,5 +7,9 @@ public interface IMinecraftServer : IAsyncDisposable
 {
     public ServerStatus Status { get; }
 
+    public IEnumerable<IPlayer> Players { get; }
+
+    public Task BroadcastChatMessage(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
+
     public Task KickPlayer(IPlayer player, ChatMessage reason);
 }

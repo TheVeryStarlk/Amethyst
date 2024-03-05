@@ -26,6 +26,8 @@ internal sealed class MinecraftClient(
 
     public Player? Player { get; private set; }
 
+    public CancellationToken CancellationToken => source.Token;
+
     private MinecraftClientState state;
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
@@ -166,28 +168,12 @@ internal sealed class MinecraftClient(
 
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
         state = MinecraftClientState.Playing;
-
-        await Transport.Output.WritePacketAsync(
-            new JoinGamePacket
-            {
-                Player = Player
-            },
-            source.Token);
-
-        await Transport.Output.WritePacketAsync(
-            new PlayerPositionAndLookPacket
-            {
-                Player = Player
-            },
-            source.Token);
+        await Player.JoinAsync();
     }
 
-    private async Task HandlePlayingAsync(Message message)
+    private Task HandlePlayingAsync(Message message)
     {
-        while (true)
-        {
-            
-        }
+        return Task.CompletedTask;
     }
 }
 

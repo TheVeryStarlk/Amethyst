@@ -20,6 +20,10 @@ internal sealed class MinecraftServer(
         configuration.MaximumPlayerCount,
         configuration.Description);
 
+    public IEnumerable<IPlayer> Players => clients
+        .Where(client => client.Value.Player is not null)
+        .Select(pair => pair.Value.Player!);
+
     private IConnectionListener? listener;
 
     private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
@@ -70,6 +74,14 @@ internal sealed class MinecraftServer(
 
         var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
         await Task.WhenAll(tasks);
+    }
+
+    public async Task BroadcastChatMessage(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
+    {
+        foreach (var player in Players)
+        {
+            await player.SendChatMessageAsync(message, position);
+        }
     }
 
     public async Task KickPlayer(IPlayer player, ChatMessage reason)

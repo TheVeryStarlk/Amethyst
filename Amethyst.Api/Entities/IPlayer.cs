@@ -13,6 +13,8 @@ public interface IPlayer : IEntity
 
     public GameMode GameMode { get; set; }
 
+    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
+
     public Task DisconnectAsync(ChatMessage reason);
 }
 
