@@ -34,7 +34,7 @@ internal ref struct MemoryReader(Memory<byte> memory)
         return result;
     }
 
-    public string ReadString()
+    public string ReadVariableString()
     {
         var length = ReadVariableInteger();
         var buffer = span[position..(position += length)];
@@ -44,5 +44,10 @@ internal ref struct MemoryReader(Memory<byte> memory)
     public ushort ReadUnsignedShort()
     {
         return BinaryPrimitives.ReadUInt16BigEndian(span[position..(position += sizeof(ushort))]);
+    }
+
+    public long ReadLong()
+    {
+        return BinaryPrimitives.ReadInt64BigEndian(span[position..(position += sizeof(long))]);
     }
 }

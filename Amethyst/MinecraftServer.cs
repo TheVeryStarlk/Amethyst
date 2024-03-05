@@ -75,6 +75,7 @@ internal sealed class MinecraftServer(
 
                 var client = new MinecraftClient(
                     loggerFactory.CreateLogger<MinecraftClient>(),
+                    this,
                     connection,
                     identifier);
 

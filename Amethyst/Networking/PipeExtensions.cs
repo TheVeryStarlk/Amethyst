@@ -18,7 +18,7 @@ internal static class PipeExtensions
 
             try
             {
-                if (TryParse(ref buffer, out var message))
+                if (TryRead(ref buffer, out var message))
                 {
                     consumed = buffer.Start;
                     examined = consumed;
@@ -45,7 +45,7 @@ internal static class PipeExtensions
 
         return null;
 
-        static bool TryParse(ref ReadOnlySequence<byte> buffer, [NotNullWhen(true)] out Message? message)
+        static bool TryRead(ref ReadOnlySequence<byte> buffer, [NotNullWhen(true)] out Message? message)
         {
             var reader = new SequenceReader<byte>(buffer);
             message = null;
@@ -69,9 +69,21 @@ internal static class PipeExtensions
         }
     }
 
-    public static Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet, CancellationToken token)
+    public static async Task WritePacketAsync<T>(this PipeWriter writer, T packet, CancellationToken token)
+        where T : IOutgoingPacket
     {
-        throw new NotImplementedException();
+        writer.Advance(Write(packet, writer.GetMemory()));
+        await writer.FlushAsync(token);
+        return;
+
+        static int Write(T packet, Memory<byte> memory)
+        {
+            var writer = new MemoryWriter(memory);
+            writer.WriteVariableInteger(VariableIntegerHelper.GetBytesCount(T.Identifier) + packet.CalculateLength());
+            writer.WriteVariableInteger(T.Identifier);
+            packet.Write(ref writer);
+            return writer.Position;
+        }
     }
 }
 

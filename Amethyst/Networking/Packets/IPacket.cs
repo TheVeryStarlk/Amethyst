@@ -12,5 +12,7 @@ internal interface IIngoingPacket<out TSelf> : IPacket where TSelf : IIngoingPac
 
 internal interface IOutgoingPacket : IPacket
 {
+    public int CalculateLength();
+
     public int Write(ref MemoryWriter writer);
 }

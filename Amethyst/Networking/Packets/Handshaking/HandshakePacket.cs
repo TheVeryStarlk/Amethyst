@@ -17,7 +17,7 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
         return new HandshakePacket
         {
             ProtocolVersion = reader.ReadVariableInteger(),
-            Address = reader.ReadString(),
+            Address = reader.ReadVariableString(),
             Port = reader.ReadUnsignedShort(),
             NextState = (MinecraftClientState) reader.ReadVariableInteger()
         };

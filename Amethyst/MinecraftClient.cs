@@ -1,5 +1,7 @@
-﻿using Amethyst.Networking;
+﻿using Amethyst.Api;
+using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
+using Amethyst.Networking.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -7,6 +9,7 @@ namespace Amethyst;
 
 internal sealed class MinecraftClient(
     ILogger<MinecraftClient> logger,
+    IMinecraftServer server,
     ConnectionContext connection,
     int identifier) : IAsyncDisposable
 {
@@ -34,6 +37,7 @@ internal sealed class MinecraftClient(
                     break;
 
                 case MinecraftClientState.Status:
+                    await HandleStatusAsync(message);
                     break;
 
                 case MinecraftClientState.Login:
@@ -77,14 +81,48 @@ internal sealed class MinecraftClient(
         var handshake = message.As<HandshakePacket>();
 
         if (handshake.ProtocolVersion != MinecraftServer.ProtocolVersion
-            || handshake.NextState is not (MinecraftClientState.Status or MinecraftClientState.Login))
+            && handshake.NextState is MinecraftClientState.Login)
         {
-            logger.LogDebug("Not supported protocol version or invalid next state");
+            logger.LogDebug("Not supported protocol version");
             await StopAsync();
+            return;
         }
 
         state = handshake.NextState;
         logger.LogDebug("Client switched state to {State}", state);
+    }
+
+    private async Task HandleStatusAsync(Message message)
+    {
+        if (message.Identifier == StatusRequestPacket.Identifier)
+        {
+            await connection.Transport.Output.WritePacketAsync(
+                new StatusResponsePacket
+                {
+                    Status = server.Status
+                },
+                source.Token);
+
+            return;
+        }
+
+        if (message.Identifier == PingRequestPacket.Identifier)
+        {
+            var ping = message.As<PingRequestPacket>();
+
+            await connection.Transport.Output.WritePacketAsync(
+                new PongResponsePacket
+                {
+                    Payload = ping.Payload
+                },
+                source.Token);
+        }
+        else
+        {
+            logger.LogDebug("Unknown packet while handling status");
+        }
+
+        await StopAsync();
     }
 }
 
