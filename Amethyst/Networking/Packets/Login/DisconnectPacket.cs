@@ -5,7 +5,7 @@ namespace Amethyst.Networking.Packets.Login;
 
 internal sealed class DisconnectPacket: IOutgoingPacket
 {
-    public static int Identifier => 0x00;
+    public int Identifier => 0x00;
 
     public required ChatMessage Reason { get; init; }
 

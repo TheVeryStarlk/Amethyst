@@ -7,7 +7,7 @@ namespace Amethyst.Networking.Packets.Status;
 
 internal sealed class StatusResponsePacket : IOutgoingPacket
 {
-    public static int Identifier => 0x00;
+    public int Identifier => 0x00;
 
     public required ServerStatus Status { get; init; }
 

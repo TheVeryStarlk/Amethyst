@@ -3,9 +3,11 @@ using Amethyst.Networking.Packets.Status;
 
 namespace Amethyst.Networking.Packets.Playing;
 
-internal sealed class ChatMessagePacket : IOutgoingPacket
+internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOutgoingPacket
 {
-    public static int Identifier => 0x02;
+    static int IIngoingPacket<ChatMessagePacket>.Identifier => 0x01;
+
+    public int Identifier => 0x02;
 
     public required ChatMessage Message { get; init; }
 
@@ -24,5 +26,19 @@ internal sealed class ChatMessagePacket : IOutgoingPacket
         writer.WriteVariableString(serializedMessage!);
         writer.WriteByte((byte) Position);
         return writer.Position;
+    }
+
+    public static ChatMessagePacket Read(MemoryReader reader)
+    {
+        return new ChatMessagePacket
+        {
+            Message = ChatMessage.Create(reader.ReadVariableString()),
+            Position = ChatMessagePosition.Box,
+        };
+    }
+
+    public async Task HandleAsync(MinecraftClient client)
+    {
+        await client.Server.BroadcastChatMessage(ChatMessage.Create($"{client.Player!.Username}: {Message.Text}"));
     }
 }

@@ -2,7 +2,7 @@
 
 internal sealed class LoginSuccessPacket : IOutgoingPacket
 {
-    public static int Identifier => 0x02;
+    public int Identifier => 0x02;
 
     public required Guid Guid { get; init; }
 

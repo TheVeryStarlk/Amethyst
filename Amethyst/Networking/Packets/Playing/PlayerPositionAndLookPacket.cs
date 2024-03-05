@@ -4,7 +4,7 @@ namespace Amethyst.Networking.Packets.Playing;
 
 internal sealed class PlayerPositionAndLookPacket : IOutgoingPacket
 {
-    public static int Identifier => 0x08;
+    public int Identifier => 0x08;
 
     public required IPlayer Player { get; init; }
 

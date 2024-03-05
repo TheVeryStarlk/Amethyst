@@ -5,7 +5,7 @@ namespace Amethyst.Networking.Packets.Playing;
 
 internal sealed class JoinGamePacket : IOutgoingPacket
 {
-    public static int Identifier => 0x01;
+    public int Identifier => 0x01;
 
     public required IPlayer Player { get; init; }
 

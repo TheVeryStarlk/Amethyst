@@ -42,9 +42,15 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
         await Server.BroadcastChatMessage(ChatMessage.Create($"{Username} has joined the server", Color.Yellow));
     }
 
-    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
+    public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
-        throw new NotImplementedException();
+        await client.Transport.Output.WritePacketAsync(
+            new ChatMessagePacket
+            {
+                Message = message,
+                Position = position
+            },
+            client.CancellationToken);
     }
 
     public async Task DisconnectAsync(ChatMessage reason)

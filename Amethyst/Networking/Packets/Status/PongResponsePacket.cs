@@ -2,7 +2,7 @@
 
 internal sealed class PongResponsePacket: IOutgoingPacket
 {
-    public static int Identifier => 0x01;
+    public int Identifier => 0x01;
 
     public required long Payload { get; init; }
 

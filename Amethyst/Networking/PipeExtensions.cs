@@ -69,18 +69,17 @@ internal static class PipeExtensions
         }
     }
 
-    public static async Task WritePacketAsync<T>(this PipeWriter writer, T packet, CancellationToken token)
-        where T : IOutgoingPacket
+    public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet, CancellationToken token)
     {
         writer.Advance(Write(packet, writer.GetMemory()));
         await writer.FlushAsync(token);
         return;
 
-        static int Write(T packet, Memory<byte> memory)
+        static int Write(IOutgoingPacket packet, Memory<byte> memory)
         {
             var writer = new MemoryWriter(memory);
-            writer.WriteVariableInteger(VariableIntegerHelper.GetBytesCount(T.Identifier) + packet.CalculateLength());
-            writer.WriteVariableInteger(T.Identifier);
+            writer.WriteVariableInteger(VariableIntegerHelper.GetBytesCount(packet.Identifier) + packet.CalculateLength());
+            writer.WriteVariableInteger(packet.Identifier);
             packet.Write(ref writer);
             return writer.Position;
         }
