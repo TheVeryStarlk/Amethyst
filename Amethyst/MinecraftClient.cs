@@ -94,7 +94,7 @@ internal sealed class MinecraftClient(
                         handshake.ProtocolVersion > MinecraftServer.ProtocolVersion
                             ? "Outdated server"
                             : "Outdated client",
-                        color: Color.Red)
+                        Color.Red)
                 },
                 source.Token);
 

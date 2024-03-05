@@ -10,7 +10,7 @@ await Host
     .ConfigureMinecraftServer((_, configuration) =>
     {
         configuration.ListeningEndPoint = new IPEndPoint(IPAddress.Any, 25565);
-        configuration.Description = ChatMessage.Create("Hello, world!", color: Color.LightPurple);
+        configuration.Description = ChatMessage.Create("Hello, world!", Color.LightPurple);
         configuration.MaximumPlayerCount = 10;
     })
     .RunConsoleAsync();
