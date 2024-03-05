@@ -1,6 +1,8 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
+using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -84,6 +86,18 @@ internal sealed class MinecraftClient(
             && handshake.NextState is MinecraftClientState.Login)
         {
             logger.LogDebug("Not supported protocol version");
+
+            await connection.Transport.Output.WritePacketAsync(
+                new DisconnectPacket
+                {
+                    Reason = ChatMessage.Create(
+                        handshake.ProtocolVersion > MinecraftServer.ProtocolVersion
+                            ? "Outdated server"
+                            : "Outdated client",
+                        color: Color.Red)
+                },
+                source.Token);
+
             await StopAsync();
             return;
         }
