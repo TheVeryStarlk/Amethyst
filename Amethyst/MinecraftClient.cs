@@ -5,6 +5,7 @@ using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
+using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ internal sealed class MinecraftClient(
     {
         while (!source.IsCancellationRequested)
         {
-            var message = await Transport.Input.ReadMessageAsync(source.Token);
+            var message = await Transport.Input.ReadMessageAsync(CancellationToken);
 
             if (message is null)
             {
@@ -108,7 +109,7 @@ internal sealed class MinecraftClient(
                             : "Outdated client",
                         Color.Red)
                 },
-                source.Token);
+                CancellationToken);
 
             await StopAsync();
             return;
@@ -127,7 +128,7 @@ internal sealed class MinecraftClient(
                 {
                     Status = server.Status
                 },
-                source.Token);
+                CancellationToken);
 
             return;
         }
@@ -141,7 +142,7 @@ internal sealed class MinecraftClient(
                 {
                     Payload = ping.Payload
                 },
-                source.Token);
+                CancellationToken);
         }
         else
         {
@@ -163,16 +164,36 @@ internal sealed class MinecraftClient(
                 Guid = Player.Guid,
                 Username = Player.Username
             },
-            source.Token);
+            CancellationToken);
 
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
         state = MinecraftClientState.Playing;
         await Player.JoinAsync();
     }
 
-    private Task HandlePlayingAsync(Message message)
+    private async Task HandlePlayingAsync(Message message)
     {
-        return Task.CompletedTask;
+        switch (message.Identifier)
+        {
+            case 0x01:
+                await message.As<ChatMessagePacket>().HandleAsync(this);
+                break;
+        }
+    }
+
+    public async Task HandleKeepAliveAsync()
+    {
+        if (state is not MinecraftClientState.Playing)
+        {
+            return;
+        }
+
+        await Transport.Output.WritePacketAsync(
+            new KeepAlivePacket
+            {
+                Payload = Random.Shared.Next()
+            },
+            CancellationToken);
     }
 }
 

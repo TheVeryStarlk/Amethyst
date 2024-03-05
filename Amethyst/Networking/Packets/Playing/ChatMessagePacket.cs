@@ -15,6 +15,15 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
 
     private string? serializedMessage;
 
+    public static ChatMessagePacket Read(MemoryReader reader)
+    {
+        return new ChatMessagePacket
+        {
+            Message = ChatMessage.Create(reader.ReadVariableString()),
+            Position = ChatMessagePosition.Box,
+        };
+    }
+
     public int CalculateLength()
     {
         serializedMessage = Message.Serialize();
@@ -26,15 +35,6 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
         writer.WriteVariableString(serializedMessage!);
         writer.WriteByte((byte) Position);
         return writer.Position;
-    }
-
-    public static ChatMessagePacket Read(MemoryReader reader)
-    {
-        return new ChatMessagePacket
-        {
-            Message = ChatMessage.Create(reader.ReadVariableString()),
-            Position = ChatMessagePosition.Box,
-        };
     }
 
     public async Task HandleAsync(MinecraftClient client)

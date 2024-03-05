@@ -1,4 +1,5 @@
-﻿using Amethyst.Api;
+﻿using System.Diagnostics;
+using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Hosting;
@@ -160,9 +161,63 @@ internal sealed class MinecraftServer(
         }
     }
 
-    private Task TickingAsync()
+    private async Task TickingAsync()
     {
         logger.LogInformation("Started ticking");
-        return Task.CompletedTask;
+
+        var keepAliveTicks = 0;
+        var timer = new BalancingTimer(50, source.Token);
+
+        while (await timer.WaitForNextTickAsync())
+        {
+            try
+            {
+                keepAliveTicks++;
+
+                if (keepAliveTicks == 50)
+                {
+                    keepAliveTicks = 0;
+
+                    var tasks = clients.Select(client => client.Value.HandleKeepAliveAsync());
+                    await Task.WhenAll(tasks);
+                }
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
+                logger.LogError(
+                    "Unexpected exception while ticking: \"{Message}\"",
+                    exception.Message);
+            }
+        }
+    }
+}
+
+internal sealed class BalancingTimer(int milliseconds, CancellationToken cancellationToken)
+{
+    private long delay;
+
+    private readonly Stopwatch stopwatch = new Stopwatch();
+    private readonly long ticksInterval = milliseconds * Stopwatch.Frequency / 1000L;
+
+    public async ValueTask<bool> WaitForNextTickAsync()
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return false;
+        }
+
+        var delta = stopwatch.ElapsedTicks;
+        stopwatch.Restart();
+
+        delay += delta - ticksInterval;
+
+        if (delay >= 0)
+        {
+            return true;
+        }
+
+        var extraMilliseconds = (int) (-delay * 1000L / Stopwatch.Frequency);
+        await Task.Delay(extraMilliseconds, cancellationToken);
+        return true;
     }
 }
