@@ -16,7 +16,6 @@ public sealed class ServerStatus
     public static ServerStatus Create(
         string name,
         int protocol,
-        int online,
         int max,
         ChatMessage description)
     {
@@ -31,7 +30,7 @@ public sealed class ServerStatus
             PlayerInformation = new PlayerInformation
             {
                 Max = max,
-                Online = online
+                Online = 0
             },
 
             Description = description,

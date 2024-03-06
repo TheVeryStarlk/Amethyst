@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Connections;
+﻿using Amethyst.Plugin;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,12 +18,14 @@ public static class HostBuilderExtensions
             var configuration = new MinecraftServerConfiguration();
             configure.Invoke(context, configuration);
 
+            services.AddSingleton<PluginService>();
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
 
             services.AddTransient(provider => new MinecraftServer(
                 configuration,
                 provider.GetRequiredService<IConnectionListenerFactory>(),
-                provider.GetRequiredService<ILoggerFactory>()));
+                provider.GetRequiredService<ILoggerFactory>(),
+                provider.GetRequiredService<PluginService>()));
 
             services.AddHostedService<MinecraftServerService>();
         });

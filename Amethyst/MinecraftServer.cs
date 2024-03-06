@@ -3,6 +3,7 @@ using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Hosting;
+using Amethyst.Plugin;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -11,20 +12,22 @@ namespace Amethyst;
 internal sealed class MinecraftServer(
     MinecraftServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
-    ILoggerFactory loggerFactory) : IMinecraftServer
+    ILoggerFactory loggerFactory,
+    PluginService pluginService) : IMinecraftServer
 {
     public const int ProtocolVersion = 47;
 
-    public ServerStatus Status => ServerStatus.Create(
+    public ServerStatus Status { get; } = ServerStatus.Create(
         nameof(Amethyst),
         ProtocolVersion,
-        Players.Count(),
         configuration.MaximumPlayerCount,
         configuration.Description);
 
     public IEnumerable<IPlayer> Players => clients
         .Where(client => client.Value.Player is not null)
         .Select(pair => pair.Value.Player!);
+
+    public PluginService PluginService => pluginService;
 
     private IConnectionListener? listener;
 
@@ -38,6 +41,8 @@ internal sealed class MinecraftServer(
         {
             throw new InvalidOperationException("Server has already started.");
         }
+
+        pluginService.Load();
 
         logger.LogInformation("Starting the server tasks");
         return Task.WhenAll(ListeningAsync(), TickingAsync());
@@ -73,6 +78,8 @@ internal sealed class MinecraftServer(
         {
             await listener.DisposeAsync();
         }
+
+        await pluginService.DisposeAsync();
 
         var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
         await Task.WhenAll(tasks);
@@ -163,6 +170,7 @@ internal sealed class MinecraftServer(
 
                 if (client.Player is not null)
                 {
+                    client.Server.Status.PlayerInformation.Online--;
                     await BroadcastChatMessage(ChatMessage.Create($"{client.Player.Username} left the server", Color.Yellow));
                 }
             }

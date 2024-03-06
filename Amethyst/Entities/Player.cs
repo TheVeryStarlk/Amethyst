@@ -40,6 +40,7 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             client.CancellationToken);
 
         await Server.BroadcastChatMessage(ChatMessage.Create($"{Username} has joined the server", Color.Yellow));
+        client.Server.Status.PlayerInformation.Online++;
     }
 
     public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)

@@ -1,6 +1,7 @@
 ﻿using System.IO.Pipelines;
 using Amethyst.Api;
 using Amethyst.Api.Components;
+using Amethyst.Api.Plugin.Events;
 using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
@@ -14,7 +15,7 @@ namespace Amethyst;
 
 internal sealed class MinecraftClient(
     ILogger<MinecraftClient> logger,
-    IMinecraftServer server,
+    MinecraftServer server,
     ConnectionContext connection,
     int identifier) : IAsyncDisposable
 {
@@ -123,6 +124,15 @@ internal sealed class MinecraftClient(
     {
         if (message.Identifier == StatusRequestPacket.Identifier)
         {
+            var eventArgs = new DescriptionRequestedEventArgs
+            {
+                Server = server,
+                Description = server.Status.Description
+            };
+
+            await server.PluginService.ExecuteEventAsync(eventArgs);
+            server.Status.Description = eventArgs.Description;
+
             await Transport.Output.WritePacketAsync(
                 new StatusResponsePacket
                 {
