@@ -61,12 +61,13 @@ internal sealed class MinecraftServer(
 
         var reason = ChatMessage.Create("Server stopped", Color.Red);
 
+        logger.LogDebug("Stopping clients");
+
         var tasks = clients.Select(
             client => client.Value.Player is not null
                 ? KickPlayerAsync(client.Value.Player, reason)
                 : client.Value.StopAsync());
 
-        logger.LogDebug("Stopping clients");
         await Task.WhenAll(tasks);
     }
 
