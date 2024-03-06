@@ -144,7 +144,6 @@ internal sealed class MinecraftClient(
                 Description = server.Status.Description
             });
 
-            await server.PluginService.ExecuteEventAsync(eventArgs);
             server.Status.Description = eventArgs.Description;
 
             await Transport.Output.WritePacketAsync(

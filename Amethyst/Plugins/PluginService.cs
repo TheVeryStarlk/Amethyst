@@ -1,21 +1,25 @@
 ﻿using System.Reflection;
 using Amethyst.Api.Plugins;
-using Amethyst.Api.Plugins.Events;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Plugins;
 
 internal sealed class PluginService : IAsyncDisposable
 {
-    public HashSet<EventWrapper> Events { get; } = [];
+    public CommandService CommandService { get; }
+
+    public EventService EventService { get; }
 
     private readonly HashSet<PluginBase> plugins = [];
     private readonly ILogger<PluginService> logger;
     private readonly IPluginRegistry registry;
 
-    public PluginService(ILogger<PluginService> logger)
+    public PluginService(ILogger<PluginService> logger, CommandService commandService, EventService eventService)
     {
         this.logger = logger;
+
+        CommandService = commandService;
+        EventService = eventService;
         registry = new PluginRegistry(this);
     }
 
@@ -46,14 +50,6 @@ internal sealed class PluginService : IAsyncDisposable
         }
 
         logger.LogInformation("Finished loading plugins");
-    }
-
-    public async Task ExecuteEventAsync<T>(T eventArgs) where T : MinecraftEventArgsBase
-    {
-        foreach (var @event in Events.Where(@event => @event.EventArgs == typeof(T)))
-        {
-            await (Task) @event.Delegate.DynamicInvoke(eventArgs)!;
-        }
     }
 
     public async ValueTask DisposeAsync()

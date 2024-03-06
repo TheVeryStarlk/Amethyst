@@ -2,7 +2,6 @@
 using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
-using Amethyst.Commands;
 using Amethyst.Hosting;
 using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
@@ -14,8 +13,7 @@ internal sealed class MinecraftServer(
     MinecraftServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
-    PluginService pluginService,
-    CommandService commandService) : IMinecraftServer
+    PluginService pluginService) : IMinecraftServer
 {
     public const int ProtocolVersion = 47;
 
@@ -31,8 +29,6 @@ internal sealed class MinecraftServer(
 
     public PluginService PluginService => pluginService;
 
-    public CommandService CommandService => commandService;
-
     private IConnectionListener? listener;
 
     private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
@@ -47,7 +43,6 @@ internal sealed class MinecraftServer(
         }
 
         pluginService.Load();
-        commandService.Load();
 
         logger.LogInformation("Starting the server tasks");
         return Task.WhenAll(ListeningAsync(), TickingAsync());
@@ -86,7 +81,6 @@ internal sealed class MinecraftServer(
         }
 
         await pluginService.DisposeAsync();
-        await commandService.DisposeAsync();
 
         var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
         await Task.WhenAll(tasks);
