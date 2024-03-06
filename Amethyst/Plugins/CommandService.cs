@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Plugins;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Plugins;
@@ -33,7 +34,12 @@ internal sealed class CommandService(ILogger<CommandService> logger)
 
         foreach (var command in predicate)
         {
-            await (Task) command.Delegate.DynamicInvoke()!;
+            await (Task) command.Delegate.DynamicInvoke(new CommandContext
+            {
+                Player = player,
+                Name = split[0],
+                Arguments = split[1..]
+            })!;
         }
     }
 }

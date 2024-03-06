@@ -8,5 +8,5 @@ public sealed class CommandContext
 
     public required string Name { get; init; }
 
-    public string[]? Arguments { get; init; }
+    public string[] Arguments { get; init; } = Array.Empty<string>();
 }
