@@ -5,6 +5,7 @@ using Amethyst.Api.Entities;
 using Amethyst.Api.Plugin.Events;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Playing;
+using Amethyst.Plugin;
 
 namespace Amethyst.Entities;
 
@@ -40,15 +41,16 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             },
             client.CancellationToken);
 
-        var eventArgs = new PlayerJoinedEventArgs
+        Server.Status.PlayerInformation.Online++;
+
+        var eventArgs = await client.Server.PluginService.ExecuteAsync(new PlayerJoinedEventArgs
         {
             Server = client.Server,
             Player = this,
             Message = ChatMessage.Create($"{Username} has joined the server", Color.Yellow)
-        };
+        });
 
         await Server.BroadcastChatMessage(eventArgs.Message);
-        Server.Status.PlayerInformation.Online++;
     }
 
     public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
@@ -76,15 +78,16 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
 
     public async Task DisconnectAsync()
     {
-        var eventArgs = new PlayerLeaveEventArgs
+        Server.Status.PlayerInformation.Online--;
+
+        var eventArgs = await client.Server.PluginService.ExecuteAsync(new PlayerLeaveEventArgs
         {
             Server = client.Server,
             Player = this,
             Message = ChatMessage.Create($"{Username} has left the server", Color.Yellow)
-        };
+        });
 
         await Server.BroadcastChatMessage(eventArgs.Message);
-        Server.Status.PlayerInformation.Online--;
         await client.StopAsync();
     }
 }

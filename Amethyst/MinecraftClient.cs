@@ -1,5 +1,4 @@
 ﻿using System.IO.Pipelines;
-using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Plugin.Events;
 using Amethyst.Entities;
@@ -8,6 +7,7 @@ using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
+using Amethyst.Plugin;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +21,7 @@ internal sealed class MinecraftClient(
 {
     public int Identifier => identifier;
 
-    public IMinecraftServer Server => server;
+    public MinecraftServer Server => server;
 
     public IDuplexPipe Transport => connection.Transport;
 
@@ -124,11 +124,11 @@ internal sealed class MinecraftClient(
     {
         if (message.Identifier == StatusRequestPacket.Identifier)
         {
-            var eventArgs = new DescriptionRequestedEventArgs
+            var eventArgs = await server.PluginService.ExecuteAsync(new DescriptionRequestedEventArgs
             {
                 Server = server,
                 Description = server.Status.Description
-            };
+            });
 
             await server.PluginService.ExecuteEventAsync(eventArgs);
             server.Status.Description = eventArgs.Description;
