@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
-using Amethyst.Api.Plugin;
-using Amethyst.Api.Plugin.Events;
+using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Events;
 using Microsoft.Extensions.Logging;
 
-namespace Amethyst.Plugin;
+namespace Amethyst.Plugins;
 
 internal sealed class PluginService : IAsyncDisposable
 {

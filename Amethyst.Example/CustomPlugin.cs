@@ -1,6 +1,6 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Api.Plugin;
-using Amethyst.Api.Plugin.Events;
+using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Events;
 
 namespace Amethyst.Example;
 

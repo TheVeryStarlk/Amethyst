@@ -1,6 +1,6 @@
 ﻿using Amethyst.Api.Components;
 
-namespace Amethyst.Api.Plugin.Events;
+namespace Amethyst.Api.Plugins.Events;
 
 public sealed class DescriptionRequestedEventArgs : MinecraftEventArgsBase
 {

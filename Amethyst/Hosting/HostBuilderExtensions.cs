@@ -1,4 +1,4 @@
-﻿using Amethyst.Plugin;
+﻿using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.DependencyInjection;

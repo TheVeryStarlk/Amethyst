@@ -3,7 +3,7 @@ using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Hosting;
-using Amethyst.Plugin;
+using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 

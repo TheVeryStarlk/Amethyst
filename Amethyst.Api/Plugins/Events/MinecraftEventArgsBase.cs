@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Api.Plugin.Events;
+﻿namespace Amethyst.Api.Plugins.Events;
 
 public abstract class MinecraftEventArgsBase
 {

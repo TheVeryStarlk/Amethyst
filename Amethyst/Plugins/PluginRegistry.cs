@@ -1,7 +1,7 @@
-﻿using Amethyst.Api.Plugin;
-using Amethyst.Api.Plugin.Events;
+﻿using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Events;
 
-namespace Amethyst.Plugin;
+namespace Amethyst.Plugins;
 
 internal sealed class PluginRegistry(PluginService pluginService) : IPluginRegistry
 {

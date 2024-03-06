@@ -1,6 +1,6 @@
-﻿using Amethyst.Api.Plugin.Events;
+﻿using Amethyst.Api.Plugins.Events;
 
-namespace Amethyst.Api.Plugin;
+namespace Amethyst.Api.Plugins;
 
 public interface IPluginRegistry
 {

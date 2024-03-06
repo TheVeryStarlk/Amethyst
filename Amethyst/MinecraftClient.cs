@@ -1,13 +1,13 @@
 ﻿using System.IO.Pipelines;
 using Amethyst.Api.Components;
-using Amethyst.Api.Plugin.Events;
+using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
-using Amethyst.Plugin;
+using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 

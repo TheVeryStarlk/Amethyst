@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Api.Plugin;
+﻿namespace Amethyst.Api.Plugins;
 
 public sealed class PluginConfiguration
 {

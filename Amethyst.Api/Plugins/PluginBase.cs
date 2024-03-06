@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Api.Plugin;
+﻿namespace Amethyst.Api.Plugins;
 
 public abstract class PluginBase : IAsyncDisposable
 {
