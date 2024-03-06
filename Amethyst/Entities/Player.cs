@@ -31,15 +31,13 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             new JoinGamePacket
             {
                 Player = this
-            },
-            client.CancellationToken);
+            });
 
         await client.Transport.Output.WritePacketAsync(
             new PlayerPositionAndLookPacket
             {
                 Player = this
-            },
-            client.CancellationToken);
+            });
 
         Server.Status.PlayerInformation.Online++;
 
@@ -60,8 +58,7 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             {
                 Message = message,
                 Position = position
-            },
-            client.CancellationToken);
+            });
     }
 
     public async Task KickAsync(ChatMessage reason)
@@ -70,8 +67,7 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             new DisconnectPacket(MinecraftClientState.Playing)
             {
                 Reason = reason
-            },
-            client.CancellationToken);
+            });
 
         await DisconnectAsync();
     }

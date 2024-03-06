@@ -102,8 +102,7 @@ internal sealed class MinecraftClient(
             new KeepAlivePacket
             {
                 Payload = Random.Shared.Next()
-            },
-            CancellationToken);
+            });
     }
 
     private async Task HandleHandshakingAsync(Message message)
@@ -123,8 +122,7 @@ internal sealed class MinecraftClient(
                             ? "Outdated server"
                             : "Outdated client",
                         Color.Red)
-                },
-                CancellationToken);
+                });
 
             await StopAsync();
             return;
@@ -150,8 +148,7 @@ internal sealed class MinecraftClient(
                 new StatusResponsePacket
                 {
                     Status = server.Status
-                },
-                CancellationToken);
+                });
 
             return;
         }
@@ -164,8 +161,7 @@ internal sealed class MinecraftClient(
                 new PongResponsePacket
                 {
                     Payload = ping.Payload
-                },
-                CancellationToken);
+                });
         }
         else
         {
@@ -186,8 +182,7 @@ internal sealed class MinecraftClient(
             {
                 Guid = Player.Guid,
                 Username = Player.Username
-            },
-            CancellationToken);
+            });
 
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
         State = MinecraftClientState.Playing;

@@ -69,10 +69,10 @@ internal static class PipeExtensions
         }
     }
 
-    public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet, CancellationToken token)
+    public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet)
     {
         writer.Advance(Write(packet, writer.GetMemory()));
-        await writer.FlushAsync(token);
+        await writer.FlushAsync();
         return;
 
         static int Write(IOutgoingPacket packet, Memory<byte> memory)
