@@ -78,6 +78,11 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
 
     public async Task DisconnectAsync()
     {
+        if (client.State is MinecraftClientState.Disconnected)
+        {
+            return;
+        }
+
         Server.Status.PlayerInformation.Online--;
 
         var eventArgs = await client.Server.PluginService.ExecuteAsync(new PlayerLeaveEventArgs

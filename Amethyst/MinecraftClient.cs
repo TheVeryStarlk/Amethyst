@@ -25,11 +25,11 @@ internal sealed class MinecraftClient(
 
     public IDuplexPipe Transport => connection.Transport;
 
-    public Player? Player { get; private set; }
-
     public CancellationToken CancellationToken => source.Token;
 
-    private MinecraftClientState state;
+    public Player? Player { get; private set; }
+
+    public MinecraftClientState State { get; private set; }
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
@@ -44,7 +44,7 @@ internal sealed class MinecraftClient(
                 break;
             }
 
-            switch (state)
+            switch (State)
             {
                 case MinecraftClientState.Handshaking:
                     await HandleHandshakingAsync(message);
@@ -73,23 +73,37 @@ internal sealed class MinecraftClient(
 
     public async Task StopAsync()
     {
-        if (state is MinecraftClientState.Disconnected)
+        if (State is MinecraftClientState.Disconnected)
         {
             return;
         }
 
-        logger.LogDebug("Stopping client");
+        State = MinecraftClientState.Disconnected;
 
+        logger.LogDebug("Stopping client");
         await source.CancelAsync();
         connection.Abort();
-
-        state = MinecraftClientState.Disconnected;
     }
 
     public async ValueTask DisposeAsync()
     {
         source.Dispose();
         await connection.DisposeAsync();
+    }
+
+    public async Task HandleKeepAliveAsync()
+    {
+        if (State is not MinecraftClientState.Playing)
+        {
+            return;
+        }
+
+        await Transport.Output.WritePacketAsync(
+            new KeepAlivePacket
+            {
+                Payload = Random.Shared.Next()
+            },
+            CancellationToken);
     }
 
     private async Task HandleHandshakingAsync(Message message)
@@ -116,8 +130,8 @@ internal sealed class MinecraftClient(
             return;
         }
 
-        state = handshake.NextState;
-        logger.LogDebug("Client switched state to {State}", state);
+        State = handshake.NextState;
+        logger.LogDebug("Client switched state to {State}", State);
     }
 
     private async Task HandleStatusAsync(Message message)
@@ -177,7 +191,7 @@ internal sealed class MinecraftClient(
             CancellationToken);
 
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
-        state = MinecraftClientState.Playing;
+        State = MinecraftClientState.Playing;
         await Player.JoinAsync();
     }
 
@@ -189,21 +203,6 @@ internal sealed class MinecraftClient(
                 await message.As<ChatMessagePacket>().HandleAsync(this);
                 break;
         }
-    }
-
-    public async Task HandleKeepAliveAsync()
-    {
-        if (state is not MinecraftClientState.Playing)
-        {
-            return;
-        }
-
-        await Transport.Output.WritePacketAsync(
-            new KeepAlivePacket
-            {
-                Payload = Random.Shared.Next()
-            },
-            CancellationToken);
     }
 }
 
