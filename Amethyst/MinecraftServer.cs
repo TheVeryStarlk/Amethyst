@@ -101,7 +101,7 @@ internal sealed class MinecraftServer(
             player.Username,
             reason.Text);
 
-        await player.DisconnectAsync(reason);
+        await player.KickAsync(reason);
     }
 
     private async Task ListeningAsync()
@@ -165,14 +165,16 @@ internal sealed class MinecraftServer(
                 logger.LogDebug("Removing client");
                 clients.Remove(client.Identifier);
 
-                await client.StopAsync();
-                await client.DisposeAsync();
-
                 if (client.Player is not null)
                 {
-                    client.Server.Status.PlayerInformation.Online--;
-                    await BroadcastChatMessage(ChatMessage.Create($"{client.Player.Username} left the server", Color.Yellow));
+                    await client.Player.DisconnectAsync();
                 }
+                else
+                {
+                    await client.StopAsync();
+                }
+
+                await client.DisposeAsync();
             }
         }
     }
