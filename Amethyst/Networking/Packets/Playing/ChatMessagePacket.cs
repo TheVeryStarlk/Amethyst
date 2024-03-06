@@ -39,6 +39,16 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
 
     public async Task HandleAsync(MinecraftClient client)
     {
-        await client.Server.BroadcastChatMessage(ChatMessage.Create($"{client.Player!.Username}: {Message.Text}"));
+        if (Message.Text.StartsWith('/'))
+        {
+            await client.Server.PluginService.CommandService.ExecuteCommandAsync(
+                client.Player!,
+                Message.Text[1..]);
+        }
+        else
+        {
+            await client.Server.BroadcastChatMessage(
+                ChatMessage.Create($"{client.Player!.Username}: {Message.Text}"));
+        }
     }
 }
