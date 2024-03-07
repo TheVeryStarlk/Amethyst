@@ -13,4 +13,13 @@ internal sealed class PingRequestPacket : IIngoingPacket<PingRequestPacket>
             Payload = reader.ReadLong()
         };
     }
+
+    public async Task HandleAsync(MinecraftClient client)
+    {
+        await client.Transport.Output.WritePacketAsync(
+            new PongResponsePacket
+            {
+                Payload = Payload
+            });
+    }
 }

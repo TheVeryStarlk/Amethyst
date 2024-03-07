@@ -17,9 +17,7 @@ public interface IPlayer : IEntity
 
     public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
 
-    public Task KickAsync(ChatMessage reason);
-
-    public Task DisconnectAsync();
+    public Task DisconnectAsync(ChatMessage reason);
 }
 
 public enum GameMode

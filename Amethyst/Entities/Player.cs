@@ -11,45 +11,19 @@ namespace Amethyst.Entities;
 
 internal sealed class Player(MinecraftClient client, string username) : IPlayer
 {
-    public string Username => username;
+    public Guid Guid { get; } = Guid.NewGuid();
 
     public int Identifier { get; } = Random.Shared.Next();
 
-    public Guid Guid { get; } = Guid.NewGuid();
-
     public IMinecraftServer Server => client.Server;
+
+    public string Username => username;
 
     public Vector3 Position { get; set; }
 
     public Vector2 Rotation { get; set; }
 
     public GameMode GameMode { get; set; }
-
-    public async Task JoinAsync()
-    {
-        await client.Transport.Output.WritePacketAsync(
-            new JoinGamePacket
-            {
-                Player = this
-            });
-
-        await client.Transport.Output.WritePacketAsync(
-            new PlayerPositionAndLookPacket
-            {
-                Player = this
-            });
-
-        Server.Status.PlayerInformation.Online++;
-
-        var eventArgs = await client.Server.PluginService.ExecuteAsync(new PlayerJoinedEventArgs
-        {
-            Server = client.Server,
-            Player = this,
-            Message = ChatMessage.Create($"{Username} has joined the server", Color.Yellow)
-        });
-
-        await Server.BroadcastChatMessage(eventArgs.Message);
-    }
 
     public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
@@ -61,34 +35,25 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             });
     }
 
-    public async Task KickAsync(ChatMessage reason)
+    public async Task DisconnectAsync(ChatMessage reason)
     {
+        Server.Status.PlayerInformation.Online--;
+
         await client.Transport.Output.WritePacketAsync(
             new DisconnectPacket(MinecraftClientState.Playing)
             {
                 Reason = reason
             });
 
-        await DisconnectAsync();
-    }
+        var eventArgs = await client.Server.PluginService.ExecuteAsync(
+            new PlayerLeaveEventArgs
+            {
+                Server = client.Server,
+                Player = this,
+                Message = ChatMessage.Create($"{Username} has left the server.", Color.Yellow)
+            });
 
-    public async Task DisconnectAsync()
-    {
-        if (client.State is MinecraftClientState.Disconnected)
-        {
-            return;
-        }
-
-        Server.Status.PlayerInformation.Online--;
-
-        var eventArgs = await client.Server.PluginService.ExecuteAsync(new PlayerLeaveEventArgs
-        {
-            Server = client.Server,
-            Player = this,
-            Message = ChatMessage.Create($"{Username} has left the server", Color.Yellow)
-        });
-
-        await Server.BroadcastChatMessage(eventArgs.Message);
         await client.StopAsync();
+        await Server.BroadcastChatMessageAsync(eventArgs.Message);
     }
 }

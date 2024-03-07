@@ -23,9 +23,9 @@ internal sealed class MinecraftServer(
         configuration.MaximumPlayerCount,
         configuration.Description);
 
-    public IEnumerable<IPlayer> Players => clients
-        .Where(client => client.Value.Player is not null)
-        .Select(pair => pair.Value.Player!);
+    public IEnumerable<IPlayer> Players => clients.Values
+        .Where(client => client.Player is not null)
+        .Select(client => client.Player!);
 
     public PluginService PluginService => pluginService;
 
@@ -59,14 +59,14 @@ internal sealed class MinecraftServer(
             await listener.UnbindAsync();
         }
 
-        var reason = ChatMessage.Create("Server stopped", Color.Red);
+        var reason = ChatMessage.Create("Server stopped.", Color.Red);
 
         logger.LogDebug("Stopping clients");
 
-        var tasks = clients.Select(
-            client => client.Value.Player is not null
-                ? KickPlayerAsync(client.Value.Player, reason)
-                : client.Value.StopAsync());
+        var tasks = clients.Values.Select(
+            client => client.Player is not null
+                ? client.Player.DisconnectAsync(reason)
+                : client.StopAsync());
 
         await Task.WhenAll(tasks);
     }
@@ -82,11 +82,11 @@ internal sealed class MinecraftServer(
 
         await pluginService.DisposeAsync();
 
-        var tasks = clients.Select(client => client.Value.DisposeAsync().AsTask());
+        var tasks = clients.Values.Select(client => client.DisposeAsync().AsTask());
         await Task.WhenAll(tasks);
     }
 
-    public async Task BroadcastChatMessage(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
+    public async Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
         logger.LogInformation("Broadcasting: \"{Message}\"", message.Text);
 
@@ -96,13 +96,13 @@ internal sealed class MinecraftServer(
         }
     }
 
-    public async Task KickPlayerAsync(IPlayer player, ChatMessage reason)
+    public async Task DisconnectPlayerAsync(IPlayer player, ChatMessage reason)
     {
-        logger.LogInformation("Kicked player: \"{Username}\", for: \"{Reason}\"",
+        logger.LogInformation("Disconnected player: \"{Username}\", for: \"{Reason}\"",
             player.Username,
             reason.Text);
 
-        await player.KickAsync(reason);
+        await player.DisconnectAsync(reason);
     }
 
     private async Task ListeningAsync()
@@ -166,15 +166,7 @@ internal sealed class MinecraftServer(
                 logger.LogDebug("Removing client");
                 clients.Remove(client.Identifier);
 
-                if (client.Player is not null)
-                {
-                    await client.Player.DisconnectAsync();
-                }
-                else
-                {
-                    await client.StopAsync();
-                }
-
+                await client.StopAsync();
                 await client.DisposeAsync();
             }
         }
@@ -184,22 +176,13 @@ internal sealed class MinecraftServer(
     {
         logger.LogInformation("Started ticking");
 
-        var keepAliveTicks = 0;
         var timer = new BalancingTimer(50, source.Token);
 
         while (await timer.WaitForNextTickAsync())
         {
             try
             {
-                keepAliveTicks++;
-
-                if (keepAliveTicks == 50)
-                {
-                    keepAliveTicks = 0;
-
-                    var tasks = clients.Select(client => client.Value.HandleKeepAliveAsync());
-                    await Task.WhenAll(tasks);
-                }
+                // Soon.
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {

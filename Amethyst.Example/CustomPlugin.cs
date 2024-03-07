@@ -13,9 +13,6 @@ public sealed class CustomPlugin : PluginBase
 
     public override void ConfigureRegistry(IPluginRegistry registry)
     {
-        registry.RegisterCommand("help",
-            async eventArgs => await eventArgs.Player.KickAsync(ChatMessage.Create("d")));
-
         registry.RegisterEvent<DescriptionRequestedEventArgs>(eventArgs =>
         {
             eventArgs.Description = ChatMessage.Create($"Current date is {DateTime.Now}");

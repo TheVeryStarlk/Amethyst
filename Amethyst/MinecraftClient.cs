@@ -1,13 +1,10 @@
 ﻿using System.IO.Pipelines;
-using Amethyst.Api.Components;
-using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
-using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -27,9 +24,9 @@ internal sealed class MinecraftClient(
 
     public CancellationToken CancellationToken => source.Token;
 
-    public Player? Player { get; private set; }
-
     public MinecraftClientState State { get; private set; }
+
+    public Player? Player { get; private set; }
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
@@ -44,30 +41,17 @@ internal sealed class MinecraftClient(
                 break;
             }
 
-            switch (State)
+            var task = State switch
             {
-                case MinecraftClientState.Handshaking:
-                    await HandleHandshakingAsync(message);
-                    break;
+                MinecraftClientState.Handshaking => HandleHandshakingAsync(message),
+                MinecraftClientState.Status => HandleStatusAsync(message),
+                MinecraftClientState.Login => HandleLoginAsync(message),
+                MinecraftClientState.Playing => HandlePlayingAsync(message),
+                MinecraftClientState.Disconnected => Task.CompletedTask,
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
-                case MinecraftClientState.Status:
-                    await HandleStatusAsync(message);
-                    break;
-
-                case MinecraftClientState.Login:
-                    await HandleLoginAsync(message);
-                    break;
-
-                case MinecraftClientState.Playing:
-                    await HandlePlayingAsync(message);
-                    break;
-
-                case MinecraftClientState.Disconnected:
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            await task;
         }
     }
 
@@ -78,9 +62,8 @@ internal sealed class MinecraftClient(
             return;
         }
 
+        logger.LogCritical("Stopping client");
         State = MinecraftClientState.Disconnected;
-
-        logger.LogDebug("Stopping client");
         await source.CancelAsync();
         connection.Abort();
     }
@@ -91,42 +74,10 @@ internal sealed class MinecraftClient(
         await connection.DisposeAsync();
     }
 
-    public async Task HandleKeepAliveAsync()
-    {
-        if (State is not MinecraftClientState.Playing)
-        {
-            return;
-        }
-
-        await Transport.Output.WritePacketAsync(
-            new KeepAlivePacket
-            {
-                Payload = Random.Shared.Next()
-            });
-    }
-
     private async Task HandleHandshakingAsync(Message message)
     {
         var handshake = message.As<HandshakePacket>();
-
-        if (handshake.ProtocolVersion != MinecraftServer.ProtocolVersion
-            && handshake.NextState is MinecraftClientState.Login)
-        {
-            logger.LogDebug("Not supported protocol version");
-
-            await Transport.Output.WritePacketAsync(
-                new DisconnectPacket(MinecraftClientState.Login)
-                {
-                    Reason = ChatMessage.Create(
-                        handshake.ProtocolVersion > MinecraftServer.ProtocolVersion
-                            ? "Outdated server"
-                            : "Outdated client",
-                        Color.Red)
-                });
-
-            await StopAsync();
-            return;
-        }
+        await handshake.HandleAsync(this);
 
         State = handshake.NextState;
         logger.LogDebug("Client switched state to {State}", State);
@@ -136,32 +87,13 @@ internal sealed class MinecraftClient(
     {
         if (message.Identifier == StatusRequestPacket.Identifier)
         {
-            var eventArgs = await server.PluginService.ExecuteAsync(new DescriptionRequestedEventArgs
-            {
-                Server = server,
-                Description = server.Status.Description
-            });
-
-            server.Status.Description = eventArgs.Description;
-
-            await Transport.Output.WritePacketAsync(
-                new StatusResponsePacket
-                {
-                    Status = server.Status
-                });
-
+            await message.As<StatusRequestPacket>().HandleAsync(this);
             return;
         }
 
         if (message.Identifier == PingRequestPacket.Identifier)
         {
-            var ping = message.As<PingRequestPacket>();
-
-            await Transport.Output.WritePacketAsync(
-                new PongResponsePacket
-                {
-                    Payload = ping.Payload
-                });
+            await message.As<PingRequestPacket>().HandleAsync(this);
         }
         else
         {
@@ -174,29 +106,23 @@ internal sealed class MinecraftClient(
     private async Task HandleLoginAsync(Message message)
     {
         var loginStart = message.As<LoginStartPacket>();
-
         Player = new Player(this, loginStart.Username);
-
-        await Transport.Output.WritePacketAsync(
-            new LoginSuccessPacket
-            {
-                Guid = Player.Guid,
-                Username = Player.Username
-            });
+        await loginStart.HandleAsync(this);
 
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
         State = MinecraftClientState.Playing;
-        await Player.JoinAsync();
     }
 
     private async Task HandlePlayingAsync(Message message)
     {
-        switch (message.Identifier)
+        var task = message.Identifier switch
         {
-            case 0x01:
-                await message.As<ChatMessagePacket>().HandleAsync(this);
-                break;
-        }
+            0x00 => message.As<KeepAlivePacket>().HandleAsync(this),
+            0x01 => message.As<ChatMessagePacket>().HandleAsync(this),
+            _ => Task.CompletedTask
+        };
+
+        await task;
     }
 }
 

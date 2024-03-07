@@ -47,7 +47,7 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
         }
         else
         {
-            await client.Server.BroadcastChatMessage(
+            await client.Server.BroadcastChatMessageAsync(
                 ChatMessage.Create($"{client.Player!.Username}: {Message.Text}"));
         }
     }

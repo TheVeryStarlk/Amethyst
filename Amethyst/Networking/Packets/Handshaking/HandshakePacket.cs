@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Networking.Packets.Handshaking;
+﻿using Amethyst.Api.Components;
+
+namespace Amethyst.Networking.Packets.Handshaking;
 
 internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 {
@@ -21,5 +23,24 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
             Port = reader.ReadUnsignedShort(),
             NextState = (MinecraftClientState) reader.ReadVariableInteger()
         };
+    }
+
+    public async Task HandleAsync(MinecraftClient client)
+    {
+        if (ProtocolVersion != MinecraftServer.ProtocolVersion
+            && NextState is MinecraftClientState.Login)
+        {
+            await client.Transport.Output.WritePacketAsync(
+                new DisconnectPacket(MinecraftClientState.Login)
+                {
+                    Reason = ChatMessage.Create(
+                        ProtocolVersion > MinecraftServer.ProtocolVersion
+                            ? "Outdated server."
+                            : "Outdated client.",
+                        Color.Red)
+                });
+
+            await client.StopAsync();
+        }
     }
 }

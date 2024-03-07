@@ -26,4 +26,13 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
         writer.WriteVariableInteger(Payload);
         return writer.Position;
     }
+
+    public async Task HandleAsync(MinecraftClient client)
+    {
+        await client.Transport.Output.WritePacketAsync(
+            new KeepAlivePacket
+            {
+                Payload = Payload
+            });
+    }
 }
