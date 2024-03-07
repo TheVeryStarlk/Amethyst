@@ -41,7 +41,6 @@ internal sealed class MinecraftClient(
 
             if (message is null)
             {
-                await HandleDisconnectedAsync();
                 break;
             }
 
@@ -56,6 +55,16 @@ internal sealed class MinecraftClient(
 
             await task;
         }
+
+        var eventArgs = await Server.PluginService.ExecuteAsync(
+            new PlayerLeaveEventArgs
+            {
+                Server = Server,
+                Player = Player!,
+                Message = ChatMessage.Create($"{Player!.Username} has left the server.", Color.Yellow)
+            });
+
+        await Server.BroadcastChatMessageAsync(eventArgs.Message);
     }
 
     public async Task StopAsync()
@@ -121,19 +130,6 @@ internal sealed class MinecraftClient(
         };
 
         await task;
-    }
-
-    private async Task HandleDisconnectedAsync()
-    {
-        var eventArgs = await Server.PluginService.ExecuteAsync(
-            new PlayerLeaveEventArgs
-            {
-                Server = Server,
-                Player = Player!,
-                Message = ChatMessage.Create($"{Player!.Username} has left the server.", Color.Yellow)
-            });
-
-        await Server.BroadcastChatMessageAsync(eventArgs.Message);
     }
 }
 
