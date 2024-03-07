@@ -1,4 +1,5 @@
-﻿using System.IO.Pipelines;
+﻿using System.Diagnostics;
+using System.IO.Pipelines;
 using Amethyst.Api.Components;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
@@ -73,10 +74,7 @@ internal sealed class MinecraftClient(
 
     public async Task StopAsync()
     {
-        if (State is MinecraftClientState.Disconnected)
-        {
-            return;
-        }
+        Debug.Assert(State is not MinecraftClientState.Disconnected);
 
         logger.LogInformation("Stopping client");
         State = MinecraftClientState.Disconnected;
