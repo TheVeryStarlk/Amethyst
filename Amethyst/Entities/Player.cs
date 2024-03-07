@@ -44,16 +44,5 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             {
                 Reason = reason
             });
-
-        var eventArgs = await client.Server.PluginService.ExecuteAsync(
-            new PlayerLeaveEventArgs
-            {
-                Server = client.Server,
-                Player = this,
-                Message = ChatMessage.Create($"{Username} has left the server.", Color.Yellow)
-            });
-
-        await client.StopAsync();
-        await Server.BroadcastChatMessageAsync(eventArgs.Message);
     }
 }

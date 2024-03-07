@@ -1,10 +1,13 @@
 ﻿using System.IO.Pipelines;
+using Amethyst.Api.Components;
+using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
+using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -53,6 +56,19 @@ internal sealed class MinecraftClient(
 
             await task;
         }
+
+        if (Player is not null)
+        {
+            var eventArgs = await Server.PluginService.ExecuteAsync(
+                new PlayerLeaveEventArgs
+                {
+                    Server = Server,
+                    Player = Player,
+                    Message = ChatMessage.Create($"{Player.Username} has left the server.", Color.Yellow)
+                });
+
+            await Server.BroadcastChatMessageAsync(eventArgs.Message);
+        }
     }
 
     public async Task StopAsync()
@@ -62,7 +78,7 @@ internal sealed class MinecraftClient(
             return;
         }
 
-        logger.LogCritical("Stopping client");
+        logger.LogInformation("Stopping client");
         State = MinecraftClientState.Disconnected;
         await source.CancelAsync();
         connection.Abort();
