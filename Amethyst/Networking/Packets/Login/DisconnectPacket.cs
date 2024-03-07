@@ -1,8 +1,7 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Status;
 
-namespace Amethyst.Networking;
+namespace Amethyst.Networking.Packets.Login;
 
 internal sealed class DisconnectPacket(MinecraftClientState state) : IOutgoingPacket
 {

@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Networking.Packets.Login;
 
 namespace Amethyst.Networking.Packets.Handshaking;
 

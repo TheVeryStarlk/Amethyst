@@ -3,6 +3,7 @@ using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Networking;
+using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 
 namespace Amethyst.Entities;
