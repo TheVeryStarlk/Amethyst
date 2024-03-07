@@ -17,12 +17,12 @@ public sealed class CustomPlugin : PluginBase
             "kick",
             async eventArgs =>
             {
-                if (eventArgs.Arguments.Length == 2)
+                if (eventArgs.Arguments.Length > 1)
                 {
                     await eventArgs.Player.Server.DisconnectPlayerAsync(
                         eventArgs.Player.Server.Players.First(player =>
                             player.Username.Equals(eventArgs.Arguments[0], StringComparison.CurrentCultureIgnoreCase)),
-                        ChatMessage.Create(eventArgs.Arguments[1], Color.Red));
+                        ChatMessage.Create(string.Join(" ", eventArgs.Arguments[1..]), Color.Red));
                 }
                 else
                 {
