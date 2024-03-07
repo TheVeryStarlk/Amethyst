@@ -2,10 +2,8 @@
 using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
-using Amethyst.Api.Plugins.Events;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Playing;
-using Amethyst.Plugins;
 
 namespace Amethyst.Entities;
 

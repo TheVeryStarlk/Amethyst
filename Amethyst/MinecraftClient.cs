@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO.Pipelines;
+﻿using System.IO.Pipelines;
 using Amethyst.Api.Components;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
@@ -42,6 +41,7 @@ internal sealed class MinecraftClient(
 
             if (message is null)
             {
+                await HandleDisconnectedAsync();
                 break;
             }
 
@@ -51,31 +51,15 @@ internal sealed class MinecraftClient(
                 MinecraftClientState.Status => HandleStatusAsync(message),
                 MinecraftClientState.Login => HandleLoginAsync(message),
                 MinecraftClientState.Playing => HandlePlayingAsync(message),
-                MinecraftClientState.Disconnected => Task.CompletedTask,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
             await task;
         }
-
-        if (Player is not null)
-        {
-            var eventArgs = await Server.PluginService.ExecuteAsync(
-                new PlayerLeaveEventArgs
-                {
-                    Server = Server,
-                    Player = Player,
-                    Message = ChatMessage.Create($"{Player.Username} has left the server.", Color.Yellow)
-                });
-
-            await Server.BroadcastChatMessageAsync(eventArgs.Message);
-        }
     }
 
     public async Task StopAsync()
     {
-        Debug.Assert(State is not MinecraftClientState.Disconnected);
-
         logger.LogInformation("Stopping client");
         State = MinecraftClientState.Disconnected;
         await source.CancelAsync();
@@ -137,6 +121,19 @@ internal sealed class MinecraftClient(
         };
 
         await task;
+    }
+
+    private async Task HandleDisconnectedAsync()
+    {
+        var eventArgs = await Server.PluginService.ExecuteAsync(
+            new PlayerLeaveEventArgs
+            {
+                Server = Server,
+                Player = Player!,
+                Message = ChatMessage.Create($"{Player!.Username} has left the server.", Color.Yellow)
+            });
+
+        await Server.BroadcastChatMessageAsync(eventArgs.Message);
     }
 }
 
