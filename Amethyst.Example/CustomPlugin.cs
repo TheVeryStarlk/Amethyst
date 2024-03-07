@@ -13,6 +13,24 @@ public sealed class CustomPlugin : PluginBase
 
     public override void ConfigureRegistry(IPluginRegistry registry)
     {
+        registry.RegisterCommand(
+            "kick",
+            async eventArgs =>
+            {
+                if (eventArgs.Arguments.Length == 2)
+                {
+                    await eventArgs.Player.Server.DisconnectPlayerAsync(
+                        eventArgs.Player.Server.Players.First(player =>
+                            player.Username.Equals(eventArgs.Arguments[0], StringComparison.CurrentCultureIgnoreCase)),
+                        ChatMessage.Create(eventArgs.Arguments[1], Color.Red));
+                }
+                else
+                {
+                    await eventArgs.Player.SendChatMessageAsync(
+                        ChatMessage.Create("Invalid kick command.", Color.Red));
+                }
+            });
+
         registry.RegisterEvent<DescriptionRequestedEventArgs>(eventArgs =>
         {
             eventArgs.Description = ChatMessage.Create($"Current date is {DateTime.Now}");
