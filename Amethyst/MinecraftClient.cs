@@ -126,6 +126,10 @@ internal sealed class MinecraftClient(
         {
             0x00 => message.As<KeepAlivePacket>().HandleAsync(this),
             0x01 => message.As<ChatMessagePacket>().HandleAsync(this),
+            0x03 => message.As<OnGroundPacket>().HandleAsync(this),
+            0x04 => message.As<PlayerPositionPacket>().HandleAsync(this),
+            0x05 => message.As<PlayerLookPacket>().HandleAsync(this),
+            0x06 => message.As<PlayerPositionAndLookPacket>().HandleAsync(this),
             _ => Task.CompletedTask
         };
 

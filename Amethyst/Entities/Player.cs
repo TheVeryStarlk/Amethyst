@@ -22,6 +22,8 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
 
     public Vector2 Rotation { get; set; }
 
+    public bool OnGround { get; set; }
+
     public GameMode GameMode { get; set; }
 
     public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)

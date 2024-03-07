@@ -39,7 +39,8 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
         await client.Transport.Output.WritePacketAsync(
             new PlayerPositionAndLookPacket
             {
-                Player = client.Player
+                Position = client.Player.Position,
+                Rotation = client.Player.Rotation
             });
 
         var eventArgs = await client.Server.PluginService.ExecuteAsync(

@@ -13,6 +13,8 @@ public interface IPlayer : IEntity
 
     public Vector2 Rotation { get; set; }
 
+    public bool OnGround { get; set; }
+
     public GameMode GameMode { get; set; }
 
     public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
