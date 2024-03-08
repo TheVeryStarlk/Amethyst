@@ -57,6 +57,11 @@ internal sealed class MinecraftClient(
 
             await task;
         }
+    }
+
+    public async Task StopAsync()
+    {
+        logger.LogInformation("Stopping client");
 
         var eventArgs = await Server.PluginService.ExecuteAsync(
             new PlayerLeaveEventArgs
@@ -67,11 +72,7 @@ internal sealed class MinecraftClient(
             });
 
         await Server.BroadcastChatMessageAsync(eventArgs.Message);
-    }
 
-    public async Task StopAsync()
-    {
-        logger.LogInformation("Stopping client");
         State = MinecraftClientState.Disconnected;
         await source.CancelAsync();
         connection.Abort();
