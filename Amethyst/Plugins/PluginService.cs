@@ -31,11 +31,11 @@ internal sealed class PluginService : IAsyncDisposable
 
         try
         {
-            paths = Directory.GetFiles("plugins");
+            paths = Directory.GetFiles("Plugins");
         }
         catch
         {
-            Directory.CreateDirectory("plugins");
+            Directory.CreateDirectory("Plugins");
         }
 
         foreach (var path in paths)
