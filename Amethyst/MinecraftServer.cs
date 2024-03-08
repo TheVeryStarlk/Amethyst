@@ -3,6 +3,8 @@ using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Hosting;
+using Amethyst.Networking;
+using Amethyst.Networking.Packets.Playing;
 using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -176,13 +178,39 @@ internal sealed class MinecraftServer(
     {
         logger.LogInformation("Started ticking");
 
+        var keepAliveTick = 0;
         var timer = new BalancingTimer(50, source.Token);
 
         while (await timer.WaitForNextTickAsync())
         {
             try
             {
-                // Soon.
+                keepAliveTick++;
+
+                if (keepAliveTick != 50)
+                {
+                    continue;
+                }
+
+                keepAliveTick = 0;
+
+                foreach (var client in clients.Values.Where(client => client.Player is not null))
+                {
+                    if (client.KeepAliveCount > 5)
+                    {
+                        await client.Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
+                        continue;
+                    }
+
+                    await client.Transport.Output.WritePacketAsync(
+                        new KeepAlivePacket
+                        {
+                            Payload = keepAliveTick
+                        });
+
+                    client.KeepAliveCount++;
+                }
+
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {

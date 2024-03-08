@@ -27,12 +27,9 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
         return writer.Position;
     }
 
-    public async Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(MinecraftClient client)
     {
-        await client.Transport.Output.WritePacketAsync(
-            new KeepAlivePacket
-            {
-                Payload = Payload
-            });
+        client.KeepAliveCount--;
+        return Task.CompletedTask;
     }
 }

@@ -31,6 +31,8 @@ internal sealed class MinecraftClient(
 
     public Player? Player { get; private set; }
 
+    public int KeepAliveCount { get; set; }
+
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
     public async Task StartAsync()
