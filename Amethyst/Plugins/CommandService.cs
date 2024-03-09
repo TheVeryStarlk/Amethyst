@@ -32,8 +32,6 @@ internal sealed class CommandService(ILogger<CommandService> logger)
             return;
         }
 
-        logger.LogInformation("Executing command {Name}", name);
-
         foreach (var command in predicate)
         {
             await (Task) command.Delegate.DynamicInvoke(new CommandContext
@@ -43,6 +41,8 @@ internal sealed class CommandService(ILogger<CommandService> logger)
                 Arguments = split[1..]
             })!;
         }
+
+        logger.LogInformation("Executed command {Name}", name);
     }
 }
 

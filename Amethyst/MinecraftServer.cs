@@ -51,11 +51,11 @@ internal sealed class MinecraftServer(
 
     public async Task StopAsync()
     {
-        logger.LogInformation("Stopping the server");
-
         await clients.Values
             .Select(client => client.StopAsync())
             .WhenAll();
+
+        logger.LogInformation("Server stopped");
     }
 
     public async ValueTask DisposeAsync()
@@ -74,11 +74,11 @@ internal sealed class MinecraftServer(
 
     public async Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
-        logger.LogInformation("Broadcasting: \"{Message}\"", message.Text);
-
         await Players
             .Select(player => player.SendChatMessageAsync(message, position))
             .WhenAll();
+
+        logger.LogInformation("Broadcast: \"{Message}\"", message.Text);
     }
 
     public async Task DisconnectPlayerAsync(IPlayer player, ChatMessage reason)
@@ -155,8 +155,8 @@ internal sealed class MinecraftServer(
             }
             finally
             {
-                logger.LogDebug("Removing client");
                 clients.Remove(client.Identifier);
+                logger.LogDebug("Removed client");
 
                 await client.StopAsync();
                 await client.DisposeAsync();
@@ -185,7 +185,7 @@ internal sealed class MinecraftServer(
                     {
                         if (client.KeepAliveCount > 5)
                         {
-                            await client.Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
+                            await DisconnectPlayerAsync(client.Player!, ChatMessage.Create("Timed out.", Color.Red));
                             continue;
                         }
 
@@ -216,7 +216,7 @@ internal sealed class MinecraftServer(
         var reason = ChatMessage.Create("Server stopped.", Color.Red);
 
         await Players
-            .Select(player => player.DisconnectAsync(reason))
+            .Select(player => DisconnectPlayerAsync(player, reason))
             .WhenAll();
     }
 }

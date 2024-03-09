@@ -64,25 +64,35 @@ internal sealed class MinecraftClient(
                 break;
             }
         }
+
+        if (Player is not null)
+        {
+            Server.Status.PlayerInformation.Online--;
+
+            var eventArgs = await Server.PluginService.ExecuteAsync(
+                new PlayerLeaveEventArgs
+                {
+                    Server = Server,
+                    Player = Player,
+                    Message = ChatMessage.Create($"{Player!.Username} has left the server.", Color.Yellow)
+                });
+
+            await Server.BroadcastChatMessageAsync(eventArgs.Message);
+        }
     }
 
     public async Task StopAsync()
     {
-        logger.LogDebug("Stopping client");
+        if (State is MinecraftClientState.Disconnected)
+        {
+            return;
+        }
 
-        var eventArgs = await Server.PluginService.ExecuteAsync(
-            new PlayerLeaveEventArgs
-            {
-                Server = Server,
-                Player = Player!,
-                Message = ChatMessage.Create($"{Player!.Username} has left the server.", Color.Yellow)
-            });
-
-        await Server.BroadcastChatMessageAsync(eventArgs.Message);
         await source.CancelAsync();
         connection.Abort();
 
         State = MinecraftClientState.Disconnected;
+        logger.LogDebug("Client stopped {Identifier}", identifier);
     }
 
     public async ValueTask DisposeAsync()
