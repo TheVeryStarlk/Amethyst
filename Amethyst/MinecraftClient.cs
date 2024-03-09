@@ -96,8 +96,8 @@ internal sealed class MinecraftClient(
         var handshake = message.As<HandshakePacket>();
         await handshake.HandleAsync(this);
 
-        logger.LogDebug("Client switched state to {State}", State);
         State = handshake.NextState;
+        logger.LogDebug("Client switched state to {State}", State);
     }
 
     private async Task HandleStatusAsync(Message message)
@@ -126,8 +126,8 @@ internal sealed class MinecraftClient(
         Player = new Player(this, loginStart.Username);
         await loginStart.HandleAsync(this);
 
-        logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
         State = MinecraftClientState.Playing;
+        logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }
 
     private async Task HandlePlayingAsync(Message message)
