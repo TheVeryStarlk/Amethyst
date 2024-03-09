@@ -72,10 +72,10 @@ internal sealed class MinecraftClient(
             });
 
         await Server.BroadcastChatMessageAsync(eventArgs.Message);
-
-        State = MinecraftClientState.Disconnected;
         await source.CancelAsync();
         connection.Abort();
+
+        State = MinecraftClientState.Disconnected;
     }
 
     public async ValueTask DisposeAsync()

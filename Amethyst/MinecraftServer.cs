@@ -34,10 +34,9 @@ internal sealed class MinecraftServer(
     private IConnectionListener? listener;
 
     private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
-    private readonly CancellationTokenSource source = new CancellationTokenSource();
     private readonly Dictionary<int, MinecraftClient> clients = [];
 
-    public Task StartAsync()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         if (listener is not null)
         {
@@ -47,36 +46,20 @@ internal sealed class MinecraftServer(
         pluginService.Load();
 
         logger.LogInformation("Starting the server tasks");
-        return Task.WhenAll(ListeningAsync(), TickingAsync());
+        return Task.WhenAll(ListeningAsync(cancellationToken), TickingAsync(cancellationToken));
     }
 
     public async Task StopAsync()
     {
         logger.LogInformation("Stopping the server");
 
-        await source.CancelAsync();
-
-        if (listener is not null)
-        {
-            await listener.UnbindAsync();
-        }
-
-        var reason = ChatMessage.Create("Server stopped.", Color.Red);
-
-        logger.LogDebug("Stopping clients");
-
-        var tasks = clients.Values.Select(
-            client => client.Player is not null
-                ? client.Player.DisconnectAsync(reason)
-                : client.StopAsync());
-
-        await Task.WhenAll(tasks);
+        await clients.Values
+            .Select(client => client.StopAsync())
+            .WhenAll();
     }
 
     public async ValueTask DisposeAsync()
     {
-        source.Dispose();
-
         if (listener is not null)
         {
             await listener.DisposeAsync();
@@ -84,18 +67,18 @@ internal sealed class MinecraftServer(
 
         await pluginService.DisposeAsync();
 
-        var tasks = clients.Values.Select(client => client.DisposeAsync().AsTask());
-        await Task.WhenAll(tasks);
+        await clients.Values
+            .Select(client => client.DisposeAsync().AsTask())
+            .WhenAll();
     }
 
     public async Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
         logger.LogInformation("Broadcasting: \"{Message}\"", message.Text);
 
-        foreach (var player in Players)
-        {
-            await player.SendChatMessageAsync(message, position);
-        }
+        await Players
+            .Select(player => player.SendChatMessageAsync(message, position))
+            .WhenAll();
     }
 
     public async Task DisconnectPlayerAsync(IPlayer player, ChatMessage reason)
@@ -107,18 +90,18 @@ internal sealed class MinecraftServer(
         await player.DisconnectAsync(reason);
     }
 
-    private async Task ListeningAsync()
+    private async Task ListeningAsync(CancellationToken cancellationToken)
     {
-        listener = await listenerFactory.BindAsync(configuration.ListeningEndPoint, source.Token);
+        listener = await listenerFactory.BindAsync(configuration.ListeningEndPoint, cancellationToken);
         logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", configuration.ListeningEndPoint);
 
         var identifier = 0;
 
-        while (!source.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                var connection = await listener.AcceptAsync(source.Token);
+                var connection = await listener.AcceptAsync(cancellationToken);
 
                 if (connection is null)
                 {
@@ -139,13 +122,20 @@ internal sealed class MinecraftServer(
 
                 _ = ExecuteAsync(client);
             }
-            catch (Exception exception) when (exception is not OperationCanceledException)
+            catch (OperationCanceledException)
+            {
+                // Ignore.
+            }
+            catch (Exception exception)
             {
                 logger.LogError(
                     "Unexpected exception while listening for connections: \"{Message}\"",
-                    exception.Message);
+                    exception);
             }
         }
+
+        // The cancellation token has been cancelled, now unbind the listener.
+        await listener.UnbindAsync(CancellationToken.None);
 
         return;
 
@@ -161,7 +151,7 @@ internal sealed class MinecraftServer(
             {
                 logger.LogError(
                     "Unexpected exception from client: \"{Message}\"",
-                    exception.Message);
+                    exception);
             }
             finally
             {
@@ -174,51 +164,60 @@ internal sealed class MinecraftServer(
         }
     }
 
-    private async Task TickingAsync()
+    private async Task TickingAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Started ticking");
 
         var keepAliveTick = 0;
-        var timer = new BalancingTimer(50, source.Token);
+        var timer = new BalancingTimer(50, cancellationToken);
 
-        while (await timer.WaitForNextTickAsync())
+        try
         {
-            try
+            while (await timer.WaitForNextTickAsync())
             {
                 keepAliveTick++;
 
-                if (keepAliveTick != 50)
+                if (keepAliveTick == 50)
                 {
-                    continue;
-                }
+                    keepAliveTick = 0;
 
-                keepAliveTick = 0;
-
-                foreach (var client in clients.Values.Where(client => client.Player is not null))
-                {
-                    if (client.KeepAliveCount > 5)
+                    foreach (var client in clients.Values.Where(client => client.Player is not null))
                     {
-                        await client.Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
-                        continue;
-                    }
-
-                    await client.Transport.Output.WritePacketAsync(
-                        new KeepAlivePacket
+                        if (client.KeepAliveCount > 5)
                         {
-                            Payload = keepAliveTick
-                        });
+                            await client.Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
+                            continue;
+                        }
 
-                    client.KeepAliveCount++;
+                        await client.Transport.Output.WritePacketAsync(
+                            new KeepAlivePacket
+                            {
+                                Payload = keepAliveTick
+                            });
+
+                        client.KeepAliveCount++;
+                    }
                 }
-
-            }
-            catch (Exception exception) when (exception is not OperationCanceledException)
-            {
-                logger.LogError(
-                    "Unexpected exception while ticking: \"{Message}\"",
-                    exception.Message);
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Ignore.
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(
+                "Unexpected exception while ticking: \"{Message}\"",
+                exception);
+        }
+
+        logger.LogDebug("Disconnecting players");
+
+        var reason = ChatMessage.Create("Server stopped.", Color.Red);
+
+        await Players
+            .Select(player => player.DisconnectAsync(reason))
+            .WhenAll();
     }
 }
 
