@@ -39,29 +39,36 @@ internal sealed class MinecraftClient(
     {
         while (!source.IsCancellationRequested)
         {
-            var message = await Transport.Input.ReadMessageAsync(CancellationToken);
+            try
+            {
+                var message = await Transport.Input.ReadMessageAsync(CancellationToken);
 
-            if (message is null)
+                if (message is null)
+                {
+                    break;
+                }
+
+                var task = State switch
+                {
+                    MinecraftClientState.Handshaking => HandleHandshakingAsync(message),
+                    MinecraftClientState.Status => HandleStatusAsync(message),
+                    MinecraftClientState.Login => HandleLoginAsync(message),
+                    MinecraftClientState.Playing => HandlePlayingAsync(message),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                await task;
+            }
+            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
                 break;
             }
-
-            var task = State switch
-            {
-                MinecraftClientState.Handshaking => HandleHandshakingAsync(message),
-                MinecraftClientState.Status => HandleStatusAsync(message),
-                MinecraftClientState.Login => HandleLoginAsync(message),
-                MinecraftClientState.Playing => HandlePlayingAsync(message),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            await task;
         }
     }
 
     public async Task StopAsync()
     {
-        logger.LogInformation("Stopping client");
+        logger.LogDebug("Stopping client");
 
         var eventArgs = await Server.PluginService.ExecuteAsync(
             new PlayerLeaveEventArgs
@@ -89,8 +96,8 @@ internal sealed class MinecraftClient(
         var handshake = message.As<HandshakePacket>();
         await handshake.HandleAsync(this);
 
-        State = handshake.NextState;
         logger.LogDebug("Client switched state to {State}", State);
+        State = handshake.NextState;
     }
 
     private async Task HandleStatusAsync(Message message)

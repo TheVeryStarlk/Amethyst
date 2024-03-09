@@ -211,7 +211,7 @@ internal sealed class MinecraftServer(
                 exception);
         }
 
-        logger.LogDebug("Disconnecting players");
+        logger.LogInformation("Disconnecting players");
 
         var reason = ChatMessage.Create("Server stopped.", Color.Red);
 
