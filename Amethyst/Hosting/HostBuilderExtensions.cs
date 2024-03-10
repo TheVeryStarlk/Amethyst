@@ -27,7 +27,8 @@ public static class HostBuilderExtensions
                 configuration,
                 provider.GetRequiredService<IConnectionListenerFactory>(),
                 provider.GetRequiredService<ILoggerFactory>(),
-                provider.GetRequiredService<PluginService>()));
+                provider.GetRequiredService<PluginService>(),
+                provider.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping));
 
             services.AddHostedService<MinecraftServerService>();
         });

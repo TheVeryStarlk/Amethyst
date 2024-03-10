@@ -11,7 +11,7 @@ internal sealed class MinecraftServerService(
     {
         try
         {
-            await server.StartAsync(cancellationToken);
+            await server.StartAsync();
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {

@@ -15,7 +15,8 @@ internal sealed class MinecraftServer(
     MinecraftServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
-    PluginService pluginService) : IMinecraftServer
+    PluginService pluginService,
+    CancellationToken cancellationToken) : IMinecraftServer
 {
     public const int ProtocolVersion = 47;
 
@@ -36,7 +37,7 @@ internal sealed class MinecraftServer(
     private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
     private readonly Dictionary<int, MinecraftClient> clients = [];
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync()
     {
         if (listener is not null)
         {
@@ -46,7 +47,7 @@ internal sealed class MinecraftServer(
         pluginService.Load();
 
         logger.LogInformation("Starting the server tasks");
-        return Task.WhenAll(ListeningAsync(cancellationToken), TickingAsync(cancellationToken));
+        return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
     public async Task StopAsync()
@@ -90,7 +91,7 @@ internal sealed class MinecraftServer(
         await player.DisconnectAsync(reason);
     }
 
-    private async Task ListeningAsync(CancellationToken cancellationToken)
+    private async Task ListeningAsync()
     {
         listener = await listenerFactory.BindAsync(configuration.ListeningEndPoint, cancellationToken);
         logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", configuration.ListeningEndPoint);
@@ -164,7 +165,7 @@ internal sealed class MinecraftServer(
         }
     }
 
-    private async Task TickingAsync(CancellationToken cancellationToken)
+    private async Task TickingAsync()
     {
         logger.LogInformation("Started ticking");
 
