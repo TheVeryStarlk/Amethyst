@@ -58,5 +58,7 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
             {
                 Reason = reason
             });
+
+        await client.StopAsync();
     }
 }

@@ -95,7 +95,7 @@ internal sealed class MinecraftServer(
     private async Task ListeningAsync()
     {
         listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, configuration.ListeningPort), cancellationToken);
-        logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", configuration.ListeningPort);
+        logger.LogInformation("Started listening for connections at port {ListeningPort}", configuration.ListeningPort);
 
         var identifier = 0;
 
@@ -159,8 +159,6 @@ internal sealed class MinecraftServer(
             {
                 clients.Remove(client.Identifier);
                 logger.LogDebug("Removed client");
-
-                await client.StopAsync();
                 await client.DisposeAsync();
             }
         }

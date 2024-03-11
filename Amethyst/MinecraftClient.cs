@@ -54,6 +54,7 @@ internal sealed class MinecraftClient(
                     MinecraftClientState.Status => HandleStatusAsync(message),
                     MinecraftClientState.Login => HandleLoginAsync(message),
                     MinecraftClientState.Playing => HandlePlayingAsync(message),
+                    MinecraftClientState.Disconnected => throw new OperationCanceledException(),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
@@ -74,11 +75,14 @@ internal sealed class MinecraftClient(
                 {
                     Server = Server,
                     Player = Player,
-                    Message = ChatMessage.Create($"{Player!.Username} has left the server.", Color.Yellow)
+                    Message = ChatMessage.Create($"{Player.Username} has left the server.", Color.Yellow)
                 });
 
             await Server.BroadcastChatMessageAsync(eventArgs.Message);
         }
+
+        connection.Abort();
+        logger.LogDebug("Client stopped {Identifier}", identifier);
     }
 
     public async Task StopAsync()
@@ -88,11 +92,8 @@ internal sealed class MinecraftClient(
             return;
         }
 
-        await source.CancelAsync();
-        connection.Abort();
-
         State = MinecraftClientState.Disconnected;
-        logger.LogDebug("Client stopped {Identifier}", identifier);
+        await source.CancelAsync();
     }
 
     public async ValueTask DisposeAsync()
