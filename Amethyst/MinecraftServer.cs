@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
@@ -93,8 +94,8 @@ internal sealed class MinecraftServer(
 
     private async Task ListeningAsync()
     {
-        listener = await listenerFactory.BindAsync(configuration.ListeningEndPoint, cancellationToken);
-        logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", configuration.ListeningEndPoint);
+        listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, configuration.ListeningPort), cancellationToken);
+        logger.LogInformation("Started listening for connections at: \"{EndPoint}\"", configuration.ListeningPort);
 
         var identifier = 0;
 
