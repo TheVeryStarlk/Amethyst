@@ -1,6 +1,4 @@
-<p align="center">
-  <img width="175" height="175" align="center" src="https://i.imgur.com/BkTfea4.png">
-</p>
+<img align="right" width="100" src="https://i.imgur.com/BkTfea4.png">
 
 # Amethyst
 A fast light-weight implementation of the Minecraft: Java edition protocol.
