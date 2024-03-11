@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using Amethyst.Api.Entities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -8,23 +8,23 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
 
     public int Identifier => 0x08;
 
-    public required Vector3 Position { get; set; }
+    public required Position Position { get; set; }
 
-    public required Vector2 Rotation { get; set; }
+    public float Yaw { get; set; }
+
+    public float Pitch { get; set; }
 
     public bool OnGround { get; set; }
 
     public static PlayerPositionAndLookPacket Read(MemoryReader reader)
     {
-        var position = new Vector3(
-            (float) reader.ReadDouble(),
-            (float) reader.ReadDouble(),
-            (float) reader.ReadDouble());
+        var position = new Position(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
 
         return new PlayerPositionAndLookPacket
         {
             Position = position,
-            Rotation = new Vector2(reader.ReadFloat(), reader.ReadFloat()),
+            Yaw = reader.ReadFloat(),
+            Pitch = reader.ReadFloat(),
             OnGround = reader.ReadBoolean()
         };
     }
@@ -44,8 +44,8 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
         writer.WriteDouble(Position.X);
         writer.WriteDouble(Position.Y);
         writer.WriteDouble(Position.Z);
-        writer.WriteFloat(Rotation.X);
-        writer.WriteFloat(Rotation.Y);
+        writer.WriteFloat(Yaw);
+        writer.WriteFloat(Pitch);
         writer.WriteByte(0);
 
         return writer.Position;
@@ -54,7 +54,8 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
     public Task HandleAsync(MinecraftClient client)
     {
         client.Player!.Position = Position;
-        client.Player.Rotation = Rotation;
+        client.Player.Yaw = Yaw;
+        client.Player.Pitch = Pitch;
         client.Player.OnGround = OnGround;
         return Task.CompletedTask;
     }

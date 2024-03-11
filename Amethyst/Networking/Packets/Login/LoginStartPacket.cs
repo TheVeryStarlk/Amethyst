@@ -40,7 +40,8 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
             new PlayerPositionAndLookPacket
             {
                 Position = client.Player.Position,
-                Rotation = client.Player.Rotation
+                Yaw = client.Player.Yaw,
+                Pitch = client.Player.Pitch,
             });
 
         var eventArgs = await client.Server.PluginService.ExecuteAsync(

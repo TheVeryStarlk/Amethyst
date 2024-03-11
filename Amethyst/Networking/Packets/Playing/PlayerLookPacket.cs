@@ -1,12 +1,12 @@
-﻿using System.Numerics;
-
-namespace Amethyst.Networking.Packets.Playing;
+﻿namespace Amethyst.Networking.Packets.Playing;
 
 internal sealed class PlayerLookPacket : IIngoingPacket<PlayerLookPacket>
 {
     public static int Identifier => 0x05;
 
-    public required Vector2 Rotation { get; init; }
+    public required float Yaw { get; init; }
+
+    public required float Pitch { get; init; }
 
     public required bool OnGround { get; init; }
 
@@ -14,14 +14,16 @@ internal sealed class PlayerLookPacket : IIngoingPacket<PlayerLookPacket>
     {
         return new PlayerLookPacket
         {
-            Rotation = new Vector2(reader.ReadFloat(), reader.ReadFloat()),
+            Yaw = reader.ReadFloat(),
+            Pitch = reader.ReadFloat(),
             OnGround = reader.ReadBoolean()
         };
     }
 
     public Task HandleAsync(MinecraftClient client)
     {
-        client.Player!.Rotation = Rotation;
+        client.Player!.Yaw = Yaw;
+        client.Player.Pitch = Pitch;
         client.Player.OnGround = OnGround;
         return Task.CompletedTask;
     }

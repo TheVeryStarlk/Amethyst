@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Amethyst.Api;
+﻿using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Networking;
@@ -18,13 +17,29 @@ internal sealed class Player(MinecraftClient client, string username) : IPlayer
 
     public string Username => username;
 
-    public Vector3 Position { get; set; }
+    public Position Position { get; set; }
 
-    public Vector2 Rotation { get; set; }
+    public float Yaw { get; set; }
+
+    public float Pitch { get; set; }
 
     public bool OnGround { get; set; }
 
     public GameMode GameMode { get; set; }
+
+    public async Task TeleportAsync(Position position)
+    {
+        Position = position;
+
+        await client.Transport.Output.WritePacketAsync(
+            new PlayerPositionAndLookPacket
+            {
+                Position = position,
+                Yaw = Yaw,
+                Pitch = Pitch,
+                OnGround = OnGround
+            });
+    }
 
     public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
