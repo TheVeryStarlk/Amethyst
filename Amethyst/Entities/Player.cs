@@ -1,13 +1,13 @@
 ﻿using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
-using Amethyst.Networking;
+using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(MinecraftClient client, string username) : IPlayer
+internal sealed class Player(Client client, string username) : IPlayer
 {
     public Guid Guid { get; } = Guid.NewGuid();
 

@@ -3,7 +3,7 @@ using Amethyst.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-var loaded = new MinecraftServerConfiguration();
+var loaded = new ServerOptions();
 
 const string directory = "Configuration";
 const string file = "configuration.json";
@@ -13,7 +13,7 @@ Directory.CreateDirectory(directory);
 try
 {
     var json = File.ReadAllText(Path.Combine(directory, file));
-    loaded = JsonSerializer.Deserialize<MinecraftServerConfiguration>(json)!;
+    loaded = JsonSerializer.Deserialize<ServerOptions>(json)!;
 }
 catch
 {

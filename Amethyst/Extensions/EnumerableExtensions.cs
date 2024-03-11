@@ -1,4 +1,4 @@
-﻿namespace Amethyst;
+﻿namespace Amethyst.Extensions;
 
 internal static class EnumerableExtensions
 {

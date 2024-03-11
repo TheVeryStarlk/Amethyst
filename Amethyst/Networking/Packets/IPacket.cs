@@ -10,7 +10,7 @@ internal interface IIngoingPacket<out TSelf> : IPacket where TSelf : IIngoingPac
 
     public static abstract TSelf Read(MemoryReader reader);
 
-    public Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(Client client)
     {
         return Task.CompletedTask;
     }

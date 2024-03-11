@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Networking.Packets.Login;
+﻿using Amethyst.Utilities;
+
+namespace Amethyst.Networking.Packets.Login;
 
 internal sealed class LoginSuccessPacket : IOutgoingPacket
 {
@@ -13,7 +15,7 @@ internal sealed class LoginSuccessPacket : IOutgoingPacket
     public int CalculateLength()
     {
         serializedGuid = Guid.ToString();
-        return VariableStringHelper.GetBytesCount(serializedGuid) + VariableStringHelper.GetBytesCount(Username);
+        return VariableString.GetBytesCount(serializedGuid) + VariableString.GetBytesCount(Username);
     }
 
     public int Write(ref MemoryWriter writer)

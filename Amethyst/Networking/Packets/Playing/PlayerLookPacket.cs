@@ -20,7 +20,7 @@ internal sealed class PlayerLookPacket : IIngoingPacket<PlayerLookPacket>
         };
     }
 
-    public Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(Client client)
     {
         client.Player!.Yaw = Yaw;
         client.Player.Pitch = Pitch;

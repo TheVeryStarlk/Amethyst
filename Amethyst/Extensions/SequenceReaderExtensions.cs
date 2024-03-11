@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace Amethyst.Networking;
+namespace Amethyst.Extensions;
 
 internal static class SequenceReaderExtensions
 {

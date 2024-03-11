@@ -2,7 +2,7 @@
 using Amethyst.Api.Components;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
-using Amethyst.Networking;
+using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
@@ -13,15 +13,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class MinecraftClient(
-    ILogger<MinecraftClient> logger,
-    MinecraftServer server,
+internal sealed class Client(
+    ILogger<Client> logger,
+    Server server,
     ConnectionContext connection,
     int identifier) : IAsyncDisposable
 {
     public int Identifier => identifier;
 
-    public MinecraftServer Server => server;
+    public Server Server => server;
 
     public IDuplexPipe Transport => connection.Transport;
 

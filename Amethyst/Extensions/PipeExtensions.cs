@@ -2,8 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
 using Amethyst.Networking.Packets;
+using Amethyst.Utilities;
 
-namespace Amethyst.Networking;
+namespace Amethyst.Extensions;
 
 internal static class PipeExtensions
 {
@@ -56,7 +57,7 @@ internal static class PipeExtensions
                 return false;
             }
 
-            var padding = VariableIntegerHelper.GetBytesCount(identifier);
+            var padding = VariableInteger.GetBytesCount(identifier);
 
             if (!reader.TryReadExact(length - padding, out var payload))
             {
@@ -78,7 +79,7 @@ internal static class PipeExtensions
         static int Write(IOutgoingPacket packet, Memory<byte> memory)
         {
             var writer = new MemoryWriter(memory);
-            writer.WriteVariableInteger(VariableIntegerHelper.GetBytesCount(packet.Identifier) + packet.CalculateLength());
+            writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + packet.CalculateLength());
             writer.WriteVariableInteger(packet.Identifier);
             return packet.Write(ref writer);
         }

@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
 
-namespace Amethyst.Networking;
+namespace Amethyst.Utilities;
 
-internal static class VariableIntegerHelper
+internal static class VariableInteger
 {
     public static int GetBytesCount(int value)
     {

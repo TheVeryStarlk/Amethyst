@@ -1,7 +1,6 @@
-﻿using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Amethyst.Api.Components;
+﻿using Amethyst.Api.Components;
+using Amethyst.Extensions;
+using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Status;
 
@@ -16,34 +15,12 @@ internal sealed class StatusResponsePacket : IOutgoingPacket
     public int CalculateLength()
     {
         serializedStatus = Status.Serialize();
-        return VariableStringHelper.GetBytesCount(serializedStatus);
+        return VariableString.GetBytesCount(serializedStatus);
     }
 
     public int Write(ref MemoryWriter writer)
     {
         writer.WriteVariableString(serializedStatus!);
         return writer.Position;
-    }
-}
-
-internal static class JsonSerializerExtensions
-{
-    private static JsonSerializerOptions Custom => new JsonSerializerOptions
-    {
-        AllowTrailingCommas = true,
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters =
-        {
-            new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)
-        }
-    };
-
-    public static string Serialize<T>(this T instance)
-    {
-        return JsonSerializer.Serialize(instance, Custom);
     }
 }

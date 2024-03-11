@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Networking.Packets.Playing;
+﻿using Amethyst.Utilities;
+
+namespace Amethyst.Networking.Packets.Playing;
 
 internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoingPacket
 {
@@ -18,7 +20,7 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
 
     public int CalculateLength()
     {
-        return VariableIntegerHelper.GetBytesCount(Payload);
+        return VariableInteger.GetBytesCount(Payload);
     }
 
     public int Write(ref MemoryWriter writer)
@@ -27,7 +29,7 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
         return writer.Position;
     }
 
-    public Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(Client client)
     {
         client.KeepAliveCount--;
         return Task.CompletedTask;

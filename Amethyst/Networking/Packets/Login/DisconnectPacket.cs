@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Networking.Packets.Status;
+using Amethyst.Extensions;
+using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Login;
 
@@ -14,7 +15,7 @@ internal sealed class DisconnectPacket(MinecraftClientState state) : IOutgoingPa
     public int CalculateLength()
     {
         serializedReason = Reason.Serialize();
-        return VariableStringHelper.GetBytesCount(serializedReason);
+        return VariableString.GetBytesCount(serializedReason);
     }
 
     public int Write(ref MemoryWriter writer)

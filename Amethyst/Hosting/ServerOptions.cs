@@ -2,7 +2,7 @@
 
 namespace Amethyst.Hosting;
 
-public sealed class MinecraftServerConfiguration
+public sealed class ServerOptions
 {
     public ushort ListeningPort { get; set; } = 25565;
 

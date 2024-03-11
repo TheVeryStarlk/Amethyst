@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Networking.Packets.Status;
+using Amethyst.Extensions;
+using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -27,7 +28,7 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
     public int CalculateLength()
     {
         serializedMessage = Message.Serialize();
-        return VariableStringHelper.GetBytesCount(serializedMessage) + sizeof(byte);
+        return VariableString.GetBytesCount(serializedMessage) + sizeof(byte);
     }
 
     public int Write(ref MemoryWriter writer)
@@ -37,7 +38,7 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
         return writer.Position;
     }
 
-    public async Task HandleAsync(MinecraftClient client)
+    public async Task HandleAsync(Client client)
     {
         if (Message.Text.StartsWith('/'))
         {

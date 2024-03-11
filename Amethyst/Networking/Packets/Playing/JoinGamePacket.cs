@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Entities;
 using Amethyst.Api.World;
+using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -18,7 +19,7 @@ internal sealed class JoinGamePacket : IOutgoingPacket
                + sizeof(sbyte)
                + sizeof(byte)
                + sizeof(byte)
-               + VariableStringHelper.GetBytesCount(LevelType.Flat.ToString())
+               + VariableString.GetBytesCount(LevelType.Flat.ToString())
                + sizeof(bool);
     }
 

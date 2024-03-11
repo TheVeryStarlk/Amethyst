@@ -11,20 +11,20 @@ public static class HostBuilderExtensions
 {
     public static IHostBuilder ConfigureMinecraftServer(
         this IHostBuilder builder,
-        Action<HostBuilderContext, MinecraftServerConfiguration> configure)
+        Action<HostBuilderContext, ServerOptions> configure)
     {
         builder.ConfigureServices((context, services) =>
         {
-            var configuration = new MinecraftServerConfiguration();
-            configure.Invoke(context, configuration);
+            var options = new ServerOptions();
+            configure.Invoke(context, options);
 
             services.AddTransient<CommandService>();
             services.AddTransient<EventService>();
             services.AddSingleton<PluginService>();
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
 
-            services.AddTransient(provider => new MinecraftServer(
-                configuration,
+            services.AddTransient(provider => new Server(
+                options,
                 provider.GetRequiredService<IConnectionListenerFactory>(),
                 provider.GetRequiredService<ILoggerFactory>(),
                 provider.GetRequiredService<PluginService>(),

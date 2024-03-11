@@ -51,7 +51,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
         return writer.Position;
     }
 
-    public Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(Client client)
     {
         client.Player!.Position = Position;
         client.Player.Yaw = Yaw;

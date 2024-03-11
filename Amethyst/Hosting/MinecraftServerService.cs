@@ -5,7 +5,7 @@ namespace Amethyst.Hosting;
 
 internal sealed class MinecraftServerService(
     ILogger<MinecraftServerService> logger,
-    MinecraftServer server) : BackgroundService
+    Server server) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {

@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Plugins.Events;
+using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Plugins;
 
@@ -19,7 +20,7 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
         };
     }
 
-    public async Task HandleAsync(MinecraftClient client)
+    public async Task HandleAsync(Client client)
     {
         client.Server.Status.PlayerInformation.Online++;
 

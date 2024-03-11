@@ -1,19 +1,19 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Extensions;
 using Amethyst.Hosting;
-using Amethyst.Networking;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Plugins;
+using Amethyst.Utilities;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class MinecraftServer(
-    MinecraftServerConfiguration configuration,
+internal sealed class Server(
+    ServerOptions options,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
     PluginService pluginService,
@@ -24,8 +24,8 @@ internal sealed class MinecraftServer(
     public ServerStatus Status { get; } = ServerStatus.Create(
         nameof(Amethyst),
         ProtocolVersion,
-        configuration.MaximumPlayerCount,
-        configuration.Description);
+        options.MaximumPlayerCount,
+        options.Description);
 
     public IEnumerable<IPlayer> Players => clients.Values
         .Where(client => client.Player is not null)
@@ -35,8 +35,8 @@ internal sealed class MinecraftServer(
 
     private IConnectionListener? listener;
 
-    private readonly ILogger<MinecraftServer> logger = loggerFactory.CreateLogger<MinecraftServer>();
-    private readonly Dictionary<int, MinecraftClient> clients = [];
+    private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
+    private readonly Dictionary<int, Client> clients = [];
 
     public Task StartAsync()
     {
@@ -94,8 +94,8 @@ internal sealed class MinecraftServer(
 
     private async Task ListeningAsync()
     {
-        listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, configuration.ListeningPort), cancellationToken);
-        logger.LogInformation("Started listening for connections at port {ListeningPort}", configuration.ListeningPort);
+        listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, options.ListeningPort), cancellationToken);
+        logger.LogInformation("Started listening for connections at port {ListeningPort}", options.ListeningPort);
 
         var identifier = 0;
 
@@ -113,8 +113,8 @@ internal sealed class MinecraftServer(
 
                 logger.LogDebug("Accepted connection from: \"{EndPoint}\"", connection.RemoteEndPoint!.ToString());
 
-                var client = new MinecraftClient(
-                    loggerFactory.CreateLogger<MinecraftClient>(),
+                var client = new Client(
+                    loggerFactory.CreateLogger<Client>(),
                     this,
                     connection,
                     identifier);
@@ -124,11 +124,7 @@ internal sealed class MinecraftServer(
 
                 _ = ExecuteAsync(client);
             }
-            catch (OperationCanceledException)
-            {
-                // Ignore.
-            }
-            catch (Exception exception)
+            catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 logger.LogError(
                     "Unexpected exception while listening for connections: \"{Message}\"",
@@ -138,10 +134,9 @@ internal sealed class MinecraftServer(
 
         // The cancellation token has been cancelled, now unbind the listener.
         await listener.UnbindAsync(CancellationToken.None);
-
         return;
 
-        async Task ExecuteAsync(MinecraftClient client)
+        async Task ExecuteAsync(Client client)
         {
             await Task.Yield();
 
@@ -218,35 +213,5 @@ internal sealed class MinecraftServer(
         await Players
             .Select(player => DisconnectPlayerAsync(player, reason))
             .WhenAll();
-    }
-}
-
-internal sealed class BalancingTimer(int milliseconds, CancellationToken cancellationToken)
-{
-    private long delay;
-
-    private readonly Stopwatch stopwatch = new Stopwatch();
-    private readonly long ticksInterval = milliseconds * Stopwatch.Frequency / 1000L;
-
-    public async ValueTask<bool> WaitForNextTickAsync()
-    {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return false;
-        }
-
-        var delta = stopwatch.ElapsedTicks;
-        stopwatch.Restart();
-
-        delay += delta - ticksInterval;
-
-        if (delay >= 0)
-        {
-            return true;
-        }
-
-        var extraMilliseconds = (int) (-delay * 1000L / Stopwatch.Frequency);
-        await Task.Delay(extraMilliseconds, cancellationToken);
-        return true;
     }
 }

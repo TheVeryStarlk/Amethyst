@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Networking.Packets.Status;
+﻿using Amethyst.Extensions;
+
+namespace Amethyst.Networking.Packets.Status;
 
 internal sealed class PingRequestPacket : IIngoingPacket<PingRequestPacket>
 {
@@ -14,7 +16,7 @@ internal sealed class PingRequestPacket : IIngoingPacket<PingRequestPacket>
         };
     }
 
-    public async Task HandleAsync(MinecraftClient client)
+    public async Task HandleAsync(Client client)
     {
         await client.Transport.Output.WritePacketAsync(
             new PongResponsePacket

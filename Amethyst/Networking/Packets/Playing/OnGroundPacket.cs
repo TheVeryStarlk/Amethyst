@@ -14,7 +14,7 @@ internal sealed class OnGroundPacket : IIngoingPacket<OnGroundPacket>
         };
     }
 
-    public Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(Client client)
     {
         client.Player!.OnGround = OnGround;
         return Task.CompletedTask;

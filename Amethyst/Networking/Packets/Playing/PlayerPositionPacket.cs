@@ -21,7 +21,7 @@ internal sealed class PlayerPositionPacket : IIngoingPacket<PlayerPositionPacket
         };
     }
 
-    public Task HandleAsync(MinecraftClient client)
+    public Task HandleAsync(Client client)
     {
         client.Player!.Position = Position;
         client.Player.OnGround = OnGround;
