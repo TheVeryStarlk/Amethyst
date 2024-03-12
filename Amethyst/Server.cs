@@ -85,11 +85,11 @@ internal sealed class Server(
 
     public async Task DisconnectPlayerAsync(IPlayer player, ChatMessage reason)
     {
+        await player.DisconnectAsync(reason);
+
         logger.LogInformation("Disconnected player: \"{Username}\", for: \"{Reason}\"",
             player.Username,
             reason.Text);
-
-        await player.DisconnectAsync(reason);
     }
 
     private async Task ListeningAsync()
