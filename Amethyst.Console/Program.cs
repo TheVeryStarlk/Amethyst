@@ -3,7 +3,7 @@ using Amethyst.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-var loaded = new ServerOptions();
+var loaded = new AmethystServerOptions();
 
 const string directory = "Configuration";
 const string file = "configuration.json";
@@ -13,7 +13,7 @@ Directory.CreateDirectory(directory);
 try
 {
     var json = File.ReadAllText(Path.Combine(directory, file));
-    loaded = JsonSerializer.Deserialize<ServerOptions>(json)!;
+    loaded = JsonSerializer.Deserialize<AmethystServerOptions>(json)!;
 }
 catch
 {
@@ -28,7 +28,7 @@ catch
 await Host
     .CreateDefaultBuilder()
     .ConfigureLogging(configure => configure.SetMinimumLevel(LogLevel.Trace))
-    .ConfigureMinecraftServer((_, configuration) =>
+    .ConfigureAmethystServer((_, configuration) =>
     {
         configuration.ListeningPort = loaded.ListeningPort;
         configuration.Description = loaded.Description;

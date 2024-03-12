@@ -2,7 +2,7 @@
 
 namespace Amethyst.Hosting;
 
-public sealed class ServerOptions
+public sealed class AmethystServerOptions
 {
     public ushort ListeningPort { get; set; } = 25565;
 

@@ -9,13 +9,13 @@ namespace Amethyst.Hosting;
 
 public static class HostBuilderExtensions
 {
-    public static IHostBuilder ConfigureMinecraftServer(
+    public static IHostBuilder ConfigureAmethystServer(
         this IHostBuilder builder,
-        Action<HostBuilderContext, ServerOptions> configure)
+        Action<HostBuilderContext, AmethystServerOptions> configure)
     {
         builder.ConfigureServices((context, services) =>
         {
-            var options = new ServerOptions();
+            var options = new AmethystServerOptions();
             configure.Invoke(context, options);
 
             services.AddTransient<CommandService>();
