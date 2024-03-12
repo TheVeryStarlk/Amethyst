@@ -3,7 +3,7 @@ using Amethyst.Api.Entities;
 
 namespace Amethyst.Api;
 
-public interface IMinecraftServer : IAsyncDisposable
+public interface IServer : IAsyncDisposable
 {
     public ServerStatus Status { get; }
 

@@ -11,7 +11,7 @@ internal sealed class PluginRegistry(PluginService pluginService) : IPluginRegis
         pluginService.CommandService.Commands.Add(wrapper);
     }
 
-    public void RegisterEvent<T>(GenericDelegate<T> @delegate) where T : MinecraftEventArgsBase
+    public void RegisterEvent<T>(GenericDelegate<T> @delegate) where T : ServerEventArgsBase
     {
         var wrapper = new EventWrapper(typeof(T), @delegate);
         pluginService.EventService.Events.Add(wrapper);

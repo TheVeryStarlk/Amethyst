@@ -7,7 +7,7 @@ internal sealed class EventService(ILogger<EventService> logger)
 {
     public HashSet<EventWrapper> Events { get; } = [];
 
-    public async Task ExecuteEventAsync<T>(T eventArgs) where T : MinecraftEventArgsBase
+    public async Task ExecuteEventAsync<T>(T eventArgs) where T : ServerEventArgsBase
     {
         foreach (var @event in Events.Where(@event => @event.EventArgs == typeof(T)))
         {

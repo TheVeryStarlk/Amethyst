@@ -17,7 +17,7 @@ internal sealed class Server(
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
     PluginService pluginService,
-    CancellationToken cancellationToken) : IMinecraftServer
+    CancellationToken cancellationToken) : IServer
 {
     public const int ProtocolVersion = 47;
 

@@ -14,7 +14,7 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 
     public required ushort Port { get; init; }
 
-    public required MinecraftClientState NextState { get; init; }
+    public required ClientState NextState { get; init; }
 
     public static HandshakePacket Read(MemoryReader reader)
     {
@@ -23,17 +23,17 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
             ProtocolVersion = reader.ReadVariableInteger(),
             Address = reader.ReadVariableString(),
             Port = reader.ReadUnsignedShort(),
-            NextState = (MinecraftClientState) reader.ReadVariableInteger()
+            NextState = (ClientState) reader.ReadVariableInteger()
         };
     }
 
     public async Task HandleAsync(Client client)
     {
         if (ProtocolVersion != Server.ProtocolVersion
-            && NextState is MinecraftClientState.Login)
+            && NextState is ClientState.Login)
         {
             await client.Transport.Output.WritePacketAsync(
-                new DisconnectPacket(MinecraftClientState.Login)
+                new DisconnectPacket(ClientState.Login)
                 {
                     Reason = ChatMessage.Create(
                         ProtocolVersion > Server.ProtocolVersion

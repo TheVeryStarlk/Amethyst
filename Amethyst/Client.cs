@@ -27,7 +27,7 @@ internal sealed class Client(
 
     public CancellationToken CancellationToken => source.Token;
 
-    public MinecraftClientState State { get; private set; }
+    public ClientState State { get; private set; }
 
     public Player? Player { get; private set; }
 
@@ -50,11 +50,11 @@ internal sealed class Client(
 
                 var task = State switch
                 {
-                    MinecraftClientState.Handshaking => HandleHandshakingAsync(message),
-                    MinecraftClientState.Status => HandleStatusAsync(message),
-                    MinecraftClientState.Login => HandleLoginAsync(message),
-                    MinecraftClientState.Playing => HandlePlayingAsync(message),
-                    MinecraftClientState.Disconnected => throw new OperationCanceledException(),
+                    ClientState.Handshaking => HandleHandshakingAsync(message),
+                    ClientState.Status => HandleStatusAsync(message),
+                    ClientState.Login => HandleLoginAsync(message),
+                    ClientState.Playing => HandlePlayingAsync(message),
+                    ClientState.Disconnected => throw new OperationCanceledException(),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
@@ -87,12 +87,12 @@ internal sealed class Client(
 
     public async Task StopAsync()
     {
-        if (State is MinecraftClientState.Disconnected)
+        if (State is ClientState.Disconnected)
         {
             return;
         }
 
-        State = MinecraftClientState.Disconnected;
+        State = ClientState.Disconnected;
         await source.CancelAsync();
     }
 
@@ -137,7 +137,7 @@ internal sealed class Client(
         Player = new Player(this, loginStart.Username);
         await loginStart.HandleAsync(this);
 
-        State = MinecraftClientState.Playing;
+        State = ClientState.Playing;
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }
 
@@ -158,7 +158,7 @@ internal sealed class Client(
     }
 }
 
-internal enum MinecraftClientState
+internal enum ClientState
 {
     Handshaking,
     Status,

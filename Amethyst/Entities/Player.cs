@@ -13,7 +13,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public int Identifier { get; } = Random.Shared.Next();
 
-    public IMinecraftServer Server => client.Server;
+    public IServer Server => client.Server;
 
     public string Username => username;
 
@@ -54,7 +54,7 @@ internal sealed class Player(Client client, string username) : IPlayer
     public async Task DisconnectAsync(ChatMessage reason)
     {
         await client.Transport.Output.WritePacketAsync(
-            new DisconnectPacket(MinecraftClientState.Playing)
+            new DisconnectPacket(ClientState.Playing)
             {
                 Reason = reason
             });

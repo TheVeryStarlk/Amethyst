@@ -30,7 +30,7 @@ public static class HostBuilderExtensions
                 provider.GetRequiredService<PluginService>(),
                 provider.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping));
 
-            services.AddHostedService<MinecraftServerService>();
+            services.AddHostedService<ServerService>();
         });
 
         return builder;
