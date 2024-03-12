@@ -1,8 +1,8 @@
 ﻿using Amethyst.Api.Components;
 
-namespace Amethyst.Hosting;
+namespace Amethyst.Api;
 
-public sealed class AmethystServerOptions
+public sealed class ServerOptions
 {
     public ushort ListeningPort { get; set; } = 25565;
 

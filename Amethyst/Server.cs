@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Amethyst;
 
 internal sealed class Server(
-    AmethystServerOptions options,
+    ServerOptions options,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
     PluginService pluginService,

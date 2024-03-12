@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Amethyst.Hosting;
+namespace Amethyst.Services;
 
 internal sealed class ServerService(
     ILogger<ServerService> logger,

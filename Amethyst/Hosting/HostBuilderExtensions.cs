@@ -1,4 +1,6 @@
-﻿using Amethyst.Plugins;
+﻿using Amethyst.Api;
+using Amethyst.Plugins;
+using Amethyst.Services;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,13 +11,13 @@ namespace Amethyst.Hosting;
 
 public static class HostBuilderExtensions
 {
-    public static IHostBuilder ConfigureAmethystServer(
+    public static IHostBuilder ConfigureServer(
         this IHostBuilder builder,
-        Action<HostBuilderContext, AmethystServerOptions> configure)
+        Action<HostBuilderContext, ServerOptions> configure)
     {
         builder.ConfigureServices((context, services) =>
         {
-            var options = new AmethystServerOptions();
+            var options = new ServerOptions();
             configure.Invoke(context, options);
 
             services.AddTransient<CommandService>();
