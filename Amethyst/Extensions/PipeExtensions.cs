@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
+using Amethyst.Networking;
 using Amethyst.Networking.Packets;
 using Amethyst.Utilities;
 

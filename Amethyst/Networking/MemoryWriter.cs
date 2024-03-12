@@ -1,7 +1,7 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
 
-namespace Amethyst.Networking.Packets;
+namespace Amethyst.Networking;
 
 internal ref struct MemoryWriter(Memory<byte> memory)
 {

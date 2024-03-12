@@ -1,8 +1,6 @@
-﻿namespace Amethyst.Networking.Packets;
+﻿namespace Amethyst.Networking;
 
-internal interface IPacket
-{
-}
+internal interface IPacket;
 
 internal interface IIngoingPacket<out TSelf> : IPacket where TSelf : IIngoingPacket<TSelf>
 {
