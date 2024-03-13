@@ -37,20 +37,24 @@ internal sealed class Client(
 
     public async Task StartAsync()
     {
-        while (state is not ClientState.Disconnected)
+        while (true)
         {
             try
             {
                 var message = await Transport.Input.ReadMessageAsync(source.Token);
 
-                state = message is null ? ClientState.Disconnected : state;
+                if (message is null)
+                {
+                    state = ClientState.Disconnected;
+                    break;
+                }
 
                 var task = state switch
                 {
-                    ClientState.Handshaking => HandleHandshakingAsync(message!),
-                    ClientState.Status => HandleStatusAsync(message!),
-                    ClientState.Login => HandleLoginAsync(message!),
-                    ClientState.Playing => HandlePlayingAsync(message!),
+                    ClientState.Handshaking => HandleHandshakingAsync(message),
+                    ClientState.Status => HandleStatusAsync(message),
+                    ClientState.Login => HandleLoginAsync(message),
+                    ClientState.Playing => HandlePlayingAsync(message),
                     ClientState.Disconnected => Task.CompletedTask,
                     _ => throw new ArgumentOutOfRangeException()
                 };
