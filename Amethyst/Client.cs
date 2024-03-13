@@ -41,10 +41,7 @@ internal sealed class Client(
         {
             var message = await Transport.Input.ReadMessageAsync(source.Token);
 
-            if (message is null)
-            {
-                state = ClientState.Disconnected;
-            }
+            state = message is null ? ClientState.Disconnected : state;
 
             var task = state switch
             {
@@ -91,22 +88,19 @@ internal sealed class Client(
 
     private async Task HandleStatusAsync(Message message)
     {
-        if (message.Identifier == StatusRequestPacket.Identifier)
+        var task = message.Identifier switch
         {
-            await message.As<StatusRequestPacket>().HandleAsync(this);
-            return;
-        }
+            0x00 => message.As<StatusRequestPacket>().HandleAsync(this),
+            0x01 => message.As<PingRequestPacket>().HandleAsync(this),
+            _ => throw new InvalidOperationException("Unknown packet.")
+        };
 
-        if (message.Identifier == PingRequestPacket.Identifier)
-        {
-            await message.As<PingRequestPacket>().HandleAsync(this);
-        }
-        else
-        {
-            logger.LogDebug("Unknown packet while handling status");
-        }
+        await task;
 
-        await StopAsync();
+        if (message.Identifier == 0x01)
+        {
+            await StopAsync();
+        }
     }
 
     private async Task HandleLoginAsync(Message message)
