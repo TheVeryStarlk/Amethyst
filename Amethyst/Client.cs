@@ -39,22 +39,39 @@ internal sealed class Client(
     {
         while (state is not ClientState.Disconnected)
         {
-            var message = await Transport.Input.ReadMessageAsync(source.Token);
-
-            state = message is null ? ClientState.Disconnected : state;
-
-            var task = state switch
+            try
             {
-                ClientState.Handshaking => HandleHandshakingAsync(message!),
-                ClientState.Status => HandleStatusAsync(message!),
-                ClientState.Login => HandleLoginAsync(message!),
-                ClientState.Playing => HandlePlayingAsync(message!),
-                ClientState.Disconnected => HandleDisconnectedAsync(),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                var message = await Transport.Input.ReadMessageAsync(source.Token);
 
-            await task;
+                state = message is null ? ClientState.Disconnected : state;
+
+                var task = state switch
+                {
+                    ClientState.Handshaking => HandleHandshakingAsync(message!),
+                    ClientState.Status => HandleStatusAsync(message!),
+                    ClientState.Login => HandleLoginAsync(message!),
+                    ClientState.Playing => HandlePlayingAsync(message!),
+                    ClientState.Disconnected => Task.CompletedTask,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                await task;
+            }
+            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(
+                    "Unexpected exception while handling packets: \"{Message}\"",
+                    exception);
+
+                break;
+            }
         }
+
+        await HandleDisconnectedAsync();
 
         connection.Abort();
         logger.LogDebug("Client stopped {Identifier}", identifier);
