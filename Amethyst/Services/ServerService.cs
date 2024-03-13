@@ -11,7 +11,7 @@ internal sealed class ServerService(
     {
         try
         {
-            await server.StartAsync();
+            await server.StartAsync(cancellationToken);
         }
         catch (OperationCanceledException)
         {

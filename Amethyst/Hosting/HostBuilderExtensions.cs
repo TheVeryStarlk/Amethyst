@@ -17,8 +17,8 @@ public static class HostBuilderExtensions
     {
         builder.ConfigureServices((context, services) =>
         {
-            var options = new ServerConfiguration();
-            configure.Invoke(context, options);
+            var configuration = new ServerConfiguration();
+            configure.Invoke(context, configuration);
 
             services.AddTransient<CommandService>();
             services.AddTransient<EventService>();
@@ -26,11 +26,10 @@ public static class HostBuilderExtensions
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
 
             services.AddTransient(provider => new Server(
-                options,
+                configuration,
                 provider.GetRequiredService<IConnectionListenerFactory>(),
                 provider.GetRequiredService<ILoggerFactory>(),
-                provider.GetRequiredService<PluginService>(),
-                provider.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping));
+                provider.GetRequiredService<PluginService>()));
 
             services.AddHostedService<ServerService>();
         });

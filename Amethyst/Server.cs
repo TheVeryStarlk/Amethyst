@@ -14,8 +14,7 @@ internal sealed class Server(
     ServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
-    PluginService pluginService,
-    CancellationToken cancellationToken) : IServer
+    PluginService pluginService) : IServer
 {
     public const int ProtocolVersion = 47;
 
@@ -36,7 +35,7 @@ internal sealed class Server(
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly Dictionary<int, Client> clients = [];
 
-    public Task StartAsync()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         if (listener is not null)
         {
@@ -46,7 +45,7 @@ internal sealed class Server(
         pluginService.Load();
 
         logger.LogInformation("Starting the server tasks");
-        return Task.WhenAll(ListeningAsync(), TickingAsync());
+        return Task.WhenAll(ListeningAsync(cancellationToken), TickingAsync(cancellationToken));
     }
 
     public async Task StopAsync()
@@ -90,7 +89,7 @@ internal sealed class Server(
             reason.Text);
     }
 
-    private async Task ListeningAsync()
+    private async Task ListeningAsync(CancellationToken cancellationToken)
     {
         listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, configuration.ListeningPort), cancellationToken);
         logger.LogInformation("Started listening for connections at port {ListeningPort}", configuration.ListeningPort);
@@ -163,7 +162,7 @@ internal sealed class Server(
         }
     }
 
-    private async Task TickingAsync()
+    private async Task TickingAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Started ticking");
 
