@@ -13,10 +13,26 @@ internal sealed class ServerService(
         {
             await server.StartAsync();
         }
-        catch (Exception exception) when (exception is not OperationCanceledException)
+        catch (OperationCanceledException)
         {
+            // Ignore.
+        }
+        catch (Exception exception)
+        {
+            var bye = new[]
+            {
+                "I guess we got hit by a cosmic ray.",
+                "Please don't forget to report this error. 😭",
+                "At least I tried...",
+                "Hopefully won't happen again...",
+                "I got tired, bye..."
+            };
+
+            logger.LogCritical("Amethyst has crashed! {Message}",
+                bye[Random.Shared.Next(bye.Length)]);
+
             logger.LogError(
-                "Unexpected exception from server: \"{Message}\"",
+                "Unexpected exception from server: \"{Exception}\"",
                 exception);
         }
         finally

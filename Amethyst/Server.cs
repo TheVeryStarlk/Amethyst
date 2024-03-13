@@ -122,16 +122,22 @@ internal sealed class Server(
 
                 _ = ExecuteAsync(client);
             }
-            catch (Exception exception) when (exception is not OperationCanceledException)
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
             {
                 logger.LogError(
                     "Unexpected exception while listening for connections: \"{Message}\"",
                     exception);
+
+                break;
             }
         }
 
-        // The cancellation token has been cancelled, now unbind the listener.
-        await listener.UnbindAsync(CancellationToken.None);
+        logger.LogCritical("Stopped listening for connections");
+        await listener.UnbindAsync();
         return;
 
         async Task ExecuteAsync(Client client)
@@ -167,7 +173,7 @@ internal sealed class Server(
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                foreach (var client in clients.Values.Where(client => client.Player is not null))
+                foreach (var client in clients.Values.ToArray().Where(client => client.Player is not null))
                 {
                     if (client.KeepAliveCount > configuration.MaximumMissedKeepAliveCount)
                     {
@@ -189,14 +195,8 @@ internal sealed class Server(
         {
             // Ignore.
         }
-        catch (Exception exception)
-        {
-            logger.LogError(
-                "Unexpected exception while ticking: \"{Message}\"",
-                exception);
-        }
 
-        logger.LogInformation("Disconnecting players");
+        logger.LogCritical("Stopped ticking");
 
         var reason = ChatMessage.Create("Server stopped.", Color.Red);
 
