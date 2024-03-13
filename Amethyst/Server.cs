@@ -3,7 +3,6 @@ using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Extensions;
-using Amethyst.Hosting;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Plugins;
 using Amethyst.Utilities;

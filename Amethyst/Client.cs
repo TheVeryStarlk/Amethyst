@@ -1,8 +1,10 @@
 ﻿using System.IO.Pipelines;
 using Amethyst.Api.Components;
+using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Entities;
 using Amethyst.Extensions;
+using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
@@ -25,13 +27,11 @@ internal sealed class Client(
 
     public IDuplexPipe Transport => connection.Transport;
 
-    public CancellationToken CancellationToken => source.Token;
-
-    public ClientState State { get; private set; }
-
     public Player? Player { get; private set; }
 
     public int KeepAliveCount { get; set; }
+
+    private ClientState state;
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
@@ -41,14 +41,14 @@ internal sealed class Client(
         {
             try
             {
-                var message = await Transport.Input.ReadMessageAsync(CancellationToken);
+                var message = await Transport.Input.ReadMessageAsync(source.Token);
 
                 if (message is null)
                 {
                     break;
                 }
 
-                var task = State switch
+                var task = state switch
                 {
                     ClientState.Handshaking => HandleHandshakingAsync(message),
                     ClientState.Status => HandleStatusAsync(message),
@@ -87,12 +87,12 @@ internal sealed class Client(
 
     public async Task StopAsync()
     {
-        if (State is ClientState.Disconnected)
+        if (state is ClientState.Disconnected)
         {
             return;
         }
 
-        State = ClientState.Disconnected;
+        state = ClientState.Disconnected;
         await source.CancelAsync();
     }
 
@@ -107,8 +107,8 @@ internal sealed class Client(
         var handshake = message.As<HandshakePacket>();
         await handshake.HandleAsync(this);
 
-        State = handshake.NextState;
-        logger.LogDebug("Client switched state to {State}", State);
+        state = handshake.NextState;
+        logger.LogDebug("Client switched state to {State}", state);
     }
 
     private async Task HandleStatusAsync(Message message)
@@ -134,10 +134,15 @@ internal sealed class Client(
     private async Task HandleLoginAsync(Message message)
     {
         var loginStart = message.As<LoginStartPacket>();
-        Player = new Player(this, loginStart.Username);
+
+        Player = new Player(this, loginStart.Username)
+        {
+            GameMode = GameMode.Creative
+        };
+
         await loginStart.HandleAsync(this);
 
-        State = ClientState.Playing;
+        state = ClientState.Playing;
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }
 

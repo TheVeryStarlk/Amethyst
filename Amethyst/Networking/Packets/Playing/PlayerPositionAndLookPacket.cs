@@ -8,21 +8,23 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
 
     public int Identifier => 0x08;
 
-    public required Position Position { get; set; }
+    public required Position Position { get; init; }
 
-    public float Yaw { get; set; }
+    public float Yaw { get; init; }
 
-    public float Pitch { get; set; }
+    public float Pitch { get; init; }
 
-    public bool OnGround { get; set; }
+    public bool OnGround { get; init; }
 
     public static PlayerPositionAndLookPacket Read(MemoryReader reader)
     {
-        var position = new Position(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
-
         return new PlayerPositionAndLookPacket
         {
-            Position = position,
+            Position = new Position(
+                reader.ReadFloat(),
+                reader.ReadFloat(),
+                reader.ReadFloat()),
+
             Yaw = reader.ReadFloat(),
             Pitch = reader.ReadFloat(),
             OnGround = reader.ReadBoolean()

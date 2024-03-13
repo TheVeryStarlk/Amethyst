@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
 using Amethyst.Networking;
-using Amethyst.Networking.Packets;
 using Amethyst.Utilities;
 
 namespace Amethyst.Extensions;
@@ -84,19 +83,5 @@ internal static class PipeExtensions
             writer.WriteVariableInteger(packet.Identifier);
             return packet.Write(ref writer);
         }
-    }
-}
-
-internal sealed record Message(int Identifier, Memory<byte> Memory)
-{
-    public T As<T>() where T : IIngoingPacket<T>
-    {
-        if (T.Identifier != Identifier)
-        {
-            throw new ArgumentException($"Expected {T.Identifier} but got {Identifier} instead.");
-        }
-
-        var reader = new MemoryReader(Memory);
-        return T.Read(reader);
     }
 }

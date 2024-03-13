@@ -6,19 +6,20 @@ namespace Amethyst.Extensions;
 
 internal static class JsonSerializerExtensions
 {
-    private static JsonSerializerOptions Custom => new JsonSerializerOptions
-    {
-        AllowTrailingCommas = true,
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        Converters =
+    private static JsonSerializerOptions Custom { get; } =
+        new JsonSerializerOptions
         {
-            new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)
-        }
-    };
+            AllowTrailingCommas = true,
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)
+            }
+        };
 
     public static string Serialize<T>(this T instance)
     {

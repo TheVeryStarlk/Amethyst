@@ -6,17 +6,19 @@ internal sealed class PlayerPositionPacket : IIngoingPacket<PlayerPositionPacket
 {
     public static int Identifier => 0x04;
 
-    public required Position Position { get; set; }
+    public required Position Position { get; init; }
 
     public required bool OnGround { get; init; }
 
     public static PlayerPositionPacket Read(MemoryReader reader)
     {
-        var position = new Position(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
-
         return new PlayerPositionPacket
         {
-            Position = position,
+            Position = new Position(
+                reader.ReadFloat(),
+                reader.ReadFloat(),
+                reader.ReadFloat()),
+
             OnGround = reader.ReadBoolean()
         };
     }

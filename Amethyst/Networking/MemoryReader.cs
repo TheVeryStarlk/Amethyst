@@ -56,11 +56,6 @@ internal ref struct MemoryReader(Memory<byte> memory)
         return span[position++] == 1;
     }
 
-    public double ReadDouble()
-    {
-        return BinaryPrimitives.ReadDoubleBigEndian(span[position..(position += sizeof(double))]);
-    }
-
     public float ReadFloat()
     {
         return BinaryPrimitives.ReadSingleBigEndian(span[position..(position += sizeof(float))]);

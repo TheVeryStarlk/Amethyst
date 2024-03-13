@@ -11,11 +11,13 @@ internal sealed class Player(Client client, string username) : IPlayer
 {
     public Guid Guid { get; } = Guid.NewGuid();
 
-    public int Identifier { get; } = Random.Shared.Next();
-
     public IServer Server => client.Server;
 
     public string Username => username;
+
+    public GameMode GameMode { get; set; }
+
+    public int Identifier { get; } = Random.Shared.Next();
 
     public Position Position { get; set; }
 
@@ -25,12 +27,8 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public GameMode GameMode { get; set; }
-
     public async Task TeleportAsync(Position position)
     {
-        Position = position;
-
         await client.Transport.Output.WritePacketAsync(
             new PlayerPositionAndLookPacket
             {
@@ -39,6 +37,8 @@ internal sealed class Player(Client client, string username) : IPlayer
                 Pitch = Pitch,
                 OnGround = OnGround
             });
+
+        Position = position;
     }
 
     public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
