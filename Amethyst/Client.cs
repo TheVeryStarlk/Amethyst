@@ -27,11 +27,11 @@ internal sealed class Client(
 
     public IDuplexPipe Transport => connection.Transport;
 
+    public ClientState State { get; private set; }
+
     public Player? Player { get; private set; }
 
     public int KeepAliveCount { get; set; }
-
-    private ClientState state;
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
@@ -45,11 +45,11 @@ internal sealed class Client(
 
                 if (message is null)
                 {
-                    state = ClientState.Disconnected;
+                    State = ClientState.Disconnected;
                     break;
                 }
 
-                var task = state switch
+                var task = State switch
                 {
                     ClientState.Handshaking => HandleHandshakingAsync(message),
                     ClientState.Status => HandleStatusAsync(message),
@@ -83,12 +83,12 @@ internal sealed class Client(
 
     public async Task StopAsync()
     {
-        if (state is ClientState.Disconnected)
+        if (State is ClientState.Disconnected)
         {
             return;
         }
 
-        state = ClientState.Disconnected;
+        State = ClientState.Disconnected;
         await source.CancelAsync();
     }
 
@@ -103,8 +103,8 @@ internal sealed class Client(
         var handshake = message.As<HandshakePacket>();
         await handshake.HandleAsync(this);
 
-        state = handshake.NextState;
-        logger.LogDebug("Client switched state to {State}", state);
+        State = handshake.NextState;
+        logger.LogDebug("Client switched state to {State}", State);
     }
 
     private async Task HandleStatusAsync(Message message)
@@ -135,7 +135,7 @@ internal sealed class Client(
 
         await loginStart.HandleAsync(this);
 
-        state = ClientState.Playing;
+        State = ClientState.Playing;
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }
 

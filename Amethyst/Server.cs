@@ -173,7 +173,7 @@ internal sealed class Server(
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                foreach (var client in clients.Values.ToArray().Where(client => client.Player is not null))
+                foreach (var client in clients.Values.ToArray().Where(client => client.State is ClientState.Playing))
                 {
                     if (client.KeepAliveCount > configuration.MaximumMissedKeepAliveCount)
                     {
