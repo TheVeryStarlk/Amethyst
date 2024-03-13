@@ -163,11 +163,11 @@ internal sealed class Server(
         logger.LogInformation("Started ticking");
 
         var keepAliveTick = 0;
-        var timer = new BalancingTimer(50, cancellationToken);
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
 
         try
         {
-            while (await timer.WaitForNextTickAsync())
+            while (await timer.WaitForNextTickAsync(cancellationToken))
             {
                 keepAliveTick++;
 
