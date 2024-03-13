@@ -13,11 +13,11 @@ public static class HostBuilderExtensions
 {
     public static IHostBuilder ConfigureServer(
         this IHostBuilder builder,
-        Action<HostBuilderContext, ServerOptions> configure)
+        Action<HostBuilderContext, ServerConfiguration> configure)
     {
         builder.ConfigureServices((context, services) =>
         {
-            var options = new ServerOptions();
+            var options = new ServerConfiguration();
             configure.Invoke(context, options);
 
             services.AddTransient<CommandService>();

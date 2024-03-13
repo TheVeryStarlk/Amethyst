@@ -5,14 +5,13 @@ using Amethyst.Api.Entities;
 using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Plugins;
-using Amethyst.Utilities;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
 internal sealed class Server(
-    ServerOptions options,
+    ServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
     PluginService pluginService,
@@ -23,8 +22,8 @@ internal sealed class Server(
     public ServerStatus Status { get; } = ServerStatus.Create(
         nameof(Amethyst),
         ProtocolVersion,
-        options.MaximumPlayerCount,
-        options.Description);
+        configuration.MaximumPlayerCount,
+        configuration.Description);
 
     public IEnumerable<IPlayer> Players => clients.Values
         .Where(client => client.Player is not null)
@@ -93,8 +92,8 @@ internal sealed class Server(
 
     private async Task ListeningAsync()
     {
-        listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, options.ListeningPort), cancellationToken);
-        logger.LogInformation("Started listening for connections at port {ListeningPort}", options.ListeningPort);
+        listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, configuration.ListeningPort), cancellationToken);
+        logger.LogInformation("Started listening for connections at port {ListeningPort}", configuration.ListeningPort);
 
         var identifier = 0;
 
@@ -162,35 +161,27 @@ internal sealed class Server(
     {
         logger.LogInformation("Started ticking");
 
-        var keepAliveTick = 0;
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
 
         try
         {
             while (await timer.WaitForNextTickAsync(cancellationToken))
             {
-                keepAliveTick++;
-
-                if (keepAliveTick == 50)
+                foreach (var client in clients.Values.Where(client => client.Player is not null))
                 {
-                    keepAliveTick = 0;
-
-                    foreach (var client in clients.Values.Where(client => client.Player is not null))
+                    if (client.KeepAliveCount > configuration.MaximumMissedKeepAliveCount)
                     {
-                        if (client.KeepAliveCount > 5)
-                        {
-                            await DisconnectPlayerAsync(client.Player!, ChatMessage.Create("Timed out.", Color.Red));
-                            continue;
-                        }
-
-                        await client.Transport.Output.WritePacketAsync(
-                            new KeepAlivePacket
-                            {
-                                Payload = keepAliveTick
-                            });
-
-                        client.KeepAliveCount++;
+                        await DisconnectPlayerAsync(client.Player!, ChatMessage.Create("Timed out.", Color.Red));
+                        continue;
                     }
+
+                    await client.Transport.Output.WritePacketAsync(
+                        new KeepAlivePacket
+                        {
+                            Payload = Random.Shared.Next()
+                        });
+
+                    client.KeepAliveCount++;
                 }
             }
         }

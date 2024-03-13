@@ -37,48 +37,26 @@ internal sealed class Client(
 
     public async Task StartAsync()
     {
-        while (!source.IsCancellationRequested)
+        while (state is not ClientState.Disconnected)
         {
-            try
+            var message = await Transport.Input.ReadMessageAsync(source.Token);
+
+            if (message is null)
             {
-                var message = await Transport.Input.ReadMessageAsync(source.Token);
-
-                if (message is null)
-                {
-                    break;
-                }
-
-                var task = state switch
-                {
-                    ClientState.Handshaking => HandleHandshakingAsync(message),
-                    ClientState.Status => HandleStatusAsync(message),
-                    ClientState.Login => HandleLoginAsync(message),
-                    ClientState.Playing => HandlePlayingAsync(message),
-                    ClientState.Disconnected => throw new OperationCanceledException(),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
-                await task;
+                state = ClientState.Disconnected;
             }
-            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
+
+            var task = state switch
             {
-                break;
-            }
-        }
+                ClientState.Handshaking => HandleHandshakingAsync(message!),
+                ClientState.Status => HandleStatusAsync(message!),
+                ClientState.Login => HandleLoginAsync(message!),
+                ClientState.Playing => HandlePlayingAsync(message!),
+                ClientState.Disconnected => HandleDisconnectedAsync(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
-        if (Player is not null)
-        {
-            Server.Status.PlayerInformation.Online--;
-
-            var eventArgs = await Server.PluginService.ExecuteAsync(
-                new PlayerLeaveEventArgs
-                {
-                    Server = Server,
-                    Player = Player,
-                    Message = ChatMessage.Create($"{Player.Username} has left the server.", Color.Yellow)
-                });
-
-            await Server.BroadcastChatMessageAsync(eventArgs.Message);
+            await task;
         }
 
         connection.Abort();
@@ -160,6 +138,26 @@ internal sealed class Client(
         };
 
         await task;
+    }
+
+    private async Task HandleDisconnectedAsync()
+    {
+        if (Player is null)
+        {
+            return;
+        }
+
+        Server.Status.PlayerInformation.Online--;
+
+        var eventArgs = await Server.PluginService.ExecuteAsync(
+            new PlayerLeaveEventArgs
+            {
+                Server = Server,
+                Player = Player,
+                Message = ChatMessage.Create($"{Player.Username} has left the server.", Color.Yellow)
+            });
+
+        await Server.BroadcastChatMessageAsync(eventArgs.Message);
     }
 }
 
