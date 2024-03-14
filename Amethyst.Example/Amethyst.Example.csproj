@@ -7,7 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Amethyst.Api\Amethyst.Api.csproj" />
+        <ProjectReference Include="..\Amethyst.Api\Amethyst.Api.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0"/>
     </ItemGroup>
 
 </Project>

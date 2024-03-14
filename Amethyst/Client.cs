@@ -1,7 +1,7 @@
 ﻿using System.IO.Pipelines;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
-using Amethyst.Api.Plugins.Events;
+using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Networking;
@@ -9,7 +9,6 @@ using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Networking.Packets.Status;
-using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -181,8 +180,8 @@ internal sealed class Client(
 
         Server.Status.PlayerInformation.Online--;
 
-        var eventArgs = await Server.PluginService.ExecuteAsync(
-            new PlayerLeaveEventArgs
+        var eventArgs = await Server.EventService.ExecuteAsync(
+            new PlayerLeftEventArgs
             {
                 Server = Server,
                 Player = Player,

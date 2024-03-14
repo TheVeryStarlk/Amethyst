@@ -1,0 +1,10 @@
+﻿using Amethyst.Api.Components;
+
+namespace Amethyst.Api.Events.Minecraft.Player;
+
+public sealed class PlayerLeftEventArgs : PlayerEventArgsBase
+{
+    public required ChatMessage Message { get; set; }
+
+    public DateTimeOffset DateTimeOffset { get; init; }
+}

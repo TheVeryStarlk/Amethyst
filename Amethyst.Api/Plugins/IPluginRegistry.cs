@@ -1,12 +1,11 @@
-﻿using Amethyst.Api.Plugins.Events;
+﻿using Amethyst.Api.Commands;
+using Amethyst.Api.Events;
 
 namespace Amethyst.Api.Plugins;
 
 public interface IPluginRegistry
 {
-    public void RegisterCommand(string name, GenericDelegate<CommandContext> @delegate);
+    public void RegisterCommand(string name, Func<Command, Task> @delegate);
 
-    public void RegisterEvent<T>(GenericDelegate<T> @delegate) where T : ServerEventArgsBase;
+    public void RegisterEvent<TEventArgs>(Func<TEventArgs, Task> @delegate) where TEventArgs : AmethystEventArgsBase;
 }
-
-public delegate Task GenericDelegate<in T>(T @event);

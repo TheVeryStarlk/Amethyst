@@ -1,6 +1,7 @@
-﻿using Amethyst.Api.Components;
+﻿using Amethyst.Api.Events.Minecraft;
+using Amethyst.Api.Events.Plugin;
 using Amethyst.Api.Plugins;
-using Amethyst.Api.Plugins.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Example;
 
@@ -8,45 +9,31 @@ public sealed class CustomPlugin : PluginBase
 {
     public override PluginConfiguration Configuration => new PluginConfiguration
     {
-        Name = "Custom provider"
+        Name = "Custom plugin",
+        Description = "A custom plugin that demonstrates the API."
     };
 
     public override void ConfigureRegistry(IPluginRegistry registry)
     {
-        registry.RegisterCommand(
-            "kick",
+        registry.RegisterEvent<DescriptionRequestedEventArgs>(
             async eventArgs =>
             {
-                if (eventArgs.Arguments.Length > 1)
-                {
-                    await eventArgs.Player.Server.DisconnectPlayerAsync(
-                        eventArgs.Player.Server.Players.First(player =>
-                            player.Username.Equals(eventArgs.Arguments[0], StringComparison.CurrentCultureIgnoreCase)),
-                        ChatMessage.Create(string.Join(" ", eventArgs.Arguments[1..]), Color.Red));
-                }
-                else
-                {
-                    await eventArgs.Player.SendChatMessageAsync(
-                        ChatMessage.Create("Invalid kick command.", Color.Red));
-                }
+                eventArgs.Description = "Hello from plugin!";
+                await eventArgs.Server.BroadcastChatMessageAsync("Status requested!");
             });
 
-        registry.RegisterEvent<DescriptionRequestedEventArgs>(eventArgs =>
-        {
-            eventArgs.Description = ChatMessage.Create($"Current date is {DateTime.Now}");
-            return Task.CompletedTask;
-        });
+        registry.RegisterEvent<PluginEnabledEventArgs>(
+            eventArgs =>
+            {
+                Logger!.LogInformation("I have been enabled @ {Offset}", eventArgs.DateTimeOffset);
+                return Task.CompletedTask;
+            });
 
-        registry.RegisterEvent<PlayerJoinedEventArgs>(eventArgs =>
-        {
-            eventArgs.Message = ChatMessage.Create($"Welcome {eventArgs.Player.Username}!", Color.Green);
-            return Task.CompletedTask;
-        });
-
-        registry.RegisterEvent<PlayerLeaveEventArgs>(eventArgs =>
-        {
-            eventArgs.Message = ChatMessage.Create($"Good bye {eventArgs.Player.Username}...", Color.Red);
-            return Task.CompletedTask;
-        });
+        registry.RegisterEvent<PluginDisabledEventArgs>(
+            eventArgs =>
+            {
+                Logger!.LogWarning("I have been disabled @ {Offset}", eventArgs.DateTimeOffset);
+                return Task.CompletedTask;
+            });
     }
 }

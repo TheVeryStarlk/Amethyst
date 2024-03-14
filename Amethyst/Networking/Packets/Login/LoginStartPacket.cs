@@ -1,8 +1,7 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Api.Plugins.Events;
+using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Playing;
-using Amethyst.Plugins;
 
 namespace Amethyst.Networking.Packets.Login;
 
@@ -45,7 +44,7 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
                 Pitch = client.Player.Pitch,
             });
 
-        var eventArgs = await client.Server.PluginService.ExecuteAsync(
+        var eventArgs = await client.Server.EventService.ExecuteAsync(
             new PlayerJoinedEventArgs
             {
                 Server = client.Server,

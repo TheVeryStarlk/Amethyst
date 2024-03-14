@@ -28,6 +28,11 @@ public sealed class ChatMessage
             Color = color
         };
     }
+
+    public static implicit operator ChatMessage(string value)
+    {
+        return Create(value);
+    }
 }
 
 public enum Color

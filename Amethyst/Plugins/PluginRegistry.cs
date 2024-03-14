@@ -1,19 +1,19 @@
-﻿using Amethyst.Api.Plugins;
-using Amethyst.Api.Plugins.Events;
+﻿using Amethyst.Api.Commands;
+using Amethyst.Api.Events;
+using Amethyst.Api.Plugins;
+using Amethyst.Services;
 
 namespace Amethyst.Plugins;
 
-internal sealed class PluginRegistry(PluginService pluginService) : IPluginRegistry
+internal sealed class PluginRegistry(CommandService commandService, EventService eventService) : IPluginRegistry
 {
-    public void RegisterCommand(string name, GenericDelegate<CommandContext> @delegate)
+    public void RegisterCommand(string name, Func<Command, Task> @delegate)
     {
-        var wrapper = new CommandWrapper(name, @delegate);
-        pluginService.CommandService.Commands.Add(wrapper);
+        commandService.Register(name, @delegate);
     }
 
-    public void RegisterEvent<T>(GenericDelegate<T> @delegate) where T : ServerEventArgsBase
+    public void RegisterEvent<TEventArgs>(Func<TEventArgs, Task> @delegate) where TEventArgs : AmethystEventArgsBase
     {
-        var wrapper = new EventWrapper(typeof(T), @delegate);
-        pluginService.EventService.Events.Add(wrapper);
+        eventService.Register(@delegate);
     }
 }

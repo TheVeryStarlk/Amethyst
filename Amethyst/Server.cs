@@ -2,9 +2,9 @@
 using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Events.Plugin;
 using Amethyst.Extensions;
-using Amethyst.Networking.Packets.Playing;
-using Amethyst.Plugins;
+using Amethyst.Services;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +14,9 @@ internal sealed class Server(
     ServerConfiguration configuration,
     IConnectionListenerFactory listenerFactory,
     ILoggerFactory loggerFactory,
-    PluginService pluginService) : IServer
+    PluginService pluginService,
+    EventService eventService,
+    CommandService commandService) : IServer
 {
     public const int ProtocolVersion = 47;
 
@@ -30,24 +32,38 @@ internal sealed class Server(
         .Where(client => client.Player is not null)
         .Select(client => client.Player!);
 
-    public PluginService PluginService => pluginService;
+    public CommandService CommandService => commandService;
+
+    public EventService EventService => eventService;
 
     private IConnectionListener? listener;
 
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly Dictionary<int, Client> clients = [];
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (listener is not null)
         {
             throw new InvalidOperationException("Server has already started.");
         }
 
-        pluginService.Load();
+        pluginService.Initialize();
+
+        await eventService.ExecuteAsync(new PluginEnabledEventArgs
+        {
+            Server = this,
+            DateTimeOffset = DateTimeOffset.Now
+        });
 
         logger.LogInformation("Starting the server tasks");
-        return Task.WhenAll(ListeningAsync(cancellationToken), TickingAsync(cancellationToken));
+        await Task.WhenAll(ListeningAsync(cancellationToken), TickingAsync(cancellationToken));
+
+        await eventService.ExecuteAsync(new PluginDisabledEventArgs
+        {
+            Server = this,
+            DateTimeOffset = DateTimeOffset.Now
+        });
     }
 
     public async Task StopAsync()
@@ -66,11 +82,11 @@ internal sealed class Server(
             await listener.DisposeAsync();
         }
 
-        await pluginService.DisposeAsync();
-
         await clients.Values
             .Select(client => client.DisposeAsync().AsTask())
             .WhenAll();
+
+        await pluginService.DisposeAsync();
     }
 
     public async Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)

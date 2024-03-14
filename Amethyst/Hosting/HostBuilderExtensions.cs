@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Plugins;
 using Amethyst.Plugins;
 using Amethyst.Services;
 using Microsoft.AspNetCore.Connections;
@@ -20,17 +21,15 @@ public static class HostBuilderExtensions
             var configuration = new ServerConfiguration();
             configure.Invoke(context, configuration);
 
-            services.AddTransient<CommandService>();
-            services.AddTransient<EventService>();
+            services.AddTransient(_ => configuration);
+            services.AddSingleton<CommandService>();
+            services.AddSingleton<EventService>();
+
+            services.AddTransient<IPluginRegistry, PluginRegistry>();
             services.AddSingleton<PluginService>();
+
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
-
-            services.AddTransient(provider => new Server(
-                configuration,
-                provider.GetRequiredService<IConnectionListenerFactory>(),
-                provider.GetRequiredService<ILoggerFactory>(),
-                provider.GetRequiredService<PluginService>()));
-
+            services.AddSingleton<Server>();
             services.AddHostedService<ServerService>();
         });
 

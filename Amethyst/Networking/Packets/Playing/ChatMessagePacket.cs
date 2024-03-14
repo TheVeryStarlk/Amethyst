@@ -42,7 +42,7 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
     {
         if (Message.Text.StartsWith('/'))
         {
-            await client.Server.PluginService.CommandService.ExecuteCommandAsync(
+            await client.Server.CommandService.ExecuteAsync(
                 client.Player!,
                 Message.Text[1..]);
         }

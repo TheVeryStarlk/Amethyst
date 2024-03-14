@@ -1,6 +1,5 @@
-﻿using Amethyst.Api.Plugins.Events;
+﻿using Amethyst.Api.Events.Minecraft;
 using Amethyst.Extensions;
-using Amethyst.Plugins;
 
 namespace Amethyst.Networking.Packets.Status;
 
@@ -15,7 +14,7 @@ internal sealed class StatusRequestPacket: IIngoingPacket<StatusRequestPacket>
 
     public async Task HandleAsync(Client client)
     {
-        var eventArgs = await client.Server.PluginService.ExecuteAsync(
+        var eventArgs = await client.Server.EventService.ExecuteAsync(
             new DescriptionRequestedEventArgs
             {
                 Server = client.Server,
