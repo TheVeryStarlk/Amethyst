@@ -31,7 +31,7 @@ internal sealed class Client(
 
     public Player? Player { get; private set; }
 
-    public int KeepAliveCount { get; set; }
+    public int MissedKeepAliveCount { get; set; }
 
     private readonly CancellationTokenSource source = new CancellationTokenSource();
 
@@ -96,6 +96,23 @@ internal sealed class Client(
     {
         source.Dispose();
         await connection.DisposeAsync();
+    }
+
+    public async Task KeepAliveAsync()
+    {
+        if (MissedKeepAliveCount > server.Configuration.MaximumMissedKeepAliveCount)
+        {
+            await Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
+            return;
+        }
+
+        await Transport.Output.WritePacketAsync(
+            new KeepAlivePacket
+            {
+                Payload = Random.Shared.Next()
+            });
+
+        MissedKeepAliveCount++;
     }
 
     private async Task HandleHandshakingAsync(Message message)

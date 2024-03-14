@@ -31,7 +31,7 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
 
     public Task HandleAsync(Client client)
     {
-        client.KeepAliveCount--;
+        client.MissedKeepAliveCount--;
         return Task.CompletedTask;
     }
 }

@@ -5,6 +5,8 @@ namespace Amethyst.Api;
 
 public interface IServer : IAsyncDisposable
 {
+    public ServerConfiguration Configuration { get; }
+
     public ServerStatus Status { get; }
 
     public IEnumerable<IPlayer> Players { get; }

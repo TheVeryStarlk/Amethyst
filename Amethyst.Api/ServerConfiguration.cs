@@ -10,5 +10,5 @@ public sealed class ServerConfiguration
 
     public int MaximumPlayerCount { get; set; } = 20;
 
-    public int MaximumMissedKeepAliveCount { get; set; } = 5;
+    public int MaximumMissedKeepAliveCount { get; set; } = 50;
 }

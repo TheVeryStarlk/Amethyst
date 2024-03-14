@@ -18,6 +18,8 @@ internal sealed class Server(
 {
     public const int ProtocolVersion = 47;
 
+    public ServerConfiguration Configuration => configuration;
+
     public ServerStatus Status { get; } = ServerStatus.Create(
         nameof(Amethyst),
         ProtocolVersion,
@@ -136,7 +138,9 @@ internal sealed class Server(
         }
 
         logger.LogCritical("Stopped listening for connections");
-        await listener.UnbindAsync();
+
+        // Ignore the parent method's cancellation token.
+        await listener.UnbindAsync(CancellationToken.None);
         return;
 
         async Task ExecuteAsync(Client client)
@@ -168,31 +172,27 @@ internal sealed class Server(
 
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
 
-        try
+        while (!cancellationToken.IsCancellationRequested)
         {
-            while (await timer.WaitForNextTickAsync(cancellationToken))
+            try
             {
-                foreach (var client in clients.Values.ToArray().Where(client => client.State is ClientState.Playing))
-                {
-                    if (client.KeepAliveCount > configuration.MaximumMissedKeepAliveCount)
-                    {
-                        await DisconnectPlayerAsync(client.Player!, ChatMessage.Create("Timed out.", Color.Red));
-                        continue;
-                    }
+                await timer.WaitForNextTickAsync(cancellationToken);
 
-                    await client.Transport.Output.WritePacketAsync(
-                        new KeepAlivePacket
-                        {
-                            Payload = Random.Shared.Next()
-                        });
-
-                    client.KeepAliveCount++;
-                }
+                await clients.Values
+                    .Where(client => client.State is ClientState.Playing)
+                    .Select(client => client.KeepAliveAsync())
+                    .WhenAll();
             }
-        }
-        catch (OperationCanceledException)
-        {
-            // Ignore.
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(
+                    "Unexpected exception while ticking: \"{Message}\"",
+                    exception);
+            }
         }
 
         logger.LogCritical("Stopped ticking");
