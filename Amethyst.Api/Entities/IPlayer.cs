@@ -4,6 +4,8 @@ namespace Amethyst.Api.Entities;
 
 public interface IPlayer : IEntity
 {
+    public Guid Guid { get; }
+
     public IServer Server { get; }
 
     public string Username { get; }

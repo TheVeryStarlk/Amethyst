@@ -4,6 +4,7 @@ using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Events.Plugin;
 using Amethyst.Extensions;
+using Amethyst.Networking;
 using Amethyst.Services;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -85,6 +86,13 @@ internal sealed class Server(
             .WhenAll();
 
         await pluginService.DisposeAsync();
+    }
+
+    public async Task BroadcastPacketAsync(IOutgoingPacket packet)
+    {
+        await clients.Values.Where(client => client.Player is not null)
+            .Select(client => client.Transport.Output.WritePacketAsync(packet))
+            .WhenAll();
     }
 
     public async Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
@@ -184,7 +192,7 @@ internal sealed class Server(
     {
         logger.LogInformation("Started ticking");
 
-        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(9));
 
         while (!cancellationToken.IsCancellationRequested)
         {

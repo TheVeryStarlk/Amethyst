@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
 using Amethyst.Networking;
@@ -79,9 +80,15 @@ internal static class PipeExtensions
         static int Write(IOutgoingPacket packet, Memory<byte> memory)
         {
             var writer = new MemoryWriter(memory);
-            writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + packet.CalculateLength());
+
+            var packetLength = packet.CalculateLength();
+            writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + packetLength);
             writer.WriteVariableInteger(packet.Identifier);
+
+            var old = writer.Position;
             packet.Write(ref writer);
+            Debug.Assert(writer.Position - old == packetLength);
+
             return writer.Position;
         }
     }

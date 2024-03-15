@@ -151,6 +151,13 @@ internal sealed class Client(
 
         await loginStart.HandleAsync(this);
 
+        await server.BroadcastPacketAsync(
+            new PlayerListItemPacket
+            {
+                Action = new AddPlayerAction(),
+                Players = server.Players
+            });
+
         State = ClientState.Playing;
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }
@@ -178,6 +185,16 @@ internal sealed class Client(
         {
             return;
         }
+
+        await server.BroadcastPacketAsync(
+            new PlayerListItemPacket
+            {
+                Action = new RemovePlayerAction(),
+                Players =
+                [
+                    Player
+                ]
+            });
 
         var eventArgs = await Server.EventService.ExecuteAsync(
             new PlayerLeftEventArgs

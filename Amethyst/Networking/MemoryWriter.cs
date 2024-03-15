@@ -1,4 +1,6 @@
 ﻿using System.Buffers.Binary;
+using System.Globalization;
+using System.Numerics;
 using System.Text;
 
 namespace Amethyst.Networking;
@@ -61,5 +63,19 @@ internal ref struct MemoryWriter(Memory<byte> memory)
     public void WriteFloat(float value)
     {
         BinaryPrimitives.WriteSingleBigEndian(span[Position..(Position += sizeof(float))], value);
+    }
+
+    public void WriteGuid(Guid value)
+    {
+        var guid = BigInteger.Parse(
+            value.ToString().Replace("-", ""),
+            NumberStyles.HexNumber);
+
+        Write(guid.ToByteArray(false, true));
+    }
+
+    public void Write(ReadOnlySpan<byte> value)
+    {
+        value.CopyTo(span[Position..(Position += value.Length)]);
     }
 }
