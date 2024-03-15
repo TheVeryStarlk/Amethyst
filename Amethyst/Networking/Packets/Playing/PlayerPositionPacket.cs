@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api.Commands;
-using Amethyst.Api.Entities;
 
 namespace Amethyst.Networking.Packets.Playing;
 

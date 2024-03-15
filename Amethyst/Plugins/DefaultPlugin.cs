@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Amethyst.Api.Components;
+﻿using Amethyst.Api.Components;
 using Amethyst.Api.Plugins;
 
 namespace Amethyst.Plugins;
