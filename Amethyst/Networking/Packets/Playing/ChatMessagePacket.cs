@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Extensions;
 using Amethyst.Utilities;
 
@@ -48,8 +49,15 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
         }
         else
         {
-            await client.Server.BroadcastChatMessageAsync(
-                ChatMessage.Create($"{client.Player!.Username}: {Message.Text}"));
+            var eventArgs = await client.Server.EventService.ExecuteAsync(
+                new ChatMessageSentEventArgs
+                {
+                    Server = client.Server,
+                    Player = client.Player!,
+                    Message = $"{client.Player!.Username}: {Message.Text}"
+                });
+
+            await client.Server.BroadcastChatMessageAsync(eventArgs.Message);
         }
     }
 }

@@ -11,7 +11,7 @@ public sealed class CustomPlugin : PluginBase
     public override PluginConfiguration Configuration => new PluginConfiguration
     {
         Name = "Custom plugin",
-        Description = "A custom plugin that demonstrates the API."
+        Description = "A custom plugin that demonstrates Amethyst's API."
     };
 
     public override void ConfigureRegistry(IPluginRegistry registry)
