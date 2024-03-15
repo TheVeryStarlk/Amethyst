@@ -49,7 +49,7 @@ public sealed class CustomPlugin : PluginBase
                 else
                 {
                     await command.Player.SendChatMessageAsync(ChatMessage.Create(
-                        "Invalid kick command.",
+                        "Invalid usage.",
                         Color.Red));
                 }
             });

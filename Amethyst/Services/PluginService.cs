@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Amethyst.Api.Plugins;
+using Amethyst.Plugins;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Services;
@@ -15,6 +16,14 @@ internal sealed class PluginService(
     public void Initialize()
     {
         logger.LogInformation("Loading all plugins...");
+
+        var @default = new DefaultPlugin
+        {
+            Logger = loggerFactory.CreateLogger<DefaultPlugin>()
+        };
+
+        @default.ConfigureRegistry(pluginRegistry);
+        Plugins[@default.Configuration.Name] = @default;
 
         Directory.CreateDirectory("Plugins");
         var paths = Directory.GetFiles("Plugins");

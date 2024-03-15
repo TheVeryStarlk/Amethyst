@@ -32,6 +32,8 @@ internal sealed class Server(
         .Where(client => client.Player is not null)
         .Select(client => client.Player!);
 
+    public PluginService PluginService => pluginService;
+
     public CommandService CommandService => commandService;
 
     public EventService EventService => eventService;

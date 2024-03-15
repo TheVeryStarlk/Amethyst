@@ -45,15 +45,29 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
     {
         var text = Matches[0];
 
-        if (text.Contains('/') && !text.Contains(' '))
+        if (!text.StartsWith('/'))
         {
             await client.Transport.Output.WritePacketAsync(
                 new TabCompletePacket
                 {
-                    Matches = client.Server.CommandService.Commands.Keys
-                        .Select(match => $"/{match}")
+                    Matches = client.Server.Players
+                        .Select(player => player.Username)
                         .ToArray()
                 });
+
+            return;
         }
+
+        var commands = client.Server.CommandService.Commands.Keys.Select(match => $"/{match}");
+
+        var matches = text.Length == 1
+            ? commands
+            : commands.Where(match => text[1] == match[1]);
+
+        await client.Transport.Output.WritePacketAsync(
+            new TabCompletePacket
+            {
+                Matches = matches.ToArray()
+            });
     }
 }
