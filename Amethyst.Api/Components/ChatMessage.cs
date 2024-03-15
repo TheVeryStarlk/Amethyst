@@ -31,7 +31,34 @@ public sealed class ChatMessage
 
     public static implicit operator ChatMessage(string value)
     {
-        return Create(value.Replace('&', '§'));
+        var text = string.Create(value.Length, value, (span, text) =>
+        {
+            for (var index = 0; index < span.Length; index++)
+            {
+                var character = text[index];
+                span[index] = character;
+
+                if (character != '&' || index + 1 >= text.Length)
+                {
+                    continue;
+                }
+
+                character = text[index + 1];
+
+                span[index] = character switch
+                {
+                    >= '0' and <= '9' => '§',
+                    >= 'a' and <= 'e' => '§',
+                    'k' or 'l' or 'm' or 'n' or 'o' or 'r' => '§',
+                    _ => span[index]
+                };
+            }
+        });
+
+        return new ChatMessage
+        {
+            Text = text
+        };
     }
 }
 
