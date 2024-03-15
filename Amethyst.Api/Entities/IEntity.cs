@@ -1,10 +1,12 @@
-﻿namespace Amethyst.Api.Entities;
+﻿using Amethyst.Api.Commands;
+
+namespace Amethyst.Api.Entities;
 
 public interface IEntity
 {
     public int Identifier { get; }
 
-    public Position Position { get; set; }
+    public VectorF Position { get; set; }
 
     public float Yaw { get; set; }
 
@@ -12,5 +14,5 @@ public interface IEntity
 
     public bool OnGround { get; set; }
 
-    public Task TeleportAsync(Position position);
+    public Task TeleportAsync(VectorF position);
 }

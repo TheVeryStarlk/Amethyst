@@ -7,11 +7,11 @@ namespace Amethyst.Services;
 
 internal sealed class CommandService(ILogger<CommandService> logger)
 {
-    private readonly Dictionary<string, Func<Command, Task>> commands = [];
+    public Dictionary<string, Func<Command, Task>> Commands { get; } = [];
 
     public void Register(string name, Func<Command, Task> @delegate)
     {
-        if (!commands.TryAdd(name, @delegate))
+        if (!Commands.TryAdd(name, @delegate))
         {
             logger.LogWarning("Could not register command: \"{Name}\"", name);
         }
@@ -29,7 +29,7 @@ internal sealed class CommandService(ILogger<CommandService> logger)
 
         var name = split[0];
 
-        var predicate = commands
+        var predicate = Commands
             .Where(command => command.Key == name)
             .ToArray();
 

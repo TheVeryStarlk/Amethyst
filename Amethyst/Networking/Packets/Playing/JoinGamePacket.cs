@@ -23,7 +23,7 @@ internal sealed class JoinGamePacket : IOutgoingPacket
                + sizeof(bool);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteInteger(Player.Identifier);
         writer.WriteByte((byte) Player.GameMode);
@@ -32,7 +32,5 @@ internal sealed class JoinGamePacket : IOutgoingPacket
         writer.WriteByte((byte) Player.Server.Status.PlayerInformation.Max);
         writer.WriteVariableString(LevelType.Flat.ToString().ToLower());
         writer.WriteBoolean(ReducedDebugInformation);
-
-        return writer.Position;
     }
 }

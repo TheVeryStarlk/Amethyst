@@ -18,10 +18,9 @@ internal sealed class LoginSuccessPacket : IOutgoingPacket
         return VariableString.GetBytesCount(serializedGuid) + VariableString.GetBytesCount(Username);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableString(serializedGuid!);
         writer.WriteVariableString(Username);
-        return writer.Position;
     }
 }

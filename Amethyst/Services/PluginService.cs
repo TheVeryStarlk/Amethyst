@@ -8,8 +8,9 @@ internal sealed class PluginService(
     ILoggerFactory loggerFactory,
     IPluginRegistry pluginRegistry) : IAsyncDisposable
 {
+    public Dictionary<string, PluginBase> Plugins { get; } = [];
+
     private readonly ILogger<PluginService> logger = loggerFactory.CreateLogger<PluginService>();
-    private readonly Dictionary<string, PluginBase> plugins = [];
 
     public void Initialize()
     {
@@ -26,7 +27,7 @@ internal sealed class PluginService(
 
             var plugin = (PluginBase) Activator.CreateInstance(type)!;
 
-            if (!plugins.TryAdd(plugin.Configuration.Name, plugin))
+            if (!Plugins.TryAdd(plugin.Configuration.Name, plugin))
             {
                 logger.LogWarning("Found a plugin with the same name: \"{Name}\"", plugin.Configuration.Name);
                 continue;
@@ -39,7 +40,7 @@ internal sealed class PluginService(
 
     public async ValueTask DisposeAsync()
     {
-        var tasks = plugins.Values.Select(plugin => plugin.DisposeAsync().AsTask());
+        var tasks = Plugins.Values.Select(plugin => plugin.DisposeAsync().AsTask());
         await Task.WhenAll(tasks);
     }
 }

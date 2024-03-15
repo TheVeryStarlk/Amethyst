@@ -18,9 +18,8 @@ internal sealed class StatusResponsePacket : IOutgoingPacket
         return VariableString.GetBytesCount(serializedStatus);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableString(serializedStatus!);
-        return writer.Position;
     }
 }

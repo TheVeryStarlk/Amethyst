@@ -81,7 +81,8 @@ internal static class PipeExtensions
             var writer = new MemoryWriter(memory);
             writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + packet.CalculateLength());
             writer.WriteVariableInteger(packet.Identifier);
-            return packet.Write(ref writer);
+            packet.Write(ref writer);
+            return writer.Position;
         }
     }
 }

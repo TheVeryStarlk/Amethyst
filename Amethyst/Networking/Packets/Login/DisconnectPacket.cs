@@ -18,9 +18,8 @@ internal sealed class DisconnectPacket(ClientState state) : IOutgoingPacket
         return VariableString.GetBytesCount(serializedReason);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableString(serializedReason!);
-        return writer.Position;
     }
 }

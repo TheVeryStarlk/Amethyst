@@ -1,5 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
+using Amethyst.Api.Commands;
 
 namespace Amethyst.Networking;
 
@@ -59,5 +60,11 @@ internal ref struct MemoryReader(Memory<byte> memory)
     public float ReadFloat()
     {
         return BinaryPrimitives.ReadSingleBigEndian(span[position..(position += sizeof(float))]);
+    }
+
+    public Position ReadPosition()
+    {
+        var value = ReadLong();
+        return new Position(value << 38, value << 52 >> 52, value << 26 >> 38);
     }
 }

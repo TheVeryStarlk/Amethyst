@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Commands;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Extensions;
@@ -19,7 +20,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public int Identifier { get; } = Random.Shared.Next();
 
-    public Position Position { get; set; }
+    public VectorF Position { get; set; }
 
     public float Yaw { get; set; }
 
@@ -27,7 +28,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public async Task TeleportAsync(Position position)
+    public async Task TeleportAsync(VectorF position)
     {
         await client.Transport.Output.WritePacketAsync(
             new PlayerPositionAndLookPacket

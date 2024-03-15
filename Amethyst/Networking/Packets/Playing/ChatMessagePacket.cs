@@ -32,11 +32,10 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
         return VariableString.GetBytesCount(serializedMessage) + sizeof(byte);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableString(serializedMessage!);
         writer.WriteByte((byte) Position);
-        return writer.Position;
     }
 
     public async Task HandleAsync(Client client)

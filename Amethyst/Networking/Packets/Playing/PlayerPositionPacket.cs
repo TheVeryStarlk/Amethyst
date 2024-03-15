@@ -1,4 +1,5 @@
-﻿using Amethyst.Api.Entities;
+﻿using Amethyst.Api.Commands;
+using Amethyst.Api.Entities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -6,7 +7,7 @@ internal sealed class PlayerPositionPacket : IIngoingPacket<PlayerPositionPacket
 {
     public static int Identifier => 0x04;
 
-    public required Position Position { get; init; }
+    public required VectorF Position { get; init; }
 
     public required bool OnGround { get; init; }
 
@@ -14,7 +15,7 @@ internal sealed class PlayerPositionPacket : IIngoingPacket<PlayerPositionPacket
     {
         return new PlayerPositionPacket
         {
-            Position = new Position(
+            Position = new VectorF(
                 reader.ReadFloat(),
                 reader.ReadFloat(),
                 reader.ReadFloat()),

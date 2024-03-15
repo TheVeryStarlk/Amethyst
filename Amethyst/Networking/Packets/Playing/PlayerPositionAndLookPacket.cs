@@ -1,4 +1,5 @@
-﻿using Amethyst.Api.Entities;
+﻿using Amethyst.Api.Commands;
+using Amethyst.Api.Entities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -8,7 +9,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
 
     public int Identifier => 0x08;
 
-    public required Position Position { get; init; }
+    public required VectorF Position { get; init; }
 
     public float Yaw { get; init; }
 
@@ -20,7 +21,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
     {
         return new PlayerPositionAndLookPacket
         {
-            Position = new Position(
+            Position = new VectorF(
                 reader.ReadFloat(),
                 reader.ReadFloat(),
                 reader.ReadFloat()),
@@ -41,7 +42,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
                + sizeof(byte);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteDouble(Position.X);
         writer.WriteDouble(Position.Y);
@@ -49,8 +50,6 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
         writer.WriteFloat(Yaw);
         writer.WriteFloat(Pitch);
         writer.WriteByte(0);
-
-        return writer.Position;
     }
 
     public Task HandleAsync(Client client)

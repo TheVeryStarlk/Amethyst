@@ -11,9 +11,8 @@ internal sealed class PongResponsePacket: IOutgoingPacket
         return sizeof(long);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteLong(Payload);
-        return writer.Position;
     }
 }

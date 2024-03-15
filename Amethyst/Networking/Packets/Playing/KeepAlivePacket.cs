@@ -23,10 +23,9 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
         return VariableInteger.GetBytesCount(Payload);
     }
 
-    public int Write(ref MemoryWriter writer)
+    public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableInteger(Payload);
-        return writer.Position;
     }
 
     public Task HandleAsync(Client client)
