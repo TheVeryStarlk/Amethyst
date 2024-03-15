@@ -1,6 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
-using Amethyst.Api.Commands;
+using Amethyst.Api.Components;
 
 namespace Amethyst.Networking;
 

@@ -1,4 +1,4 @@
-﻿using Amethyst.Api.Commands;
+﻿using Amethyst.Api.Components;
 using Amethyst.Extensions;
 using Amethyst.Utilities;
 
