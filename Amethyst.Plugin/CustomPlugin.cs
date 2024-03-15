@@ -28,18 +28,20 @@ public sealed class CustomPlugin : PluginBase
 
                     if (player is null)
                     {
-                        await command.Player.SendChatMessageAsync(ChatMessage.Create(
-                            $"Could not find player: \"{command.Arguments[0]}\".",
-                            Color.Red));
+                        await command.Player.SendChatMessageAsync(
+                            ChatMessage.Create(
+                                $"Could not find player: \"{command.Arguments[0]}\".",
+                                Color.Red));
 
                         return;
                     }
 
                     if (command.Arguments.Length == 1)
                     {
-                        await command.Player.SendChatMessageAsync(ChatMessage.Create(
-                            "Must provide a kick reason.",
-                            Color.Red));
+                        await command.Player.SendChatMessageAsync(
+                            ChatMessage.Create(
+                                "Must provide a kick reason.",
+                                Color.Red));
 
                         return;
                     }
@@ -48,9 +50,10 @@ public sealed class CustomPlugin : PluginBase
                 }
                 else
                 {
-                    await command.Player.SendChatMessageAsync(ChatMessage.Create(
-                        "Invalid usage.",
-                        Color.Red));
+                    await command.Player.SendChatMessageAsync(
+                        ChatMessage.Create(
+                            "Invalid usage.",
+                            Color.Red));
                 }
             });
 

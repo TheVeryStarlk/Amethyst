@@ -3,9 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Services;
 
-internal sealed class ServerService(
-    ILogger<ServerService> logger,
-    Server server) : BackgroundService
+internal sealed class ServerService(ILogger<ServerService> logger, Server server) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {

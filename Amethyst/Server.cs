@@ -90,7 +90,8 @@ internal sealed class Server(
 
     public async Task BroadcastPacketAsync(IOutgoingPacket packet)
     {
-        await clients.Values.Where(client => client.Player is not null)
+        await clients.Values
+            .Where(client => client.Player is not null)
             .Select(client => client.Transport.Output.WritePacketAsync(packet))
             .WhenAll();
     }

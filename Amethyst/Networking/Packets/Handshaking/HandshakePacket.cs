@@ -29,8 +29,7 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 
     public async Task HandleAsync(Client client)
     {
-        if (ProtocolVersion != Server.ProtocolVersion
-            && NextState is ClientState.Login)
+        if (ProtocolVersion != Server.ProtocolVersion && NextState is ClientState.Login)
         {
             await client.Transport.Output.WritePacketAsync(
                 new DisconnectPacket(ClientState.Login)

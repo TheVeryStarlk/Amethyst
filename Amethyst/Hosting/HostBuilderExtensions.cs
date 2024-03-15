@@ -19,12 +19,12 @@ public static class HostBuilderExtensions
         {
             var configuration = new ServerConfiguration();
             configure.Invoke(context, configuration);
-
             services.AddTransient(_ => configuration);
-            services.AddSingleton<CommandService>();
-            services.AddSingleton<EventService>();
 
             services.AddTransient<IPluginRegistry, PluginRegistry>();
+
+            services.AddSingleton<CommandService>();
+            services.AddSingleton<EventService>();
             services.AddSingleton<PluginService>();
 
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();

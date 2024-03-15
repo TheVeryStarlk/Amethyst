@@ -44,12 +44,13 @@ internal sealed class CommandService(ILogger<CommandService> logger)
 
         foreach (var command in predicate)
         {
-            await (Task) command.Value.DynamicInvoke(new Command
-            {
-                Server = player.Server,
-                Player = player,
-                Arguments = split[1..]
-            })!;
+            await (Task) command.Value.DynamicInvoke(
+                new Command
+                {
+                    Server = player.Server,
+                    Player = player,
+                    Arguments = split[1..]
+                })!;
         }
 
         logger.LogInformation("Executed command {Name}", name);
