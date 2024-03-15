@@ -31,7 +31,7 @@ public sealed class ChatMessage
 
     public static implicit operator ChatMessage(string value)
     {
-        return Create(value);
+        return Create(value.Replace('&', '§'));
     }
 }
 

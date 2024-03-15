@@ -26,9 +26,9 @@ internal sealed class PluginService(
 
             var plugin = (PluginBase) Activator.CreateInstance(type)!;
 
-            if (plugins.ContainsKey(plugin.Configuration.Name))
+            if (!plugins.TryAdd(plugin.Configuration.Name, plugin))
             {
-                logger.LogWarning("Found a plugin with the same name: \"{Name}\'", plugin.Configuration.Name);
+                logger.LogWarning("Found a plugin with the same name: \"{Name}\"", plugin.Configuration.Name);
                 continue;
             }
 
