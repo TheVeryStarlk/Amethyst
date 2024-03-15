@@ -1,4 +1,5 @@
-﻿using Amethyst.Api.Events.Minecraft;
+﻿using Amethyst.Api.Components;
+using Amethyst.Api.Events.Minecraft;
 using Amethyst.Extensions;
 
 namespace Amethyst.Networking.Packets.Status;
@@ -18,15 +19,20 @@ internal sealed class StatusRequestPacket: IIngoingPacket<StatusRequestPacket>
             new DescriptionRequestedEventArgs
             {
                 Server = client.Server,
-                Description = client.Server.Status.Description
+                Description = client.Server.Description
             });
 
-        client.Server.Status.Description = eventArgs.Description;
+        client.Server.Description = eventArgs.Description;
 
         await client.Transport.Output.WritePacketAsync(
             new StatusResponsePacket
             {
-                Status = client.Server.Status
+                Status = ServerStatus.Create(
+                    nameof(Amethyst),
+                    Server.ProtocolVersion,
+                    client.Server.Configuration.MaximumPlayerCount,
+                    client.Server.Players.Count(),
+                    client.Server.Description)
             });
     }
 }

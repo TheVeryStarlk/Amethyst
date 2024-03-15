@@ -21,8 +21,6 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
 
     public async Task HandleAsync(Client client)
     {
-        client.Server.Status.PlayerInformation.Online++;
-
         await client.Transport.Output.WritePacketAsync(
             new LoginSuccessPacket
             {

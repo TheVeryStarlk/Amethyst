@@ -5,11 +5,13 @@ namespace Amethyst.Api;
 
 public interface IServer : IAsyncDisposable
 {
+    public static abstract int ProtocolVersion { get; }
+
     public ServerConfiguration Configuration { get; }
 
-    public ServerStatus Status { get; }
-
     public IEnumerable<IPlayer> Players { get; }
+
+    public ChatMessage Description { get; set; }
 
     public Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
 

@@ -179,8 +179,6 @@ internal sealed class Client(
             return;
         }
 
-        Server.Status.PlayerInformation.Online--;
-
         var eventArgs = await Server.EventService.ExecuteAsync(
             new PlayerLeftEventArgs
             {

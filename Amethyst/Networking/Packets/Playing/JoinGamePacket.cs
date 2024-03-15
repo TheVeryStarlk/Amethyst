@@ -29,7 +29,7 @@ internal sealed class JoinGamePacket : IOutgoingPacket
         writer.WriteByte((byte) Player.GameMode);
         writer.WriteByte((byte) Dimension.OverWorld);
         writer.WriteByte((byte) Difficulty.Peaceful);
-        writer.WriteByte((byte) Player.Server.Status.PlayerInformation.Max);
+        writer.WriteByte((byte) Player.Server.Configuration.MaximumPlayerCount);
         writer.WriteVariableString(LevelType.Flat.ToString().ToLower());
         writer.WriteBoolean(ReducedDebugInformation);
     }

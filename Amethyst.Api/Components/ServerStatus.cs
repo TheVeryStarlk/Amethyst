@@ -17,6 +17,7 @@ public sealed class ServerStatus
         string name,
         int protocol,
         int max,
+        int online,
         ChatMessage description)
     {
         return new ServerStatus
@@ -30,7 +31,7 @@ public sealed class ServerStatus
             PlayerInformation = new PlayerInformation
             {
                 Max = max,
-                Online = 0
+                Online = online
             },
 
             Description = description,

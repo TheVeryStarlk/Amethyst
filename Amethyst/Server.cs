@@ -18,19 +18,15 @@ internal sealed class Server(
     EventService eventService,
     CommandService commandService) : IServer
 {
-    public const int ProtocolVersion = 47;
+    public static int ProtocolVersion => 47;
 
     public ServerConfiguration Configuration => configuration;
-
-    public ServerStatus Status { get; } = ServerStatus.Create(
-        nameof(Amethyst),
-        ProtocolVersion,
-        configuration.MaximumPlayerCount,
-        configuration.Description);
 
     public IEnumerable<IPlayer> Players => clients.Values
         .Where(client => client.Player is not null)
         .Select(client => client.Player!);
+
+    public ChatMessage Description { get; set; } = configuration.Description;
 
     public PluginService PluginService => pluginService;
 
