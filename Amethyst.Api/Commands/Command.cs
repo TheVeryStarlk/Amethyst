@@ -8,5 +8,5 @@ public sealed class Command
 
     public required IPlayer Player { get; init; }
 
-    public string[]? Arguments { get; init; }
+    public string[] Arguments { get; init; } = Array.Empty<string>();
 }

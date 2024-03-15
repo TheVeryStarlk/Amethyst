@@ -6,7 +6,7 @@ public abstract class PluginBase : IAsyncDisposable
 {
     public abstract PluginConfiguration Configuration { get; }
 
-    public ILogger? Logger { get; set; }
+    public required ILogger Logger { get; set; }
 
     public abstract void ConfigureRegistry(IPluginRegistry pluginRegistry);
 
