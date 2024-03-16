@@ -1,12 +1,15 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Levels;
 using Amethyst.Api.Levels.Blocks;
+using Amethyst.Api.Levels.Generators;
 
 namespace Amethyst.Levels;
 
-internal sealed class World(string name) : IWorld
+internal sealed class World(string name, IWorldGenerator generator) : IWorld
 {
     public string Name => name;
+
+    public IWorldGenerator Generator { get; set; } = generator;
 
     public WorldType Type { get; set; }
 
@@ -17,17 +20,6 @@ internal sealed class World(string name) : IWorld
     public IEnumerable<IRegion> Regions => regions;
 
     private readonly List<Region> regions = [];
-
-    public void Generate()
-    {
-        for (var x = -16; x < 16; x++)
-        {
-            for (var z = -16; z < 16; z++)
-            {
-                SetBlock(new Block(35, Random.Shared.Next(15)), new Position(x, 0, z));
-            }
-        }
-    }
 
     public Block GetBlock(Position position)
     {
@@ -54,7 +46,7 @@ internal sealed class World(string name) : IWorld
             return region;
         }
 
-        region = new Region((long) x, (long) z);
+        region = new Region((long) x, (long) z, Generator);
         regions.Add(region);
         return region;
     }

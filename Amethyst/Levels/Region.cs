@@ -1,10 +1,11 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Levels;
 using Amethyst.Api.Levels.Blocks;
+using Amethyst.Api.Levels.Generators;
 
 namespace Amethyst.Levels;
 
-internal sealed class Region(long x, long z) : IRegion
+internal sealed class Region(long x, long z, IWorldGenerator generator) : IRegion
 {
     public (long X, long Z) Position { get; } = (x, z);
 
@@ -23,6 +24,7 @@ internal sealed class Region(long x, long z) : IRegion
         }
 
         chunk = new Chunk(x, z);
+        generator.GenerateChunk(chunk);
         chunks.Add(chunk);
         return chunk;
     }

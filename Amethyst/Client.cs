@@ -159,17 +159,19 @@ internal sealed class Client(
                 Players = server.Players
             });
 
+        var world = server.Level!.Worlds.FirstOrDefault().Value;
 
-        foreach (var chunk in server.Level!.Worlds
-                     .FirstOrDefault().Value.Regions
-                     .SelectMany(region => region.Chunks))
+        for (var x = -4; x < 4; x++)
         {
-            await Transport.Output.WritePacketAsync(
-                new ChunkPacket
-                {
-                    Chunk = chunk
-                }
-            );
+            for (var z = -4; z < 4; z++)
+            {
+                await Transport.Output.WritePacketAsync(
+                    new ChunkPacket
+                    {
+                        Chunk = world.GetChunk(new Position(x, 0, z))
+                    }
+                );
+            }
         }
 
         State = ClientState.Playing;

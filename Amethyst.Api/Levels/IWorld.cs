@@ -1,10 +1,13 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Levels.Blocks;
+using Amethyst.Api.Levels.Generators;
 
 namespace Amethyst.Api.Levels;
 
 public interface IWorld
 {
+    public IWorldGenerator Generator { get; set; }
+
     public WorldType Type { get; set; }
 
     public Difficulty Difficulty { get; set; }

@@ -4,6 +4,7 @@ using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Events.Plugin;
 using Amethyst.Api.Levels;
+using Amethyst.Api.Levels.Generators;
 using Amethyst.Extensions;
 using Amethyst.Levels;
 using Amethyst.Networking;
@@ -51,8 +52,7 @@ internal sealed class Server(
             throw new InvalidOperationException("Server has already started.");
         }
 
-        var world = new World("Default");
-        world.Generate();
+        var world = new World("Flat", new FlatWorldGenerator());
 
         Level = new Level
         {
