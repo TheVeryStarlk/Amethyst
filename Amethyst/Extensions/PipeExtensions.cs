@@ -85,7 +85,6 @@ internal static class PipeExtensions
 
             var temporary = memory[..position].ToArray();
             var payloadWriter = new MemoryWriter(memory);
-
             payloadWriter.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + position);
             payloadWriter.WriteVariableInteger(packet.Identifier);
             payloadWriter.Write(temporary);
