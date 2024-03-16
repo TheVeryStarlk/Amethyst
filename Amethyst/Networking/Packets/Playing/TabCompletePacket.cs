@@ -1,6 +1,5 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Extensions;
-using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -24,11 +23,6 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
             ],
             Position = reader.ReadBoolean() ? reader.ReadPosition() : null
         };
-    }
-
-    public int CalculateLength()
-    {
-        return VariableInteger.GetBytesCount(Matches.Length) + Matches.Sum(VariableString.GetBytesCount);
     }
 
     public void Write(ref MemoryWriter writer)

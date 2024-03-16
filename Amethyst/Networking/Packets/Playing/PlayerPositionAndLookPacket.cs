@@ -31,16 +31,6 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
         };
     }
 
-    public int CalculateLength()
-    {
-        return sizeof(double)
-               + sizeof(double)
-               + sizeof(double)
-               + sizeof(float)
-               + sizeof(float)
-               + sizeof(byte);
-    }
-
     public void Write(ref MemoryWriter writer)
     {
         writer.WriteDouble(Position.X);

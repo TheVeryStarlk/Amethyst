@@ -1,6 +1,4 @@
-﻿using Amethyst.Utilities;
-
-namespace Amethyst.Networking.Packets.Playing;
+﻿namespace Amethyst.Networking.Packets.Playing;
 
 internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoingPacket
 {
@@ -16,11 +14,6 @@ internal sealed class KeepAlivePacket : IIngoingPacket<KeepAlivePacket>, IOutgoi
         {
             Payload = reader.ReadVariableInteger()
         };
-    }
-
-    public int CalculateLength()
-    {
-        return VariableInteger.GetBytesCount(Payload);
     }
 
     public void Write(ref MemoryWriter writer)

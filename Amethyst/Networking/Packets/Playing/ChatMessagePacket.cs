@@ -1,7 +1,6 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Extensions;
-using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -15,8 +14,6 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
 
     public ChatMessagePosition Position { get; init; }
 
-    private string? serializedMessage;
-
     public static ChatMessagePacket Read(MemoryReader reader)
     {
         return new ChatMessagePacket
@@ -26,15 +23,9 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IOu
         };
     }
 
-    public int CalculateLength()
-    {
-        serializedMessage = Message.Serialize();
-        return VariableString.GetBytesCount(serializedMessage) + sizeof(byte);
-    }
-
     public void Write(ref MemoryWriter writer)
     {
-        writer.WriteVariableString(serializedMessage!);
+        writer.WriteVariableString(Message.Serialize());
         writer.WriteByte((byte) Position);
     }
 

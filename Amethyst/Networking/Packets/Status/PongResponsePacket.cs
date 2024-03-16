@@ -6,11 +6,6 @@ internal sealed class PongResponsePacket: IOutgoingPacket
 
     public required long Payload { get; init; }
 
-    public int CalculateLength()
-    {
-        return sizeof(long);
-    }
-
     public void Write(ref MemoryWriter writer)
     {
         writer.WriteLong(Payload);

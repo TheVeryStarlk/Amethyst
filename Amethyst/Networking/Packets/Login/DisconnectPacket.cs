@@ -1,6 +1,5 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Extensions;
-using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Login;
 
@@ -10,16 +9,8 @@ internal sealed class DisconnectPacket(ClientState state) : IOutgoingPacket
 
     public required ChatMessage Reason { get; init; }
 
-    private string? serializedReason;
-
-    public int CalculateLength()
-    {
-        serializedReason = Reason.Serialize();
-        return VariableString.GetBytesCount(serializedReason);
-    }
-
     public void Write(ref MemoryWriter writer)
     {
-        writer.WriteVariableString(serializedReason!);
+        writer.WriteVariableString(Reason.Serialize());
     }
 }

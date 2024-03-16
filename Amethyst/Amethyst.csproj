@@ -14,4 +14,8 @@
         <ProjectReference Include="..\Amethyst.Api\Amethyst.Api.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2"/>
+    </ItemGroup>
+
 </Project>

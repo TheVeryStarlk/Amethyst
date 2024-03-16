@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
 using Amethyst.Networking;
@@ -73,22 +72,24 @@ internal static class PipeExtensions
 
     public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet)
     {
-        var length = packet.CalculateLength();
-        writer.Advance(Write(packet, length, writer.GetMemory(length)));
+        var memory = writer.GetMemory(short.MaxValue);
+        writer.Advance(Write(packet, memory));
         await writer.FlushAsync();
         return;
 
-        static int Write(IOutgoingPacket packet, int length, Memory<byte> memory)
+        static int Write(IOutgoingPacket packet, Memory<byte> memory)
         {
-            var writer = new MemoryWriter(memory);
-            writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + length);
-            writer.WriteVariableInteger(packet.Identifier);
+            var packetWriter = new MemoryWriter(memory);
+            packet.Write(ref packetWriter);
+            var position = packetWriter.Position;
 
-            var old = writer.Position;
-            packet.Write(ref writer);
-            Debug.Assert(writer.Position - old == length);
+            var temporary = memory[..position].ToArray();
+            var payloadWriter = new MemoryWriter(memory);
 
-            return writer.Position;
+            payloadWriter.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + position);
+            payloadWriter.WriteVariableInteger(packet.Identifier);
+            payloadWriter.Write(temporary);
+            return payloadWriter.Position;
         }
     }
 }

@@ -18,7 +18,5 @@ internal interface IOutgoingPacket : IPacket
 {
     public int Identifier { get; }
 
-    public int CalculateLength();
-
     public void Write(ref MemoryWriter writer);
 }

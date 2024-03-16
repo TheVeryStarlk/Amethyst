@@ -8,11 +8,6 @@ internal sealed class TimeUpdatePacket : IOutgoingPacket
 
     public required IWorld World { get; init; }
 
-    public int CalculateLength()
-    {
-        return sizeof(long) * 2;
-    }
-
     public void Write(ref MemoryWriter writer)
     {
         writer.WriteLong(World.Age);
