@@ -52,7 +52,12 @@ internal sealed class Server(
             throw new InvalidOperationException("Server has already started.");
         }
 
-        var world = new World("Flat", new FlatWorldGenerator());
+        var world = new World("Flat", new FlatWorldGenerator())
+        {
+            Type = WorldType.Flat,
+            Difficulty = Difficulty.Peaceful,
+            Dimension = Dimension.OverWorld
+        };
 
         Level = new Level
         {

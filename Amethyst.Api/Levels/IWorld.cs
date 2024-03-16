@@ -14,6 +14,10 @@ public interface IWorld
 
     public Dimension Dimension { get; set; }
 
+    public long Age { get; }
+
+    public long Time { get; set; }
+
     public IEnumerable<IRegion> Regions { get; }
 
     public Block GetBlock(Position position);

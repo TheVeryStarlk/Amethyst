@@ -17,6 +17,10 @@ internal sealed class World(string name, IWorldGenerator generator) : IWorld
 
     public Dimension Dimension { get; set; }
 
+    public long Age => DateTimeOffset.Now.Ticks;
+
+    public long Time { get; set; }
+
     public IEnumerable<IRegion> Regions => regions;
 
     private readonly List<Region> regions = [];
