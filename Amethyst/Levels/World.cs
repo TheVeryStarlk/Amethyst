@@ -14,15 +14,17 @@ internal sealed class World(string name) : IWorld
 
     public Dimension Dimension { get; set; }
 
+    public IEnumerable<IRegion> Regions => regions;
+
     private readonly List<Region> regions = [];
 
     public void Generate()
     {
-        for (var x = 0; x < 16; x++)
+        for (var x = -16; x < 16; x++)
         {
-            for (var z = 0; z < 16; z++)
+            for (var z = -16; z < 16; z++)
             {
-                SetBlock(new Block(7, 0), new Position(x, 0, z));
+                SetBlock(new Block(35, Random.Shared.Next(15)), new Position(x, 0, z));
             }
         }
     }

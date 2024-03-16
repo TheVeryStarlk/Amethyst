@@ -1,11 +1,14 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Levels;
 using Amethyst.Api.Levels.Blocks;
 
 namespace Amethyst.Levels;
 
-internal sealed class Region(long x, long z)
+internal sealed class Region(long x, long z) : IRegion
 {
     public (long X, long Z) Position { get; } = (x, z);
+
+    public IEnumerable<IChunk> Chunks => chunks;
 
     private readonly List<Chunk> chunks = [];
 

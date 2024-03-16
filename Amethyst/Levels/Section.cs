@@ -57,6 +57,6 @@ internal sealed class Section
 
     private static long AsIndex(Position position)
     {
-        return position.Y << 8 | position.Z << 4 | position.X;
+        return ((position.Y & 0xF) << 8) | ((position.Z & 0xF) << 4) | (position.X & 0xF);
     }
 }

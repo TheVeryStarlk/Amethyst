@@ -11,6 +11,8 @@ public interface IWorld
 
     public Dimension Dimension { get; set; }
 
+    public IEnumerable<IRegion> Regions { get; }
+
     public Block GetBlock(Position position);
 
     public void SetBlock(Block block, Position position);
