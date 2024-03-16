@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Levels;
 
 namespace Amethyst.Api;
 
@@ -12,6 +13,8 @@ public interface IServer : IAsyncDisposable
     public IEnumerable<IPlayer> Players { get; }
 
     public ChatMessage Description { get; set; }
+
+    public ILevel? Level { get; set; }
 
     public Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
 

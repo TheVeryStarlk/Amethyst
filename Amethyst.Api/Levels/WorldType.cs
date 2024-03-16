@@ -1,6 +1,6 @@
-﻿namespace Amethyst.Api.World;
+﻿namespace Amethyst.Api.Levels;
 
-public enum LevelType
+public enum WorldType
 {
     Default,
     Flat,

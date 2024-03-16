@@ -3,7 +3,9 @@ using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Events.Plugin;
+using Amethyst.Api.Levels;
 using Amethyst.Extensions;
+using Amethyst.Levels;
 using Amethyst.Networking;
 using Amethyst.Services;
 using Microsoft.AspNetCore.Connections;
@@ -29,6 +31,8 @@ internal sealed class Server(
 
     public ChatMessage Description { get; set; } = configuration.Description;
 
+    public ILevel? Level { get; set; }
+
     public PluginService PluginService => pluginService;
 
     public CommandService CommandService => commandService;
@@ -47,22 +51,38 @@ internal sealed class Server(
             throw new InvalidOperationException("Server has already started.");
         }
 
+        var world = new World("Default");
+        world.Generate();
+
+        Level = new Level
+        {
+            Worlds =
+            {
+                {
+                    world.Name,
+                    world
+                }
+            }
+        };
+
         pluginService.Initialize();
 
-        await eventService.ExecuteAsync(new PluginEnabledEventArgs
-        {
-            Server = this,
-            DateTimeOffset = DateTimeOffset.Now
-        });
+        await eventService.ExecuteAsync(
+            new PluginEnabledEventArgs
+            {
+                Server = this,
+                DateTimeOffset = DateTimeOffset.Now
+            });
 
         logger.LogInformation("Starting the server tasks");
         await Task.WhenAll(ListeningAsync(cancellationToken), TickingAsync(cancellationToken));
 
-        await eventService.ExecuteAsync(new PluginDisabledEventArgs
-        {
-            Server = this,
-            DateTimeOffset = DateTimeOffset.Now
-        });
+        await eventService.ExecuteAsync(
+            new PluginDisabledEventArgs
+            {
+                Server = this,
+                DateTimeOffset = DateTimeOffset.Now
+            });
     }
 
     public async Task StopAsync()
@@ -193,7 +213,7 @@ internal sealed class Server(
     {
         logger.LogInformation("Started ticking");
 
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(9));
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
 
         while (!cancellationToken.IsCancellationRequested)
         {

@@ -73,21 +73,20 @@ internal static class PipeExtensions
 
     public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet)
     {
-        writer.Advance(Write(packet, writer.GetMemory()));
+        var length = packet.CalculateLength();
+        writer.Advance(Write(packet, length, writer.GetMemory(length)));
         await writer.FlushAsync();
         return;
 
-        static int Write(IOutgoingPacket packet, Memory<byte> memory)
+        static int Write(IOutgoingPacket packet, int length, Memory<byte> memory)
         {
             var writer = new MemoryWriter(memory);
-
-            var packetLength = packet.CalculateLength();
-            writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + packetLength);
+            writer.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + length);
             writer.WriteVariableInteger(packet.Identifier);
 
             var old = writer.Position;
             packet.Write(ref writer);
-            Debug.Assert(writer.Position - old == packetLength);
+            Debug.Assert(writer.Position - old == length);
 
             return writer.Position;
         }

@@ -158,6 +158,19 @@ internal sealed class Client(
                 Players = server.Players
             });
 
+        var world = server.Level!.Worlds.FirstOrDefault();
+
+        await Transport.Output.WritePacketAsync(
+            new ChunkPacket
+            {
+                Chunk = world.Value.GetChunk(new Position(
+                    (long) Player.Position.X,
+                    (long) Player.Position.Y,
+                    (long) Player.Position.Z))
+            });
+
+        await Player!.TeleportAsync(new VectorF(8, 4, 8));
+
         State = ClientState.Playing;
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
     }

@@ -78,4 +78,9 @@ internal ref struct MemoryWriter(Memory<byte> memory)
     {
         value.CopyTo(span[Position..(Position += value.Length)]);
     }
+
+    public void WriteUnsignedShort(ushort value)
+    {
+        BinaryPrimitives.WriteUInt16BigEndian(span[Position..(Position += sizeof(ushort))], value);
+    }
 }

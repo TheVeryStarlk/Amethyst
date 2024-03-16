@@ -1,5 +1,5 @@
 ﻿using Amethyst.Api.Entities;
-using Amethyst.Api.World;
+using Amethyst.Api.Levels;
 using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Playing;
@@ -19,7 +19,7 @@ internal sealed class JoinGamePacket : IOutgoingPacket
                + sizeof(sbyte)
                + sizeof(byte)
                + sizeof(byte)
-               + VariableString.GetBytesCount(LevelType.Flat.ToString())
+               + VariableString.GetBytesCount(WorldType.Flat.ToString())
                + sizeof(bool);
     }
 
@@ -30,7 +30,7 @@ internal sealed class JoinGamePacket : IOutgoingPacket
         writer.WriteByte((byte) Dimension.OverWorld);
         writer.WriteByte((byte) Difficulty.Peaceful);
         writer.WriteByte((byte) Player.Server.Configuration.MaximumPlayerCount);
-        writer.WriteVariableString(LevelType.Flat.ToString().ToLower());
+        writer.WriteVariableString(WorldType.Flat.ToString().ToLower());
         writer.WriteBoolean(ReducedDebugInformation);
     }
 }

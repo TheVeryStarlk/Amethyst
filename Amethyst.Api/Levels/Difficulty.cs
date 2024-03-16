@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Api.World;
+﻿namespace Amethyst.Api.Levels;
 
 public enum Difficulty
 {
