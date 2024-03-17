@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using Amethyst.Api.Components;
 
 namespace Amethyst.Networking;
 
@@ -82,5 +83,16 @@ internal ref struct MemoryWriter(Memory<byte> memory)
     public void WriteUnsignedShort(ushort value)
     {
         BinaryPrimitives.WriteUInt16BigEndian(span[Position..(Position += sizeof(ushort))], value);
+    }
+
+    public void WritePosition(Position position)
+    {
+        var value = ((position.X & 0x3FFFFFF) << 38) | ((position.Y & 0xFFF) << 26) | (position.Z & 0x3FFFFFF);
+        WriteUnsignedLong((ulong) value);
+    }
+
+    private void WriteUnsignedLong(ulong value)
+    {
+        BinaryPrimitives.WriteUInt64BigEndian(span[Position..(Position += sizeof(ulong))], value);
     }
 }

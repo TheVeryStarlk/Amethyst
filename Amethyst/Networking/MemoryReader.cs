@@ -65,6 +65,16 @@ internal ref struct MemoryReader(Memory<byte> memory)
     public Position ReadPosition()
     {
         var value = ReadLong();
-        return new Position(value << 38, value << 52 >> 52, value << 26 >> 38);
+        return new Position((value >> 38), (value >> 26) & 0xFFF, (value << 38) >> 38);
+    }
+
+    private ulong ReadUnsignedLong()
+    {
+        return BinaryPrimitives.ReadUInt64BigEndian(span[position..(position += sizeof(ulong))]);
+    }
+
+    public byte ReadByte()
+    {
+        return span[position++];
     }
 }

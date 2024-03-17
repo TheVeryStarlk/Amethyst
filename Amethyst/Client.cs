@@ -188,6 +188,7 @@ internal sealed class Client(
             0x04 => message.As<PlayerPositionPacket>().HandleAsync(this),
             0x05 => message.As<PlayerLookPacket>().HandleAsync(this),
             0x06 => message.As<PlayerPositionAndLookPacket>().HandleAsync(this),
+            0x07 => message.As<PlayerDiggingPacket>().HandleAsync(this),
             0x14 => message.As<TabCompletePacket>().HandleAsync(this),
             _ => Task.CompletedTask
         };
