@@ -49,9 +49,14 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
 
     public async Task HandleAsync(Client client)
     {
-        var position = Position;
+        if (!Enum.TryParse(Face.ToString(), true, out BlockFace face)
+            || !Enum.IsDefined(typeof(BlockFace), face))
+        {
+            return;
+        }
 
-        position = Face switch
+        var position = Position;
+        position = face switch
         {
             BlockFace.NegativeY => Position with
             {
