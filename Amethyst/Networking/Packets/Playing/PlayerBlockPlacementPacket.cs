@@ -49,53 +49,47 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
 
     public async Task HandleAsync(Client client)
     {
-        var world = client.Server.Level?.Worlds.FirstOrDefault().Value;
-
-        Position? position = Position;
+        var position = Position;
 
         position = Face switch
         {
             BlockFace.NegativeY => Position with
             {
-                Y = position.Value.Y - 1
+                Y = position.Y - 1
             },
             BlockFace.PositiveY => Position with
             {
-                Y = position.Value.Y + 1
+                Y = position.Y + 1
             },
             BlockFace.NegativeZ => Position with
             {
-                Z = position.Value.Z - 1
+                Z = position.Z - 1
             },
             BlockFace.PositiveZ => Position with
             {
-                Z = position.Value.Z + 1
+                Z = position.Z + 1
             },
             BlockFace.NegativeX => Position with
             {
-                X = position.Value.X - 1
+                X = position.X - 1
             },
             BlockFace.PositiveX => Position with
             {
-                X = position.Value.X + 1
+                X = position.X + 1
             },
-            _ => null
+            _ => throw new ArgumentException("Unknown face.")
         };
 
-        if (!position.HasValue)
-        {
-            return;
-        }
-
+        var world = client.Server.Level?.Worlds.FirstOrDefault().Value;
         var block = new Block(Item.Type);
 
         await client.Server.BroadcastPacketAsync(
             new BlockChangePacket
             {
-                Position = position.Value,
+                Position = position,
                 Block = block
             });
 
-        world?.SetBlock(block, position.Value);
+        world?.SetBlock(block, position);
     }
 }

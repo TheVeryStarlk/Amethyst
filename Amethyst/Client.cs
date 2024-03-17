@@ -66,6 +66,11 @@ internal sealed class Client(
             }
             catch (Exception exception)
             {
+                if (Player is not null)
+                {
+                    await Player.DisconnectAsync(ChatMessage.Create("Internal server error.", Color.Red));
+                }
+
                 logger.LogError(
                     "Unexpected exception while handling packets: \"{Message}\"",
                     exception);
