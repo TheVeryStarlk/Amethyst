@@ -77,4 +77,9 @@ internal ref struct MemoryReader(Memory<byte> memory)
     {
         return span[position++];
     }
+
+    public short ReadShort()
+    {
+        return BinaryPrimitives.ReadInt16BigEndian(span[position..(position += sizeof(short))]);
+    }
 }
