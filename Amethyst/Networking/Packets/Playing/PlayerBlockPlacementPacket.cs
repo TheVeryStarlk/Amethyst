@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Api.Levels.Blocks;
 
 namespace Amethyst.Networking.Packets.Playing;
@@ -88,11 +89,28 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
         var world = client.Server.Level?.Worlds.FirstOrDefault().Value;
         var block = new Block(Item.Type);
 
+        var eventArgs = await client.Server.EventService.ExecuteAsync(
+            new BlockPlaceEventArgs
+            {
+                Server = client.Server,
+                Player = client.Player!,
+                Block = block,
+                Position = position,
+                Sound = SoundEffect.DigStone
+            });
+
+        await client.Server.BroadcastPacketAsync(
+            new SoundEffectPacket
+            {
+                Effect = eventArgs.Sound,
+                Position = eventArgs.Position
+            });
+
         await client.Server.BroadcastPacketAsync(
             new BlockChangePacket
             {
-                Position = position,
-                Block = block
+                Position = eventArgs.Position,
+                Block = eventArgs.Block
             });
 
         world?.SetBlock(block, position);

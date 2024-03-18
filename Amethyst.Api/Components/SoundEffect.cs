@@ -2,255 +2,255 @@
 
 public sealed class SoundEffect
 {
-    public string AmbientCave { get; } = "ambient.cave.cave";
+    public static string AmbientCave => "ambient.cave.cave";
 
-    public string AmbientWeatherRain { get; } = "ambient.weather.rain";
+    public static string AmbientWeatherRain => "ambient.weather.rain";
 
-    public string AmbientWeatherThunder { get; } = "ambient.weather.thunder";
+    public static string AmbientWeatherThunder => "ambient.weather.thunder";
 
-    public string DamageFallBig { get; } = "damage.fallbig";
+    public static string DamageFallBig => "damage.fallbig";
 
-    public string DamageFallSmall { get; } = "damage.fallsmall";
+    public static string DamageFallSmall => "damage.fallsmall";
 
-    public string FireActive { get; } = "fire.fire";
+    public static string FireActive => "fire.fire";
 
-    public string FireIgnite { get; } = "fire.ignite";
+    public static string FireIgnite => "fire.ignite";
 
-    public string LiquidLava { get; } = "liquid.lava";
+    public static string LiquidLava => "liquid.lava";
 
-    public string LiquidLavaPop { get; } = "liquid.lavapop";
+    public static string LiquidLavaPop => "liquid.lavapop";
 
-    public string LiquidSplash { get; } = "liquid.splash";
+    public static string LiquidSplash => "liquid.splash";
 
-    public string LiquidWater { get; } = "liquid.water";
+    public static string LiquidWater => "liquid.water";
 
-    public string MobBlazeBreathe { get; } = "mob.blaze.breathe";
+    public static string MobBlazeBreathe => "mob.blaze.breathe";
 
-    public string MobBlazeDeath { get; } = "mob.blaze.death";
+    public static string MobBlazeDeath => "mob.blaze.death";
 
-    public string MobBlazeHit { get; } = "mob.blaze.hit";
+    public static string MobBlazeHit => "mob.blaze.hit";
 
-    public string MobCatHiss { get; } = "mob.cat.hiss";
+    public static string MobCatHiss => "mob.cat.hiss";
 
-    public string MobCatMeow { get; } = "mob.cat.meow";
+    public static string MobCatMeow => "mob.cat.meow";
 
-    public string MobCatPurr { get; } = "mob.cat.purr";
+    public static string MobCatPurr => "mob.cat.purr";
 
-    public string MobChickenHurt { get; } = "mob.chicken.hurt";
+    public static string MobChickenHurt => "mob.chicken.hurt";
 
-    public string MobChickenPlop { get; } = "mob.chicken.plop";
+    public static string MobChickenPlop => "mob.chicken.plop";
 
-    public string MobCowHurt { get; } = "mob.cow.hurt";
+    public static string MobCowHurt => "mob.cow.hurt";
 
-    public string MobCreeper { get; } = "mob.creeper";
+    public static string MobCreeper => "mob.creeper";
 
-    public string MobCreeperDeath { get; } = "mob.creeperdeath";
+    public static string MobCreeperDeath => "mob.creeperdeath";
 
-    public string MobSilverfishHit { get; } = "mob.silverfish.hit";
+    public static string MobSilverfishHit => "mob.silverfish.hit";
 
-    public string MobSilverfishKill { get; } = "mob.silverfish.kill";
+    public static string MobSilverfishKill => "mob.silverfish.kill";
 
-    public string MobSilverfishSay { get; } = "mob.silverfish.say";
+    public static string MobSilverfishSay => "mob.silverfish.say";
 
-    public string MobSilverfishStep { get; } = "mob.silverfish.step";
+    public static string MobSilverfishStep => "mob.silverfish.step";
 
-    public string MobSkeletonDeath { get; } = "mob.skeleton.death";
+    public static string MobSkeletonDeath => "mob.skeleton.death";
 
-    public string MobSkeletonHurt { get; } = "mob.skeleton.hurt";
+    public static string MobSkeletonHurt => "mob.skeleton.hurt";
 
-    public string MobSpiderDeath { get; } = "mob.spider.death";
+    public static string MobSpiderDeath => "mob.spider.death";
 
-    public string MobWolfBark { get; } = "mob.wolf.bark";
+    public static string MobWolfBark => "mob.wolf.bark";
 
-    public string MobWolfDeath { get; } = "mob.wolf.death";
+    public static string MobWolfDeath => "mob.wolf.death";
 
-    public string MobWolfGrowl { get; } = "mob.wolf.growl";
+    public static string MobWolfGrowl => "mob.wolf.growl";
 
-    public string MobWolfHowl { get; } = "mob.wolf.howl";
+    public static string MobWolfHowl => "mob.wolf.howl";
 
-    public string MobWolfHurt { get; } = "mob.wolf.hurt";
+    public static string MobWolfHurt => "mob.wolf.hurt";
 
-    public string MobWolfPanting { get; } = "mob.wolf.panting";
+    public static string MobWolfPanting => "mob.wolf.panting";
 
-    public string MobWolfShake { get; } = "mob.wolf.shake";
+    public static string MobWolfShake => "mob.wolf.shake";
 
-    public string MobWolfWhine { get; } = "mob.wolf.whine";
+    public static string MobWolfWhine => "mob.wolf.whine";
 
-    public string MobZombieMetal { get; } = "mob.zombie.metal";
+    public static string MobZombieMetal => "mob.zombie.metal";
 
-    public string MobZombieWood { get; } = "mob.zombie.wood";
+    public static string MobZombieWood => "mob.zombie.wood";
 
-    public string MobZombieWoodBreak { get; } = "mob.zombie.woodbreak";
+    public static string MobZombieWoodBreak => "mob.zombie.woodbreak";
 
-    public string MobZombie { get; } = "mob.zombie";
+    public static string MobZombie => "mob.zombie";
 
-    public string NoteBass { get; } = "note.bass";
+    public static string NoteBass => "note.bass";
 
-    public string NoteBassAttack { get; } = "note.bassattack";
+    public static string NoteBassAttack => "note.bassattack";
 
-    public string NoteBd { get; } = "note.bd";
+    public static string NoteBd => "note.bd";
 
-    public string NoteHarp { get; } = "note.harp";
+    public static string NoteHarp => "note.harp";
 
-    public string NoteHat { get; } = "note.hat";
+    public static string NoteHat => "note.hat";
 
-    public string NoteSnare { get; } = "note.snare";
+    public static string NoteSnare => "note.snare";
 
-    public string PortalNear { get; } = "portal.portal";
+    public static string PortalNear => "portal.portal";
 
-    public string PortalTravel { get; } = "portal.travel";
+    public static string PortalTravel => "portal.travel";
 
-    public string PortalTrigger { get; } = "portal.trigger";
+    public static string PortalTrigger => "portal.trigger";
 
-    public string RandomBow { get; } = "random.bow";
+    public static string RandomBow => "random.bow";
 
-    public string RandomBreak { get; } = "random.break";
+    public static string RandomBreak => "random.break";
 
-    public string RandomBreath { get; } = "random.breath";
+    public static string RandomBreath => "random.breath";
 
-    public string RandomBurp { get; } = "random.burp";
+    public static string RandomBurp => "random.burp";
 
-    public string RandomClick { get; } = "random.click";
+    public static string RandomClick => "random.click";
 
-    public string RandomDoorClose { get; } = "random.door_close";
+    public static string RandomDoorClose => "random.door_close";
 
-    public string RandomDoorOpen { get; } = "random.door_open";
+    public static string RandomDoorOpen => "random.door_open";
 
-    public string RandomDrink { get; } = "random.drink";
+    public static string RandomDrink => "random.drink";
 
-    public string RandomEat { get; } = "random.eat";
+    public static string RandomEat => "random.eat";
 
-    public string RandomExplode { get; } = "random.explode";
+    public static string RandomExplode => "random.explode";
 
-    public string RandomFizz { get; } = "random.fizz";
+    public static string RandomFizz => "random.fizz";
 
-    public string RandomFuse { get; } = "random.fuse";
+    public static string RandomFuse => "random.fuse";
 
-    public string RandomGlass { get; } = "random.glass";
+    public static string RandomGlass => "random.glass";
 
-    public string RandomLevelUp { get; } = "random.levelup";
+    public static string RandomLevelUp => "random.levelup";
 
-    public string RandomOldExplode { get; } = "random.old_explode";
+    public static string RandomOldExplode => "random.old_explode";
 
-    public string RandomOrb { get; } = "random.orb";
+    public static string RandomOrb => "random.orb";
 
-    public string RandomPop { get; } = "random.pop";
+    public static string RandomPop => "random.pop";
 
-    public string RandomSplash { get; } = "random.splash";
+    public static string RandomSplash => "random.splash";
 
-    public string RandomWoodClick { get; } = "random.wood click";
+    public static string RandomWoodClick => "random.wood click";
 
-    public string StepCloth { get; } = "step.cloth";
+    public static string StepCloth => "step.cloth";
 
-    public string StepGrass { get; } = "step.grass";
+    public static string StepGrass => "step.grass";
 
-    public string StepGravel { get; } = "step.gravel";
+    public static string StepGravel => "step.gravel";
 
-    public string StepSand { get; } = "step.sand";
+    public static string StepSand => "step.sand";
 
-    public string StepSnow { get; } = "step.snow";
+    public static string StepSnow => "step.snow";
 
-    public string StepStone { get; } = "step.stone";
+    public static string StepStone => "step.stone";
 
-    public string StepWood { get; } = "step.wood";
+    public static string StepWood => "step.wood";
 
-    public string TilePistonIn { get; } = "tile.piston.in";
+    public static string TilePistonIn => "tile.piston.in";
 
-    public string TilePistonOut { get; } = "tile.piston.out";
+    public static string TilePistonOut => "tile.piston.out";
 
-    public string DamageHit { get; } = "damage.hit";
+    public static string DamageHit => "damage.hit";
 
-    public string DigCloth { get; } = "dig.cloth";
+    public static string DigCloth => "dig.cloth";
 
-    public string DigGrass { get; } = "dig.grass";
+    public static string DigGrass => "dig.grass";
 
-    public string DigGravel { get; } = "dig.gravel";
+    public static string DigGravel => "dig.gravel";
 
-    public string DigSand { get; } = "dig.sand";
+    public static string DigSand => "dig.sand";
 
-    public string DigSnow { get; } = "dig.snow";
+    public static string DigSnow => "dig.snow";
 
-    public string DigStone { get; } = "dig.stone";
+    public static string DigStone => "dig.stone";
 
-    public string DigWood { get; } = "dig.wood";
+    public static string DigWood => "dig.wood";
 
-    public string LiquidSwim { get; } = "liquid.swim";
+    public static string LiquidSwim => "liquid.swim";
 
-    public string MobChickenSay { get; } = "mob.chicken.say";
+    public static string MobChickenSay => "mob.chicken.say";
 
-    public string MobChickenStep { get; } = "mob.chicken.step";
+    public static string MobChickenStep => "mob.chicken.step";
 
-    public string MobCowSay { get; } = "mob.cow.say";
+    public static string MobCowSay => "mob.cow.say";
 
-    public string MobCowStep { get; } = "mob.cow.step";
+    public static string MobCowStep => "mob.cow.step";
 
-    public string MobCreeperSay { get; } = "mob.creeper.say";
+    public static string MobCreeperSay => "mob.creeper.say";
 
-    public string MobPigDeath { get; } = "mob.pig.death";
+    public static string MobPigDeath => "mob.pig.death";
 
-    public string MobPigSay { get; } = "mob.pig.say";
+    public static string MobPigSay => "mob.pig.say";
 
-    public string MobPigStep { get; } = "mob.pig.step";
+    public static string MobPigStep => "mob.pig.step";
 
-    public string MobSheepSay { get; } = "mob.sheep.say";
+    public static string MobSheepSay => "mob.sheep.say";
 
-    public string MobSheepShear { get; } = "mob.sheep.shear";
+    public static string MobSheepShear => "mob.sheep.shear";
 
-    public string MobSheepStep { get; } = "mob.sheep.step";
+    public static string MobSheepStep => "mob.sheep.step";
 
-    public string MobSkeletonSay { get; } = "mob.skeleton.say";
+    public static string MobSkeletonSay => "mob.skeleton.say";
 
-    public string MobSkeletonStep { get; } = "mob.skeleton.step";
+    public static string MobSkeletonStep => "mob.skeleton.step";
 
-    public string MobSlimeAttack { get; } = "mob.slime.attack";
+    public static string MobSlimeAttack => "mob.slime.attack";
 
-    public string MobSlimeBig { get; } = "mob.slime.big";
+    public static string MobSlimeBig => "mob.slime.big";
 
-    public string MobSlimeSmall { get; } = "mob.slime.small";
+    public static string MobSlimeSmall => "mob.slime.small";
 
-    public string MobSpiderSay { get; } = "mob.spider.say";
+    public static string MobSpiderSay => "mob.spider.say";
 
-    public string MobSpiderStep { get; } = "mob.spider.step";
+    public static string MobSpiderStep => "mob.spider.step";
 
-    public string MobWolfStep { get; } = "mob.wolf.step";
+    public static string MobWolfStep => "mob.wolf.step";
 
-    public string MobZombieDeath { get; } = "mob.zombie.death";
+    public static string MobZombieDeath => "mob.zombie.death";
 
-    public string MobZombieHurt { get; } = "mob.zombie.hurt";
+    public static string MobZombieHurt => "mob.zombie.hurt";
 
-    public string MobZombieSay { get; } = "mob.zombie.say";
+    public static string MobZombieSay => "mob.zombie.say";
 
-    public string MobZombieStep { get; } = "mob.zombie.step";
+    public static string MobZombieStep => "mob.zombie.step";
 
-    public string RandomClassicHurt { get; } = "random.classic_hurt";
+    public static string RandomClassicHurt => "random.classic_hurt";
 
-    public string StepLadder { get; } = "step.ladder";
+    public static string StepLadder => "step.ladder";
 
-    public string MobBatDeath { get; } = "mob.bat.death";
+    public static string MobBatDeath => "mob.bat.death";
 
-    public string MobBatHurt { get; } = "mob.bat.hurt";
+    public static string MobBatHurt => "mob.bat.hurt";
 
-    public string MobBatIdle { get; } = "mob.bat.idle";
+    public static string MobBatIdle => "mob.bat.idle";
 
-    public string MobBatTakeoff { get; } = "mob.bat.takeoff";
+    public static string MobBatTakeoff => "mob.bat.takeoff";
 
-    public string MobWitherDeath { get; } = "mob.wither.death";
+    public static string MobWitherDeath => "mob.wither.death";
 
-    public string MobWitherHurt { get; } = "mob.wither.hurt";
+    public static string MobWitherHurt => "mob.wither.hurt";
 
-    public string MobWitherIdle { get; } = "mob.wither.idle";
+    public static string MobWitherIdle => "mob.wither.idle";
 
-    public string MobWitherShoot { get; } = "mob.wither.shoot";
+    public static string MobWitherShoot => "mob.wither.shoot";
 
-    public string MobWitherSpawn { get; } = "mob.wither.spawn";
+    public static string MobWitherSpawn => "mob.wither.spawn";
 
-    public string MobZombieInfect { get; } = "mob.zombie.infect";
+    public static string MobZombieInfect => "mob.zombie.infect";
 
-    public string MobZombieRemedy { get; } = "mob.zombie.remedy";
+    public static string MobZombieRemedy => "mob.zombie.remedy";
 
-    public string RandomAnvilBreak { get; } = "random.anvil_break";
+    public static string RandomAnvilBreak => "random.anvil_break";
 
-    public string RandomAnvilLand { get; } = "random.anvil_land";
+    public static string RandomAnvilLand => "random.anvil_land";
 
-    public string RandomAnvilUse { get; } = "random.anvil_use";
+    public static string RandomAnvilUse => "random.anvil_use";
 }

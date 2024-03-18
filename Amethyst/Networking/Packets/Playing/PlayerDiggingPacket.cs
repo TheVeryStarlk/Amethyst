@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Api.Levels.Blocks;
 
 namespace Amethyst.Networking.Packets.Playing;
@@ -30,14 +31,25 @@ internal sealed class PlayerDiggingPacket : IIngoingPacket<PlayerDiggingPacket>
 
         if (Status is DiggingStatus.StartedDigging || client.Player!.GameMode is GameMode.Creative)
         {
+            var block = new Block(0);
+
+            var eventArgs = await client.Server.EventService.ExecuteAsync(
+                new BlockBreakEventArgs
+                {
+                    Server = client.Server,
+                    Player = client.Player!,
+                    Block = block,
+                    Position = Position
+                });
+
             await client.Server.BroadcastPacketAsync(
                 new BlockChangePacket
                 {
-                    Position = Position,
-                    Block = new Block(0)
+                    Position = eventArgs.Position,
+                    Block = eventArgs.Block
                 });
 
-            world?.SetBlock(new Block(0), Position);
+            world?.SetBlock(block, Position);
         }
     }
 }
