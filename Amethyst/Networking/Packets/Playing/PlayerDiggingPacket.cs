@@ -42,7 +42,7 @@ internal sealed class PlayerDiggingPacket : IIngoingPacket<PlayerDiggingPacket>
                     Position = Position
                 });
 
-            await client.Server.BroadcastPacketAsync(
+            client.Server.BroadcastPacket(
                 new BlockChangePacket
                 {
                     Position = eventArgs.Position,

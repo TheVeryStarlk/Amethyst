@@ -102,23 +102,6 @@ internal sealed class Client(
         await connection.DisposeAsync();
     }
 
-    public async Task KeepAliveAsync()
-    {
-        if (MissedKeepAliveCount > server.Configuration.MaximumMissedKeepAliveCount)
-        {
-            await Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
-            return;
-        }
-
-        await Transport.Output.WritePacketAsync(
-            new KeepAlivePacket
-            {
-                Payload = Random.Shared.Next()
-            });
-
-        MissedKeepAliveCount++;
-    }
-
     private async Task HandleHandshakingAsync(Message message)
     {
         var handshake = message.As<HandshakePacket>();
@@ -157,7 +140,7 @@ internal sealed class Client(
 
         await loginStart.HandleAsync(this);
 
-        await server.BroadcastPacketAsync(
+        server.BroadcastPacket(
             new PlayerListItemPacket
             {
                 Action = new AddPlayerAction(),
@@ -170,7 +153,7 @@ internal sealed class Client(
         {
             for (var z = -4; z < 4; z++)
             {
-                await Transport.Output.WritePacketAsync(
+                Transport.Output.QueuePacket(
                     new ChunkPacket
                     {
                         Chunk = world.GetChunk(new Position(x, 0, z))
@@ -209,7 +192,7 @@ internal sealed class Client(
             return;
         }
 
-        await server.BroadcastPacketAsync(
+        server.BroadcastPacket(
             new PlayerListItemPacket
             {
                 Action = new RemovePlayerAction(),

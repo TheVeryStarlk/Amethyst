@@ -27,9 +27,9 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public async Task TeleportAsync(VectorF position)
+    public Task TeleportAsync(VectorF position)
     {
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new PlayerPositionAndLookPacket
             {
                 Position = position,
@@ -39,21 +39,24 @@ internal sealed class Player(Client client, string username) : IPlayer
             });
 
         Position = position;
+        return Task.CompletedTask;
     }
 
-    public async Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
+    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
     {
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new ChatMessagePacket
             {
                 Message = message,
                 Position = position
             });
+
+        return Task.CompletedTask;
     }
 
     public async Task DisconnectAsync(ChatMessage reason)
     {
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new DisconnectPacket(ClientState.Playing)
             {
                 Reason = reason

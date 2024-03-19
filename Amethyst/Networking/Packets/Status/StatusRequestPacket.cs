@@ -4,7 +4,7 @@ using Amethyst.Extensions;
 
 namespace Amethyst.Networking.Packets.Status;
 
-internal sealed class StatusRequestPacket: IIngoingPacket<StatusRequestPacket>
+internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {
     public static int Identifier => 0x00;
 

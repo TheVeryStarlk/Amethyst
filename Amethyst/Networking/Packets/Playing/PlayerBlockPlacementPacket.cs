@@ -57,6 +57,7 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
         }
 
         var position = Position;
+
         position = face switch
         {
             BlockFace.NegativeY => Position with
@@ -99,14 +100,14 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
                 Sound = SoundEffect.DigStone
             });
 
-        await client.Server.BroadcastPacketAsync(
+        client.Server.BroadcastPacket(
             new SoundEffectPacket
             {
                 Effect = eventArgs.Sound,
                 Position = eventArgs.Position
             });
 
-        await client.Server.BroadcastPacketAsync(
+        client.Server.BroadcastPacket(
             new BlockChangePacket
             {
                 Position = eventArgs.Position,

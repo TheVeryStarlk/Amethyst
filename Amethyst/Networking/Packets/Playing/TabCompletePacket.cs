@@ -35,13 +35,13 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
         }
     }
 
-    public async Task HandleAsync(Client client)
+    public Task HandleAsync(Client client)
     {
         var text = Matches[0];
 
         if (!text.StartsWith('/'))
         {
-            await client.Transport.Output.WritePacketAsync(
+            client.Transport.Output.QueuePacket(
                 new TabCompletePacket
                 {
                     Matches = client.Server.Players
@@ -49,7 +49,7 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
                         .ToArray()
                 });
 
-            return;
+            return Task.CompletedTask;
         }
 
         var commands = client.Server.CommandService.Commands.Keys.Select(match => $"/{match}");
@@ -58,10 +58,12 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
             ? commands
             : commands.Where(match => text[1] == match[1]);
 
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new TabCompletePacket
             {
                 Matches = matches.ToArray()
             });
+
+        return Task.CompletedTask;
     }
 }

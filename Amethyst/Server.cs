@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
@@ -8,6 +9,7 @@ using Amethyst.Api.Levels.Generators;
 using Amethyst.Extensions;
 using Amethyst.Levels;
 using Amethyst.Networking;
+using Amethyst.Networking.Packets.Playing;
 using Amethyst.Services;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -43,7 +45,7 @@ internal sealed class Server(
     private IConnectionListener? listener;
 
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
-    private readonly Dictionary<int, Client> clients = [];
+    private readonly ConcurrentDictionary<int, Client> clients = [];
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -113,12 +115,12 @@ internal sealed class Server(
         await pluginService.DisposeAsync();
     }
 
-    public async Task BroadcastPacketAsync(IOutgoingPacket packet)
+    public void BroadcastPacket(IOutgoingPacket packet)
     {
-        await clients.Values
-            .Where(client => client.Player is not null)
-            .Select(client => client.Transport.Output.WritePacketAsync(packet))
-            .WhenAll();
+        foreach (var client in clients.Values.Where(client => client.Player is not null))
+        {
+            client.Transport.Output.QueuePacket(packet);
+        }
     }
 
     public async Task BroadcastChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
@@ -207,7 +209,7 @@ internal sealed class Server(
             }
             finally
             {
-                clients.Remove(client.Identifier);
+                _ = clients.TryRemove(client.Identifier, out _);
                 logger.LogDebug("Removed client");
                 await client.DisposeAsync();
             }
@@ -218,7 +220,8 @@ internal sealed class Server(
     {
         logger.LogInformation("Started ticking");
 
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
+        var tick = 0;
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(5));
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -226,10 +229,36 @@ internal sealed class Server(
             {
                 await timer.WaitForNextTickAsync(cancellationToken);
 
-                await clients.Values
-                    .Where(client => client.State is ClientState.Playing)
-                    .Select(client => client.KeepAliveAsync())
-                    .WhenAll();
+                for (var index = 0; index < clients.Values.Count; index++)
+                {
+                    var client = clients.Values.ElementAt(index);
+
+                    if (client.State is not ClientState.Playing)
+                    {
+                        continue;
+                    }
+
+                    if (tick % 50 == 0)
+                    {
+                        if (client.MissedKeepAliveCount > Configuration.MaximumMissedKeepAliveCount)
+                        {
+                            await client.Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
+                            return;
+                        }
+
+                        client.Transport.Output.QueuePacket(
+                            new KeepAlivePacket
+                            {
+                                Payload = tick
+                            });
+
+                        client.MissedKeepAliveCount++;
+                    }
+
+                    await client.Transport.Output.FlushAsync(cancellationToken);
+                }
+
+                tick++;
             }
             catch (OperationCanceledException)
             {

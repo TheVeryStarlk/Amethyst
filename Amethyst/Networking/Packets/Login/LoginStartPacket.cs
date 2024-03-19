@@ -21,20 +21,20 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
 
     public async Task HandleAsync(Client client)
     {
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new LoginSuccessPacket
             {
                 Guid = client.Player!.Guid,
                 Username = client.Player.Username
             });
 
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new JoinGamePacket
             {
                 Player = client.Player
             });
 
-        await client.Transport.Output.WritePacketAsync(
+        client.Transport.Output.QueuePacket(
             new PlayerPositionAndLookPacket
             {
                 Position = client.Player.Position,

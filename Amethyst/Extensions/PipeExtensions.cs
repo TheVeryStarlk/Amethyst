@@ -72,9 +72,14 @@ internal static class PipeExtensions
 
     public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet)
     {
+        writer.QueuePacket(packet);
+        await writer.FlushAsync();
+    }
+
+    public static void QueuePacket(this PipeWriter writer, IOutgoingPacket packet)
+    {
         var memory = writer.GetMemory(short.MaxValue);
         writer.Advance(Write(packet, memory));
-        await writer.FlushAsync();
         return;
 
         static int Write(IOutgoingPacket packet, Memory<byte> memory)
