@@ -78,7 +78,7 @@ internal static class PipeExtensions
 
     public static void QueuePacket(this PipeWriter writer, IOutgoingPacket packet)
     {
-        var memory = writer.GetMemory(short.MaxValue);
+        var memory = writer.GetMemory(packet.CalculateLength());
         writer.Advance(Write(packet, memory));
         return;
 

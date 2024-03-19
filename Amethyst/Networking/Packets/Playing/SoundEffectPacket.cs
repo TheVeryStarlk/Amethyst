@@ -12,15 +12,15 @@ internal sealed class SoundEffectPacket : IOutgoingPacket
 
     public float Volume { get; init; } = 1;
 
-    public byte Pitch { get; init; } = 63;
+    public byte Pitch { get; init; }
 
     public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableString(Effect);
-        writer.WriteInteger((int) Position.X);
-        writer.WriteInteger((int) Position.Y);
-        writer.WriteInteger((int) Position.Z);
+        writer.WriteInteger((int) Position.X * 8);
+        writer.WriteInteger((int) Position.Y * 8);
+        writer.WriteInteger((int) Position.Z * 8);
         writer.WriteFloat(Volume);
-        writer.WriteByte(Pitch);
+        writer.WriteByte((byte) (Pitch * 63));
     }
 }

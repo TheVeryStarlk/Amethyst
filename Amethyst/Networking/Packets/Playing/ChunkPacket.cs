@@ -8,15 +8,21 @@ internal sealed class ChunkPacket : IOutgoingPacket
 
     public required IChunk Chunk { get; init; }
 
+    private (byte[] Payload, ushort Bitmask)? serializedChunk;
+
+    public int CalculateLength()
+    {
+        serializedChunk = Chunk.Serialize();
+        return serializedChunk.Value.Payload.Length;
+    }
+
     public void Write(ref MemoryWriter writer)
     {
         writer.WriteInteger((int) Chunk.Position.X);
         writer.WriteInteger((int) Chunk.Position.Z);
         writer.WriteBoolean(true);
-
-        var serializedChunk = Chunk.Serialize();
-        writer.WriteUnsignedShort(serializedChunk.Bitmask);
-        writer.WriteVariableInteger(serializedChunk.Payload.Length);
-        writer.Write(serializedChunk.Payload);
+        writer.WriteUnsignedShort(serializedChunk!.Value.Bitmask);
+        writer.WriteVariableInteger(serializedChunk!.Value.Payload.Length);
+        writer.Write(serializedChunk!.Value.Payload);
     }
 }

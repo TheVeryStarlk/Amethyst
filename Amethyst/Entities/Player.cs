@@ -56,7 +56,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public async Task DisconnectAsync(ChatMessage reason)
     {
-        client.Transport.Output.QueuePacket(
+        await client.Transport.Output.WritePacketAsync(
             new DisconnectPacket(ClientState.Playing)
             {
                 Reason = reason
