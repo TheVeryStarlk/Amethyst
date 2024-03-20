@@ -15,7 +15,7 @@ internal sealed class Region(long x, long z, IWorldGenerator generator) : IRegio
 
     public Chunk GetChunk(Position position)
     {
-        var (x, z) = (position.X >> 4, position.Z >> 4);
+        var (x, z) = (position.X, position.Z);
         var chunk = chunks.FirstOrDefault(chunk => chunk.Position == (x, z));
 
         if (chunk is not null)
