@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Services;
 
+// Maybe move this to the plugin project?
 internal sealed class PluginService(
     ILoggerFactory loggerFactory,
     IPluginRegistry pluginRegistry) : IAsyncDisposable
