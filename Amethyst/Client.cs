@@ -131,8 +131,9 @@ internal sealed class Client(
     private async Task HandleLoginAsync(Message message)
     {
         var loginStart = message.As<LoginStartPacket>();
+        var world = server.Level!.Worlds.FirstOrDefault().Value;
 
-        Player = new Player(this, loginStart.Username)
+        Player = new Player(this, world, loginStart.Username)
         {
             Position = new VectorF(0, 4, 0),
             GameMode = GameMode.Creative
@@ -146,8 +147,6 @@ internal sealed class Client(
                 Action = new AddPlayerAction(),
                 Players = server.Players
             });
-
-        var world = server.Level!.Worlds.FirstOrDefault().Value;
 
         for (var x = -4; x < 4; x++)
         {

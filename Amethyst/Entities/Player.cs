@@ -1,13 +1,14 @@
 ﻿using Amethyst.Api;
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Levels;
 using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(Client client, string username) : IPlayer
+internal sealed class Player(Client client, IWorld world, string username) : IPlayer
 {
     public Guid Guid { get; } = Guid.NewGuid();
 
@@ -18,6 +19,8 @@ internal sealed class Player(Client client, string username) : IPlayer
     public GameMode GameMode { get; set; }
 
     public int Identifier { get; } = Random.Shared.Next();
+
+    public IWorld World => world;
 
     public VectorF Position { get; set; }
 

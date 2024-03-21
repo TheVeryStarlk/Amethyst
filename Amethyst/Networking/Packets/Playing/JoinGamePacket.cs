@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api.Entities;
-using Amethyst.Api.Levels;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -15,10 +14,10 @@ internal sealed class JoinGamePacket : IOutgoingPacket
     {
         writer.WriteInteger(Player.Identifier);
         writer.WriteByte((byte) Player.GameMode);
-        writer.WriteByte((byte) Dimension.OverWorld);
-        writer.WriteByte((byte) Difficulty.Peaceful);
+        writer.WriteByte((byte) Player.World.Dimension);
+        writer.WriteByte((byte) Player.World.Difficulty);
         writer.WriteByte((byte) Player.Server.Configuration.MaximumPlayerCount);
-        writer.WriteVariableString(WorldType.Flat.ToString().ToLower());
+        writer.WriteVariableString(Player.World.Type.ToString().ToLower());
         writer.WriteBoolean(ReducedDebugInformation);
     }
 }
