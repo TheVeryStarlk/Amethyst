@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Entities;
 using Amethyst.Api.Levels.Blocks;
 using Amethyst.Api.Levels.Generators;
 
@@ -19,6 +20,10 @@ public interface IWorld
     public long Time { get; set; }
 
     public IEnumerable<IRegion> Regions { get; }
+
+    public Task AddPlayerAsync(IPlayer player);
+
+    public Task RemovePlayerAsync(IPlayer player);
 
     public Block GetBlock(Position position);
 

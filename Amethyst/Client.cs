@@ -131,14 +131,6 @@ internal sealed class Client(
     private async Task HandleLoginAsync(Message message)
     {
         var loginStart = message.As<LoginStartPacket>();
-        var world = server.Level!.Worlds.FirstOrDefault().Value;
-
-        Player = new Player(this, world, loginStart.Username)
-        {
-            Position = new VectorF(0, 4, 0),
-            GameMode = GameMode.Creative
-        };
-
         await loginStart.HandleAsync(this);
 
         server.BroadcastPacket(
@@ -147,6 +139,17 @@ internal sealed class Client(
                 Action = new AddPlayerAction(),
                 Players = server.Players
             });
+
+
+        var world = server.Level!.Worlds.FirstOrDefault().Value;
+
+        Player = new Player(this, loginStart.Username)
+        {
+            Position = new VectorF(0, 4, 0),
+            GameMode = GameMode.Creative
+        };
+
+        await world.AddPlayerAsync(Player);
 
         for (var x = -4; x < 4; x++)
         {

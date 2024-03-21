@@ -1,7 +1,9 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Entities;
 using Amethyst.Api.Levels;
 using Amethyst.Api.Levels.Blocks;
 using Amethyst.Api.Levels.Generators;
+using Amethyst.Entities;
 
 namespace Amethyst.Levels;
 
@@ -24,6 +26,19 @@ internal sealed class World(string name, IWorldGenerator generator) : IWorld
     public IEnumerable<IRegion> Regions => regions;
 
     private readonly List<Region> regions = [];
+    private readonly List<IPlayer> players = [];
+
+    public async Task AddPlayerAsync(IPlayer player)
+    {
+        player.World = this;
+        players.Add(player);
+    }
+
+    public async Task RemovePlayerAsync(IPlayer player)
+    {
+        player.World = null;
+        players.Remove(player);
+    }
 
     public Block GetBlock(Position position)
     {

@@ -8,7 +8,7 @@ using Amethyst.Networking.Packets.Playing;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(Client client, IWorld world, string username) : IPlayer
+internal sealed class Player(Client client, string username) : IPlayer
 {
     public Guid Guid { get; } = Guid.NewGuid();
 
@@ -20,7 +20,7 @@ internal sealed class Player(Client client, IWorld world, string username) : IPl
 
     public int Identifier { get; } = Random.Shared.Next();
 
-    public IWorld World => world;
+    public IWorld? World { get; set; }
 
     public VectorF Position { get; set; }
 

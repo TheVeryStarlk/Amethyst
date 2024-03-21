@@ -7,7 +7,7 @@ public interface IEntity
 {
     public int Identifier { get; }
 
-    public IWorld World { get; }
+    public IWorld? World { get; set; }
 
     public VectorF Position { get; set; }
 
