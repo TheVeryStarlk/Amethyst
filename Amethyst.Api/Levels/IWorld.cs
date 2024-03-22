@@ -21,9 +21,9 @@ public interface IWorld
 
     public IEnumerable<IRegion> Regions { get; }
 
-    public Task AddPlayerAsync(IPlayer player);
+    public Task SpawnPlayerAsync(IPlayer player);
 
-    public Task RemovePlayerAsync(IPlayer player);
+    public Task DestroyEntitiesAsync(params IEntity[] entities);
 
     public Block GetBlock(Position position);
 

@@ -201,12 +201,6 @@ internal sealed class Server(
             {
                 await client.StartAsync();
             }
-            catch (Exception exception) when (exception is not OperationCanceledException)
-            {
-                logger.LogError(
-                    "Unexpected exception from client: \"{Message}\"",
-                    exception);
-            }
             finally
             {
                 _ = clients.TryRemove(client.Identifier, out _);
@@ -238,6 +232,8 @@ internal sealed class Server(
                         continue;
                     }
 
+                    await client.Transport.Output.FlushAsync(cancellationToken);
+
                     if (tick % 50 == 0)
                     {
                         if (client.MissedKeepAliveCount > Configuration.MaximumMissedKeepAliveCount)
@@ -254,8 +250,6 @@ internal sealed class Server(
 
                         client.MissedKeepAliveCount++;
                     }
-
-                    await client.Transport.Output.FlushAsync(cancellationToken);
                 }
 
                 tick++;

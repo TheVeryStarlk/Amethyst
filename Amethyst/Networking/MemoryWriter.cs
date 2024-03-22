@@ -95,4 +95,14 @@ internal ref struct MemoryWriter(Memory<byte> memory)
     {
         BinaryPrimitives.WriteUInt64BigEndian(span[Position..(Position += sizeof(ulong))], value);
     }
+
+    public void WriteFixedPointInteger(int value)
+    {
+        BinaryPrimitives.WriteInt32BigEndian(span[Position..(Position += sizeof(int))], (int) (value * 32.0D));
+    }
+
+    public void WriteShort(short value)
+    {
+        BinaryPrimitives.WriteInt16BigEndian(span[Position..(Position += sizeof(short))], value);
+    }
 }

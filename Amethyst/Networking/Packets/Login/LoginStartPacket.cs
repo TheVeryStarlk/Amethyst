@@ -28,6 +28,9 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
                 Username = client.Player.Username
             });
 
+        var world = client.Server.Level!.Worlds.FirstOrDefault().Value;
+        client.Player.World = world;
+
         client.Transport.Output.QueuePacket(
             new JoinGamePacket
             {
@@ -51,5 +54,27 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
             });
 
         await client.Server.BroadcastChatMessageAsync(eventArgs.Message);
+
+        client.Server.BroadcastPacket(
+            new PlayerListItemPacket
+            {
+                Action = new AddPlayerAction(),
+                Players = client.Server.Players
+            });
+
+        await world.SpawnPlayerAsync(client.Player);
+
+        for (var x = -1; x < 1; x++)
+        {
+            for (var z = -1; z < 1; z++)
+            {
+                client.Transport.Output.QueuePacket(
+                    new ChunkPacket
+                    {
+                        Chunk = world.GetChunk(new Position(x, 0, z))
+                    }
+                );
+            }
+        }
     }
 }

@@ -21,9 +21,9 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
         return new PlayerPositionAndLookPacket
         {
             Position = new VectorF(
-                reader.ReadFloat(),
-                reader.ReadFloat(),
-                reader.ReadFloat()),
+                reader.ReadDouble(),
+                reader.ReadDouble(),
+                reader.ReadDouble()),
 
             Yaw = reader.ReadFloat(),
             Pitch = reader.ReadFloat(),

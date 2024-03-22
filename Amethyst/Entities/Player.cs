@@ -67,4 +67,26 @@ internal sealed class Player(Client client, string username) : IPlayer
 
         await client.StopAsync();
     }
+
+    public Task SpawnPlayerAsync(IPlayer player)
+    {
+        client.Transport.Output.QueuePacket(
+            new SpawnPlayerPacket
+            {
+                Player = player
+            });
+
+        return Task.CompletedTask;
+    }
+
+    public Task DestroyEntitiesAsync(params IEntity[] entities)
+    {
+        client.Transport.Output.QueuePacket(
+            new DestroyEntitiesPacket
+            {
+                Entities = entities
+            });
+
+        return Task.CompletedTask;
+    }
 }

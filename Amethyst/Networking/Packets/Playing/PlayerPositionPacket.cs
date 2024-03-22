@@ -15,9 +15,9 @@ internal sealed class PlayerPositionPacket : IIngoingPacket<PlayerPositionPacket
         return new PlayerPositionPacket
         {
             Position = new VectorF(
-                reader.ReadFloat(),
-                reader.ReadFloat(),
-                reader.ReadFloat()),
+                reader.ReadDouble(),
+                reader.ReadDouble(),
+                reader.ReadDouble()),
 
             OnGround = reader.ReadBoolean()
         };

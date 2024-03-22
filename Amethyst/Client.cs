@@ -131,17 +131,6 @@ internal sealed class Client(
     private async Task HandleLoginAsync(Message message)
     {
         var loginStart = message.As<LoginStartPacket>();
-        await loginStart.HandleAsync(this);
-
-        server.BroadcastPacket(
-            new PlayerListItemPacket
-            {
-                Action = new AddPlayerAction(),
-                Players = server.Players
-            });
-
-
-        var world = server.Level!.Worlds.FirstOrDefault().Value;
 
         Player = new Player(this, loginStart.Username)
         {
@@ -149,20 +138,7 @@ internal sealed class Client(
             GameMode = GameMode.Creative
         };
 
-        await world.AddPlayerAsync(Player);
-
-        for (var x = -4; x < 4; x++)
-        {
-            for (var z = -4; z < 4; z++)
-            {
-                Transport.Output.QueuePacket(
-                    new ChunkPacket
-                    {
-                        Chunk = world.GetChunk(new Position(x, 0, z))
-                    }
-                );
-            }
-        }
+        await loginStart.HandleAsync(this);
 
         State = ClientState.Playing;
         logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
@@ -193,6 +169,8 @@ internal sealed class Client(
         {
             return;
         }
+
+        await Player.World!.DestroyEntitiesAsync(Player);
 
         server.BroadcastPacket(
             new PlayerListItemPacket

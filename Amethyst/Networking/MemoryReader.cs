@@ -82,4 +82,9 @@ internal ref struct MemoryReader(Memory<byte> memory)
     {
         return BinaryPrimitives.ReadInt16BigEndian(span[position..(position += sizeof(short))]);
     }
+
+    public double ReadDouble()
+    {
+        return BinaryPrimitives.ReadDoubleBigEndian(span[position..(position += sizeof(double))]);
+    }
 }

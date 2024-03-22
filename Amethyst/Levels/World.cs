@@ -28,16 +28,28 @@ internal sealed class World(string name, IWorldGenerator generator) : IWorld
     private readonly List<Region> regions = [];
     private readonly List<IPlayer> players = [];
 
-    public async Task AddPlayerAsync(IPlayer player)
+    public async Task SpawnPlayerAsync(IPlayer player)
     {
-        player.World = this;
+        foreach (var other in players)
+        {
+            await player.SpawnPlayerAsync(other);
+            await other.SpawnPlayerAsync(player);
+        }
+
         players.Add(player);
     }
 
-    public async Task RemovePlayerAsync(IPlayer player)
+    public async Task DestroyEntitiesAsync(params IEntity[] entities)
     {
-        player.World = null;
-        players.Remove(player);
+        foreach (var player in entities.OfType<IPlayer>())
+        {
+            players.Remove(player);
+        }
+
+        foreach (var player in players)
+        {
+            await player.DestroyEntitiesAsync(entities);
+        }
     }
 
     public Block GetBlock(Position position)
