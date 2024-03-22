@@ -12,13 +12,15 @@ public interface IPlayer : IEntity
 
     public GameMode GameMode { get; set; }
 
-    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box);
+    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition messagePosition = ChatMessagePosition.Box);
 
     public Task DisconnectAsync(ChatMessage reason);
 
     public Task SpawnPlayerAsync(IPlayer player);
 
     public Task DestroyEntitiesAsync(params IEntity[] entities);
+
+    Task UpdateEntitiesAsync(params IEntity[] where);
 }
 
 public enum GameMode

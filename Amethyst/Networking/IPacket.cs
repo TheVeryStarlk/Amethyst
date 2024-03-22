@@ -20,7 +20,7 @@ internal interface IOutgoingPacket : IPacket
 
     public int CalculateLength()
     {
-        return short.MaxValue;
+        return ushort.MaxValue;
     }
 
     public void Write(ref MemoryWriter writer);

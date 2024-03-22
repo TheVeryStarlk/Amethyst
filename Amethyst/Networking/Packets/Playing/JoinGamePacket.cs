@@ -14,7 +14,7 @@ internal sealed class JoinGamePacket : IOutgoingPacket
     {
         writer.WriteInteger(Player.Identifier);
         writer.WriteByte((byte) Player.GameMode);
-        writer.WriteByte((byte) Player.World.Dimension);
+        writer.WriteByte((byte) Player.World!.Dimension);
         writer.WriteByte((byte) Player.World.Difficulty);
         writer.WriteByte((byte) Player.Server.Configuration.MaximumPlayerCount);
         writer.WriteVariableString(Player.World.Type.ToString().ToLower());

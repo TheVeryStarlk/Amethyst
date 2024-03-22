@@ -22,7 +22,17 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public IWorld? World { get; set; }
 
-    public VectorF Position { get; set; }
+    public VectorF Position
+    {
+        get => position;
+        set
+        {
+            OldPosition = Position;
+            position = value;
+        }
+    }
+
+    public VectorF OldPosition { get; set; }
 
     public float Yaw { get; set; }
 
@@ -30,28 +40,30 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public Task TeleportAsync(VectorF position)
+    private VectorF position;
+
+    public Task TeleportAsync(VectorF destination)
     {
         client.Transport.Output.QueuePacket(
             new PlayerPositionAndLookPacket
             {
-                Position = position,
+                Position = destination,
                 Yaw = Yaw,
                 Pitch = Pitch,
                 OnGround = OnGround
             });
 
-        Position = position;
+        Position = destination;
         return Task.CompletedTask;
     }
 
-    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition position = ChatMessagePosition.Box)
+    public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition messagePosition = ChatMessagePosition.Box)
     {
         client.Transport.Output.QueuePacket(
             new ChatMessagePacket
             {
                 Message = message,
-                Position = position
+                Position = messagePosition
             });
 
         return Task.CompletedTask;
@@ -86,6 +98,20 @@ internal sealed class Player(Client client, string username) : IPlayer
             {
                 Entities = entities
             });
+
+        return Task.CompletedTask;
+    }
+
+    public Task UpdateEntitiesAsync(params IEntity[] entities)
+    {
+        foreach (var entity in entities)
+        {
+            client.Transport.Output.QueuePacket(
+                new EntityLookAndRelativeMovePacket
+                {
+                    Entity = entity
+                });
+        }
 
         return Task.CompletedTask;
     }

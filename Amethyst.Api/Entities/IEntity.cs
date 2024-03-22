@@ -11,11 +11,13 @@ public interface IEntity
 
     public VectorF Position { get; set; }
 
+    public VectorF OldPosition { get; set; }
+
     public float Yaw { get; set; }
 
     public float Pitch { get; set; }
 
     public bool OnGround { get; set; }
 
-    public Task TeleportAsync(VectorF position);
+    public Task TeleportAsync(VectorF destination);
 }

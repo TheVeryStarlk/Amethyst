@@ -6,9 +6,12 @@ internal sealed class Level : ILevel
 {
     public Dictionary<string, IWorld> Worlds { get; } = [];
 
-    public Task TickAsync(CancellationToken cancellationToken)
+    public async Task TickAsync(CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        foreach (var world in Worlds.Values)
+        {
+            await world.TickAsync();
+        }
     }
 
     public ValueTask DisposeAsync()

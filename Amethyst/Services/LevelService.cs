@@ -1,4 +1,6 @@
-﻿using Amethyst.Levels;
+﻿using Amethyst.Api.Levels;
+using Amethyst.Api.Levels.Generators;
+using Amethyst.Levels;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -8,12 +10,35 @@ internal sealed class LevelService(ILogger<LevelService> logger, Server server) 
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var level = (Level) server.Level!;
+        var world = new World("Flat", new FlatWorldGenerator())
+        {
+            Type = WorldType.Flat,
+            Difficulty = Difficulty.Peaceful,
+            Dimension = Dimension.OverWorld
+        };
 
-        while (cancellationToken.IsCancellationRequested)
+        var level =  new Level
+        {
+            Worlds =
+            {
+                {
+                    world.Name,
+                    world
+                }
+            }
+        };
+
+        server.Level = level;
+
+        logger.LogInformation("Started ticking level worlds");
+
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
+
+        while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
+                await timer.WaitForNextTickAsync(cancellationToken);
                 await level.TickAsync(cancellationToken);
             }
             catch (OperationCanceledException)
@@ -23,7 +48,7 @@ internal sealed class LevelService(ILogger<LevelService> logger, Server server) 
             catch (Exception exception)
             {
                 logger.LogError(
-                    "Unexpected exception from server: \"{Exception}\"",
+                    "Unexpected exception while ticking level worlds: \"{Exception}\"",
                     exception);
 
                 break;

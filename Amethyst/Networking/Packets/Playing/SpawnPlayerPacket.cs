@@ -10,7 +10,6 @@ internal sealed class SpawnPlayerPacket : IOutgoingPacket
 
     public void Write(ref MemoryWriter writer)
     {
-        Console.WriteLine($"{Player.Position.X} {Player.Position.Y} {Player.Position.Z}");
         writer.WriteVariableInteger(Player.Identifier);
         writer.WriteGuid(Player.Guid);
         writer.WriteFixedPointInteger((int) Player.Position.X);

@@ -30,8 +30,8 @@ public static class HostBuilderExtensions
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
             services.AddSingleton<Server>();
 
-            services.AddHostedService<ServerService>();
             services.AddHostedService<LevelService>();
+            services.AddHostedService<ServerService>();
         });
 
         return builder;

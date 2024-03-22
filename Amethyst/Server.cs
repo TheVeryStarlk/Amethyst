@@ -5,9 +5,7 @@ using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Events.Plugin;
 using Amethyst.Api.Levels;
-using Amethyst.Api.Levels.Generators;
 using Amethyst.Extensions;
-using Amethyst.Levels;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Playing;
 using Amethyst.Services;
@@ -53,24 +51,6 @@ internal sealed class Server(
         {
             throw new InvalidOperationException("Server has already started.");
         }
-
-        var world = new World("Flat", new FlatWorldGenerator())
-        {
-            Type = WorldType.Flat,
-            Difficulty = Difficulty.Peaceful,
-            Dimension = Dimension.OverWorld
-        };
-
-        Level = new Level
-        {
-            Worlds =
-            {
-                {
-                    world.Name,
-                    world
-                }
-            }
-        };
 
         pluginService.Initialize();
 

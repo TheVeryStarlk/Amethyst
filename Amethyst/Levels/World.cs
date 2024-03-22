@@ -3,7 +3,6 @@ using Amethyst.Api.Entities;
 using Amethyst.Api.Levels;
 using Amethyst.Api.Levels.Blocks;
 using Amethyst.Api.Levels.Generators;
-using Amethyst.Entities;
 
 namespace Amethyst.Levels;
 
@@ -27,6 +26,19 @@ internal sealed class World(string name, IWorldGenerator generator) : IWorld
 
     private readonly List<Region> regions = [];
     private readonly List<IPlayer> players = [];
+
+    public async Task TickAsync()
+    {
+        foreach (var player in players)
+        {
+            var others = players
+                .Where(predicate => predicate.Username != player.Username)
+                .Select(predicate => (IEntity) predicate)
+                .ToArray();
+
+            await player.UpdateEntitiesAsync(others);
+        }
+    }
 
     public async Task SpawnPlayerAsync(IPlayer player)
     {
