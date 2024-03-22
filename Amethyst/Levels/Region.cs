@@ -13,9 +13,9 @@ internal sealed class Region(long x, long z, IWorldGenerator generator) : IRegio
 
     private readonly List<Chunk> chunks = [];
 
-    public Chunk GetChunk(Position position)
+    public Chunk GetChunk(Position position, bool shift = false)
     {
-        var (x, z) = (position.X, position.Z);
+        var (x, z) = (shift ? (position.X >> 4, position.Z >> 4) : (position.X, position.Z));
         var chunk = chunks.FirstOrDefault(chunk => chunk.Position == (x, z));
 
         if (chunk is not null)
@@ -36,25 +36,25 @@ internal sealed class Region(long x, long z, IWorldGenerator generator) : IRegio
 
     public Block GetBlock(Position position)
     {
-        var chunk = GetChunk(position);
+        var chunk = GetChunk(position, true);
         return chunk.GetBlock(position);
     }
 
     public void SetBlock(Block block, Position position)
     {
-        var chunk = GetChunk(position);
+        var chunk = GetChunk(position, true);
         chunk.SetBlock(block, position);
     }
 
     public byte GetSkyLight(Position position)
     {
-        var chunk = GetChunk(position);
+        var chunk = GetChunk(position, true);
         return chunk.GetSkyLight(position);
     }
 
     public void SetSkyLight(byte value, Position position)
     {
-        var chunk = GetChunk(position);
+        var chunk = GetChunk(position, true);
         chunk.SetSkyLight(value, position);
     }
 }
