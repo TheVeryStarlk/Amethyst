@@ -50,6 +50,11 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
 
     public async Task HandleAsync(Client client)
     {
+        if (!client.Player!.Chunks.Any(chunk => chunk.X == Position.X >> 4 && chunk.Z == Position.Z >> 4))
+        {
+            return;
+        }
+
         if (!Enum.TryParse(Face.ToString(), true, out BlockFace face)
             || !Enum.IsDefined(typeof(BlockFace), face))
         {

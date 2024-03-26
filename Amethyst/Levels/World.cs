@@ -26,7 +26,7 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
     public IEnumerable<IRegion> Regions => regions;
 
     private readonly List<Region> regions = [];
-    private readonly Dictionary<IPlayer, Chunk[]> players = [];
+    private readonly List<IPlayer> players = [];
 
     public async Task TickAsync()
     {
@@ -39,7 +39,7 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
             },
             this);
 
-        foreach (var player in players.Keys)
+        foreach (var player in players)
         {
             var position = new Position((int) player.Position.X >> 4, 0, (int) player.Position.Z >> 4);
 
@@ -47,14 +47,13 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
             {
                 for (var z = position.Z - 1; z < position.Z + 1; z++)
                 {
-                    var chunk = GetChunk(new Position((int) x, 0, (int) z));
-
                     if (player.Chunks.Any(predicate => predicate.X == x && predicate.Z == z))
                     {
                         continue;
                     }
 
-                    player.Chunks.Add(new Position(x, 0, z));
+                    var chunk = GetChunk(new Position((int) x, 0, (int) z));
+                    player.Chunks.Add(new Position(chunk.Position.X, 0, chunk.Position.Z));
 
                     server.QueuePacket(
                         player,
@@ -65,7 +64,7 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
                 }
             }
 
-            var others = players.Keys
+            var others = players
                 .Where(predicate => predicate.Username != player.Username)
                 .Select(predicate => (IEntity) predicate)
                 .ToArray();
@@ -76,13 +75,13 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
 
     public async Task AddPlayerAsync(IPlayer player)
     {
-        foreach (var other in players.Keys)
+        foreach (var other in players)
         {
             await player.SpawnPlayerAsync(other);
             await other.SpawnPlayerAsync(player);
         }
 
-        players.Add(player, Array.Empty<Chunk>());
+        players.Add(player);
     }
 
     public async Task RemovePlayerAsync(IPlayer player)
@@ -108,7 +107,7 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
             players.Remove(player);
         }
 
-        foreach (var player in players.Keys)
+        foreach (var player in players)
         {
             await player.DestroyEntitiesAsync(entities);
         }
