@@ -61,19 +61,6 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
                 Players = client.Server.Players
             });
 
-        await world.SpawnPlayerAsync(client.Player);
-
-        for (var x = -1; x < 1; x++)
-        {
-            for (var z = -1; z < 1; z++)
-            {
-                client.Transport.Queue(
-                    new ChunkPacket
-                    {
-                        Chunk = world.GetChunk(new Position(x, 0, z))
-                    }
-                );
-            }
-        }
+        await world.AddPlayerAsync(client.Player);
     }
 }

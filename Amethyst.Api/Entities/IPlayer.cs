@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Levels;
 
 namespace Amethyst.Api.Entities;
 
@@ -11,6 +12,8 @@ public interface IPlayer : IEntity
     public string Username { get; }
 
     public GameMode GameMode { get; set; }
+
+    public List<Position> Chunks { get; set; }
 
     public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition messagePosition = ChatMessagePosition.Box);
 

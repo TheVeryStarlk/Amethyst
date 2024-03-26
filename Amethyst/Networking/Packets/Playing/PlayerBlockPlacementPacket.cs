@@ -97,7 +97,7 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
                 Player = client.Player!,
                 Block = block,
                 Position = position,
-                Sound = SoundEffect.DigStone
+                Sound = SoundEffect.DigWood
             });
 
         client.Server.BroadcastPacket(

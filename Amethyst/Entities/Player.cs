@@ -17,6 +17,8 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public GameMode GameMode { get; set; }
 
+    public List<Position> Chunks { get; set; } = [];
+
     public int Identifier { get; } = Random.Shared.Next();
 
     public IWorld? World { get; set; }

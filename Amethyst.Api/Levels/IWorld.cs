@@ -23,7 +23,9 @@ public interface IWorld
 
     public Task TickAsync();
 
-    public Task SpawnPlayerAsync(IPlayer player);
+    public Task AddPlayerAsync(IPlayer player);
+
+    public Task RemovePlayerAsync(IPlayer player);
 
     public Task DestroyEntitiesAsync(params IEntity[] entities);
 

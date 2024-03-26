@@ -25,7 +25,7 @@ internal sealed class Transport(IDuplexPipe duplexPipe)
 
     public async Task DequeueAsync(CancellationToken cancellationToken)
     {
-        while (true)
+        while (!cancellationToken.IsCancellationRequested)
         {
             if (packets.Reader.TryRead(out var packet))
             {

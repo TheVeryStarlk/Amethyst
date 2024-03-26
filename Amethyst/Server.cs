@@ -95,6 +95,12 @@ internal sealed class Server(
         await pluginService.DisposeAsync();
     }
 
+    public void QueuePacket(IPlayer player, ChunkPacket packet)
+    {
+        var client = clients.Values.FirstOrDefault(client => client.Player?.Username == player.Username);
+        client?.Transport.Queue(packet);
+    }
+
     public void BroadcastPacket(IOutgoingPacket packet, IWorld? world = null)
     {
         var players = clients.Values.Where(client => client.Player is not null);

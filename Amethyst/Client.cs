@@ -168,17 +168,7 @@ internal sealed class Client(
             return;
         }
 
-        await Player.World!.DestroyEntitiesAsync(Player);
-
-        server.BroadcastPacket(
-            new PlayerListItemPacket
-            {
-                Action = new RemovePlayerAction(),
-                Players =
-                [
-                    Player
-                ]
-            });
+        await Player.World!.RemovePlayerAsync(Player);
 
         var eventArgs = await Server.EventService.ExecuteAsync(
             new PlayerLeftEventArgs
