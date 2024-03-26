@@ -3,10 +3,11 @@ using Amethyst.Api.Entities;
 using Amethyst.Api.Levels;
 using Amethyst.Api.Levels.Blocks;
 using Amethyst.Api.Levels.Generators;
+using Amethyst.Networking.Packets.Playing;
 
 namespace Amethyst.Levels;
 
-internal sealed class World(string name, IWorldGenerator generator) : IWorld
+internal sealed class World(Server server, string name, IWorldGenerator generator) : IWorld
 {
     public string Name => name;
 
@@ -29,6 +30,15 @@ internal sealed class World(string name, IWorldGenerator generator) : IWorld
 
     public async Task TickAsync()
     {
+        Time++;
+
+        server.BroadcastPacket(
+            new TimeUpdatePacket
+            {
+                World = this
+            },
+            this);
+
         foreach (var player in players)
         {
             var others = players

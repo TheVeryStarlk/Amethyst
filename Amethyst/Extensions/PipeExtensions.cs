@@ -72,28 +72,29 @@ internal static class PipeExtensions
 
     public static async Task WritePacketAsync(this PipeWriter writer, IOutgoingPacket packet)
     {
-        writer.QueuePacket(packet);
+        Write(writer, packet);
         await writer.FlushAsync();
-    }
-
-    public static void QueuePacket(this PipeWriter writer, IOutgoingPacket packet)
-    {
-        var memory = writer.GetMemory(packet.CalculateLength());
-        writer.Advance(Write(packet, memory));
         return;
 
-        static int Write(IOutgoingPacket packet, Memory<byte> memory)
+        static void Write(PipeWriter writer, IOutgoingPacket packet)
         {
-            var packetWriter = new MemoryWriter(memory);
-            packet.Write(ref packetWriter);
-            var position = packetWriter.Position;
+            var memory = writer.GetMemory(packet.CalculateLength());
+            writer.Advance(Write(packet, memory));
+            return;
 
-            var temporary = memory[..position].ToArray();
-            var payloadWriter = new MemoryWriter(memory);
-            payloadWriter.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + position);
-            payloadWriter.WriteVariableInteger(packet.Identifier);
-            payloadWriter.Write(temporary);
-            return payloadWriter.Position;
+            static int Write(IOutgoingPacket packet, Memory<byte> memory)
+            {
+                var packetWriter = new MemoryWriter(memory);
+                packet.Write(ref packetWriter);
+                var position = packetWriter.Position;
+
+                var temporary = memory[..position].ToArray();
+                var payloadWriter = new MemoryWriter(memory);
+                payloadWriter.WriteVariableInteger(VariableInteger.GetBytesCount(packet.Identifier) + position);
+                payloadWriter.WriteVariableInteger(packet.Identifier);
+                payloadWriter.Write(temporary);
+                return payloadWriter.Position;
+            }
         }
     }
 }

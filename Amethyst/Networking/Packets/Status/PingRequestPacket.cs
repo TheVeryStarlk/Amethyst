@@ -1,6 +1,4 @@
-﻿using Amethyst.Extensions;
-
-namespace Amethyst.Networking.Packets.Status;
+﻿namespace Amethyst.Networking.Packets.Status;
 
 internal sealed class PingRequestPacket : IIngoingPacket<PingRequestPacket>
 {
@@ -18,7 +16,7 @@ internal sealed class PingRequestPacket : IIngoingPacket<PingRequestPacket>
 
     public async Task HandleAsync(Client client)
     {
-        await client.Transport.Output.WritePacketAsync(
+        await client.Transport.WriteAsync(
             new PongResponsePacket
             {
                 Payload = Payload

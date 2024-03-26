@@ -1,6 +1,5 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Events.Minecraft;
-using Amethyst.Extensions;
 
 namespace Amethyst.Networking.Packets.Status;
 
@@ -24,7 +23,7 @@ internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 
         client.Server.Description = eventArgs.Description;
 
-        await client.Transport.Output.WritePacketAsync(
+        await client.Transport.WriteAsync(
             new StatusResponsePacket
             {
                 Status = ServerStatus.Create(

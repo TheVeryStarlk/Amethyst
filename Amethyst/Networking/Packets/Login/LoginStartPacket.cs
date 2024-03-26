@@ -1,6 +1,5 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Events.Minecraft.Player;
-using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Playing;
 
 namespace Amethyst.Networking.Packets.Login;
@@ -21,7 +20,7 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
 
     public async Task HandleAsync(Client client)
     {
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new LoginSuccessPacket
             {
                 Guid = client.Player!.Guid,
@@ -31,13 +30,13 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
         var world = client.Server.Level!.Worlds.FirstOrDefault().Value;
         client.Player.World = world;
 
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new JoinGamePacket
             {
                 Player = client.Player
             });
 
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new PlayerPositionAndLookPacket
             {
                 Position = client.Player.Position,
@@ -68,7 +67,7 @@ internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
         {
             for (var z = -1; z < 1; z++)
             {
-                client.Transport.Output.QueuePacket(
+                client.Transport.Queue(
                     new ChunkPacket
                     {
                         Chunk = world.GetChunk(new Position(x, 0, z))

@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Extensions;
 
 namespace Amethyst.Networking.Packets.Playing;
 
@@ -41,7 +40,7 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
 
         if (!text.StartsWith('/'))
         {
-            client.Transport.Output.QueuePacket(
+            client.Transport.Queue(
                 new TabCompletePacket
                 {
                     Matches = client.Server.Players
@@ -58,7 +57,7 @@ internal sealed class TabCompletePacket : IIngoingPacket<TabCompletePacket>, IOu
             ? commands
             : commands.Where(match => text[1] == match[1]);
 
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new TabCompletePacket
             {
                 Matches = matches.ToArray()

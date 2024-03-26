@@ -1,9 +1,7 @@
-﻿using System.IO.Pipelines;
-using Amethyst.Api.Components;
+﻿using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Events.Minecraft.Player;
 using Amethyst.Entities;
-using Amethyst.Extensions;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets.Handshaking;
 using Amethyst.Networking.Packets.Login;
@@ -24,7 +22,7 @@ internal sealed class Client(
 
     public Server Server => server;
 
-    public IDuplexPipe Transport => connection.Transport;
+    public Transport Transport { get; } = new Transport(connection.Transport);
 
     public ClientState State { get; private set; }
 
@@ -40,7 +38,7 @@ internal sealed class Client(
         {
             try
             {
-                var message = await Transport.Input.ReadMessageAsync(source.Token);
+                var message = await Transport.ReadAsync(source.Token);
 
                 if (message is null)
                 {

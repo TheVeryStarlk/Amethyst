@@ -95,11 +95,18 @@ internal sealed class Server(
         await pluginService.DisposeAsync();
     }
 
-    public void BroadcastPacket(IOutgoingPacket packet)
+    public void BroadcastPacket(IOutgoingPacket packet, IWorld? world = null)
     {
-        foreach (var client in clients.Values.Where(client => client.Player is not null))
+        var players = clients.Values.Where(client => client.Player is not null);
+
+        if (world is not null)
         {
-            client.Transport.Output.QueuePacket(packet);
+            players = players.Where(client => client.Player!.World == world);
+        }
+
+        foreach (var client in players)
+        {
+            client.Transport.Queue(packet);
         }
     }
 
@@ -203,6 +210,8 @@ internal sealed class Server(
             {
                 await timer.WaitForNextTickAsync(cancellationToken);
 
+                var tasks = new List<Task>();
+
                 for (var index = 0; index < clients.Values.Count; index++)
                 {
                     var client = clients.Values.ElementAt(index);
@@ -212,17 +221,15 @@ internal sealed class Server(
                         continue;
                     }
 
-                    await client.Transport.Output.FlushAsync(cancellationToken);
-
                     if (tick % 50 == 0)
                     {
                         if (client.MissedKeepAliveCount > Configuration.MaximumMissedKeepAliveCount)
                         {
                             await client.Player!.DisconnectAsync(ChatMessage.Create("Timed out.", Color.Red));
-                            return;
+                            continue;
                         }
 
-                        client.Transport.Output.QueuePacket(
+                        client.Transport.Queue(
                             new KeepAlivePacket
                             {
                                 Payload = tick
@@ -230,7 +237,11 @@ internal sealed class Server(
 
                         client.MissedKeepAliveCount++;
                     }
+
+                    tasks.Add(client.Transport.DequeueAsync(cancellationToken));
                 }
+
+                await Task.WhenAll(tasks);
 
                 tick++;
             }

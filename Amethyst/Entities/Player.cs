@@ -2,7 +2,6 @@
 using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Levels;
-using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Playing;
 
@@ -44,7 +43,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public Task TeleportAsync(VectorF destination)
     {
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new PlayerPositionAndLookPacket
             {
                 Position = destination,
@@ -59,7 +58,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public Task SendChatMessageAsync(ChatMessage message, ChatMessagePosition messagePosition = ChatMessagePosition.Box)
     {
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new ChatMessagePacket
             {
                 Message = message,
@@ -71,7 +70,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public async Task DisconnectAsync(ChatMessage reason)
     {
-        await client.Transport.Output.WritePacketAsync(
+        await client.Transport.WriteAsync(
             new DisconnectPacket(ClientState.Playing)
             {
                 Reason = reason
@@ -82,7 +81,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public Task SpawnPlayerAsync(IPlayer player)
     {
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new SpawnPlayerPacket
             {
                 Player = player
@@ -93,7 +92,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public Task DestroyEntitiesAsync(params IEntity[] entities)
     {
-        client.Transport.Output.QueuePacket(
+        client.Transport.Queue(
             new DestroyEntitiesPacket
             {
                 Entities = entities
@@ -106,7 +105,7 @@ internal sealed class Player(Client client, string username) : IPlayer
     {
         foreach (var entity in entities)
         {
-            client.Transport.Output.QueuePacket(
+            client.Transport.Queue(
                 new EntityLookAndRelativeMovePacket
                 {
                     Entity = entity

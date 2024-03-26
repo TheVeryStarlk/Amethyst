@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Extensions;
 using Amethyst.Networking.Packets.Login;
 
 namespace Amethyst.Networking.Packets.Handshaking;
@@ -31,7 +30,7 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
     {
         if (ProtocolVersion != Server.ProtocolVersion && NextState is ClientState.Login)
         {
-            await client.Transport.Output.WritePacketAsync(
+            await client.Transport.WriteAsync(
                 new DisconnectPacket(ClientState.Login)
                 {
                     Reason = ChatMessage.Create(

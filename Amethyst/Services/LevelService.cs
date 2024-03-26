@@ -10,7 +10,7 @@ internal sealed class LevelService(ILogger<LevelService> logger, Server server) 
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var world = new World("Flat", new FlatWorldGenerator())
+        var world = new World(server, "Flat", new FlatWorldGenerator())
         {
             Type = WorldType.Flat,
             Difficulty = Difficulty.Peaceful,
@@ -32,7 +32,7 @@ internal sealed class LevelService(ILogger<LevelService> logger, Server server) 
 
         logger.LogInformation("Started ticking level worlds");
 
-        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(5));
 
         while (!cancellationToken.IsCancellationRequested)
         {
