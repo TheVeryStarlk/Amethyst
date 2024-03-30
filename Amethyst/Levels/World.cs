@@ -39,28 +39,49 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
             },
             this);
 
-        foreach (var player in players)
+        foreach (var player in players.ToArray())
         {
-            var position = new Position((int) player.Position.X >> 4, 0, (int) player.Position.Z >> 4);
+            var position = new Position(
+                (int) player.Position.X >> 4,
+                0,
+                (int) player.Position.Z >> 4);
 
-            for (var x = position.X - 1; x < position.X + 1; x++)
+            var needed = new List<Position>();
+
+            for (var x = position.X - player.ViewDistance; x < position.X + player.ViewDistance; x++)
             {
-                for (var z = position.Z - 1; z < position.Z + 1; z++)
+                for (var z = position.Z - player.ViewDistance; z < position.Z + player.ViewDistance; z++)
                 {
-                    if (player.Chunks.Any(predicate => predicate.X == x && predicate.Z == z))
+                    needed.Add(new Position(x, 0, z));
+                }
+            }
+
+            var unload = player.Chunks.Except(needed).ToArray();
+            foreach (var unneeded in unload)
+            {
+                server.QueuePacket(
+                    player,
+                    new ChunkPacket
                     {
-                        continue;
-                    }
+                        Chunk = GetChunk(unneeded),
+                        Unload = true
+                    });
 
-                    var chunk = GetChunk(new Position((int) x, 0, (int) z));
-                    player.Chunks.Add(new Position(chunk.Position.X, 0, chunk.Position.Z));
+                player.Chunks.Remove(unneeded);
+            }
 
+            foreach (var need in needed)
+            {
+                if (!player.Chunks.Contains(need))
+                {
                     server.QueuePacket(
                         player,
                         new ChunkPacket
                         {
-                            Chunk = chunk
+                            Chunk = GetChunk(need)
                         });
+
+                    player.Chunks.Add(need);
                 }
             }
 
