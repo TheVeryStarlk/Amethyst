@@ -11,4 +11,6 @@ public sealed class ServerConfiguration
     public int MaximumPlayerCount { get; set; } = 20;
 
     public int MaximumMissedKeepAliveCount { get; set; } = 50;
+
+    public byte MaximumViewDistance { get; set; } = 4;
 }

@@ -17,7 +17,14 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public GameMode GameMode { get; set; }
 
-    public byte ViewDistance { get; set; } = 4;
+    public byte ViewDistance
+    {
+        get => viewDistance;
+        set => viewDistance =
+            value > Server.Configuration.MaximumViewDistance
+                ? Server.Configuration.MaximumViewDistance
+                : value;
+    }
 
     public List<Position> Chunks { get; set; } = [];
 
@@ -44,6 +51,7 @@ internal sealed class Player(Client client, string username) : IPlayer
     public bool OnGround { get; set; }
 
     private VectorF position;
+    private byte viewDistance;
 
     public Task TeleportAsync(VectorF destination)
     {
