@@ -148,7 +148,7 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
 
     private Region GetRegion(Position position)
     {
-        var (x, z) = (Math.Floor((double) position.X / 32), Math.Floor((double) position.Z / 32));
+        var (x, z) = (Math.Floor((double) (position.X >> 4) / 32), Math.Floor((double) (position.Z >> 4) / 32));
         var region = regions.FirstOrDefault(region => region.Position == (x, z));
 
         if (region is not null)
