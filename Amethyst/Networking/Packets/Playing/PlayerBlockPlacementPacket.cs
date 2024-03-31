@@ -50,13 +50,10 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
 
     public async Task HandleAsync(Client client)
     {
-        if (!client.Player!.Chunks.Any(chunk => chunk.X == Position.X >> 4 && chunk.Z == Position.Z >> 4))
-        {
-            return;
-        }
-
         if (!Enum.TryParse(Face.ToString(), true, out BlockFace face)
-            || !Enum.IsDefined(typeof(BlockFace), face))
+            || !Enum.IsDefined(typeof(BlockFace), face)
+            || !client.Player!.Chunks.Any(chunk => chunk.X == Position.X >> 4 && chunk.Z == Position.Z >> 4)
+            || !Item.IsBlock)
         {
             return;
         }
@@ -93,7 +90,7 @@ internal sealed class PlayerBlockPlacementPacket : IIngoingPacket<PlayerBlockPla
         };
 
         var world = client.Server.Level?.Worlds.FirstOrDefault().Value;
-        var block = new Block(Item.Type);
+        var block = new Block(Item.Type, Item.Durability);
 
         var eventArgs = await client.Server.EventService.ExecuteAsync(
             new BlockPlaceEventArgs

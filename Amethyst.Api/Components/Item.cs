@@ -7,4 +7,6 @@ public sealed class Item
     public byte Amount { get; set; }
 
     public short Durability { get; set; }
+
+    public bool IsBlock => Type < 256;
 }

@@ -132,7 +132,7 @@ internal sealed class Client(
 
         Player = new Player(this, loginStart.Username)
         {
-            Position = new VectorF(0, 4, 0),
+            Position = new VectorF(0, 8, 0),
             GameMode = GameMode.Creative
         };
 
