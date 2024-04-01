@@ -11,7 +11,7 @@ public interface IEntity
 
     public VectorF Position { get; set; }
 
-    public VectorF OldPosition { get; set; }
+    public VectorF DeltaPosition { get; set; }
 
     public float Yaw { get; set; }
 

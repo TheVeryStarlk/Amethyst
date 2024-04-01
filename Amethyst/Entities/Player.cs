@@ -37,12 +37,16 @@ internal sealed class Player(Client client, string username) : IPlayer
         get => position;
         set
         {
-            OldPosition = Position;
+            DeltaPosition = new VectorF(
+                (int) (value.X * 32.0D) - (int) (position.X * 32.0D),
+                (int) (value.Y * 32.0D) - (int) (position.Y * 32.0D),
+                (int) (value.Z * 32.0D) - (int) (position.Z * 32.0D));
+
             position = value;
         }
     }
 
-    public VectorF OldPosition { get; set; }
+    public VectorF DeltaPosition { get; set; }
 
     public float Yaw { get; set; }
 

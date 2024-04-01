@@ -11,9 +11,9 @@ internal sealed class EntityLookAndRelativeMovePacket : IOutgoingPacket
     public void Write(ref MemoryWriter writer)
     {
         writer.WriteVariableInteger(Entity.Identifier);
-        writer.WriteByte((byte) ((Entity.Position.X - Entity.OldPosition.X) * 32.0D));
-        writer.WriteByte((byte) ((Entity.Position.Y - Entity.OldPosition.Y) * 32.0D));
-        writer.WriteByte((byte) ((Entity.Position.Z - Entity.OldPosition.Z) * 32.0D));
+        writer.WriteByte((byte) (Entity.DeltaPosition.X));
+        writer.WriteByte((byte) (Entity.DeltaPosition.Y));
+        writer.WriteByte((byte) (Entity.DeltaPosition.Z));
         writer.WriteByte((byte) (Entity.Yaw / 256));
         writer.WriteByte((byte) (Entity.Pitch / 256));
         writer.WriteBoolean(Entity.OnGround);

@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Api.Levels;
 
 namespace Amethyst.Api.Entities;
 

@@ -88,6 +88,7 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
                 .ToArray();
 
             await player.UpdateEntitiesAsync(others);
+            player.DeltaPosition = new VectorF();
         }
     }
 
