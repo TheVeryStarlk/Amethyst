@@ -95,7 +95,7 @@ internal sealed class Server(
         await pluginService.DisposeAsync();
     }
 
-    public void QueuePacket(IPlayer player, ChunkPacket packet)
+    public void QueuePacket(IPlayer player, IOutgoingPacket packet)
     {
         var client = clients.Values.FirstOrDefault(client => client.Player?.Username == player.Username);
         client?.Transport.Queue(packet);

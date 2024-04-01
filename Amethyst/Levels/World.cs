@@ -70,17 +70,20 @@ internal sealed class World(Server server, string name, IWorldGenerator generato
                 player.Chunks.Remove(unneeded);
             }
 
+            var chunks = new List<IChunk>();
+
             foreach (var need in needed.Where(need => !player.Chunks.Contains(need)))
             {
-                server.QueuePacket(
-                    player,
-                    new ChunkPacket
-                    {
-                        Chunk = GetChunk(need)
-                    });
-
+                chunks.Add(GetChunk(need));
                 player.Chunks.Add(need);
             }
+            
+            server.QueuePacket(
+                player,
+                new ChunkBulkPacket
+                {
+                    Chunks = chunks
+                });
 
             var others = players
                 .Where(predicate => predicate.Username != player.Username)
