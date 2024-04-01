@@ -8,5 +8,5 @@ public sealed class Item
 
     public short Durability { get; set; }
 
-    public bool IsBlock => Type < 256;
+    public bool IsBlock => Type is > 0 and < 256;
 }
