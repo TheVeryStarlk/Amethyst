@@ -1,8 +1,10 @@
-﻿using Amethyst.Entities;
+﻿using Amethyst.Api;
+using Amethyst.Api.Entities;
+using Amethyst.Protocol.Transport;
 
-namespace Amethyst.Protocol.Playing;
+namespace Amethyst.Protocol.Packets.Playing;
 
-internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IHandler
+internal sealed class ChatPacket : IIngoingPacket<ChatPacket>
 {
     public static int Identifier => 0x01;
 
@@ -13,7 +15,7 @@ internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IHandler
         throw new NotImplementedException();
     }
 
-    public async Task HandleAsync(Server server, Player player, Client client)
+    public async Task HandleAsync(IServer server, IPlayer player, IClient client)
     {
         foreach (var other in server.Players.Where(other => other.Identifier != player.Identifier))
         {

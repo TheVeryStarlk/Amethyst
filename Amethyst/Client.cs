@@ -1,5 +1,7 @@
 ﻿using Amethyst.Api.Entities;
+using Amethyst.Extensions;
 using Amethyst.Protocol;
+using Amethyst.Protocol.Transport;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -29,14 +31,37 @@ internal sealed class Client(
     private State state;
 
     private readonly Queue<IOutgoingPacket> queue = [];
+    private readonly Transport transport = new Transport(connection.Transport);
 
     public async Task StartAsync()
     {
         source = new CancellationTokenSource();
 
+        logger.LogDebug("Started connection");
+
         while (!source.IsCancellationRequested)
         {
-            Stop();
+            try
+            {
+                var message = await transport.ReadAsync(source.Token);
+
+                if (message is null)
+                {
+                    break;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(
+                    "Unexpected exception while handling packets: \"{Message}\"",
+                    exception);
+
+                break;
+            }
         }
 
         await HandleDisconnectedAsync();
@@ -54,10 +79,10 @@ internal sealed class Client(
             await Player.KickAsync();
         }
 
-        foreach (var packet in queue)
-        {
-            // Do something.
-        }
+        // Hmm, I wonder if order matters.
+        await queue
+            .Select(packet => transport.WriteAsync(packet))
+            .WhenEach();
     }
 
     public void Queue(IOutgoingPacket packet)
