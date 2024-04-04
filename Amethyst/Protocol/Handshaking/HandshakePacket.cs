@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Protocol.Packets.Handshaking;
+﻿namespace Amethyst.Protocol.Handshaking;
 
 internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 {

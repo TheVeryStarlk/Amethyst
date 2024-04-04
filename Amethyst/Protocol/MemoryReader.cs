@@ -1,3 +1,3 @@
 ﻿namespace Amethyst.Protocol;
 
-public ref struct MemoryReader(ReadOnlyMemory<byte> Memory);
+internal ref struct MemoryReader(ReadOnlyMemory<byte> Memory);

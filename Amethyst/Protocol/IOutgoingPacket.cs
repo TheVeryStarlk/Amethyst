@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Protocol;
 
-public interface IOutgoingPacket
+internal interface IOutgoingPacket
 {
     public int Identifier { get; }
 

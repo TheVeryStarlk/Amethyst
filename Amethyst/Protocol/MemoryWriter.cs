@@ -1,3 +1,3 @@
 ﻿namespace Amethyst.Protocol;
 
-public ref struct MemoryWriter(Memory<byte> Memory);
+internal ref struct MemoryWriter(Memory<byte> Memory);
