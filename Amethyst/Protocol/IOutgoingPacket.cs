@@ -1,6 +1,4 @@
-﻿using Amethyst.Protocol.Transport;
-
-namespace Amethyst.Protocol;
+﻿namespace Amethyst.Protocol;
 
 internal interface IOutgoingPacket
 {

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO.Pipelines;
 using System.Numerics;
 
-namespace Amethyst.Protocol.Transport;
+namespace Amethyst.Protocol;
 
 internal sealed class Transport(IDuplexPipe duplexPipe)
 {

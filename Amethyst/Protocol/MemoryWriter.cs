@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 
-namespace Amethyst.Protocol.Transport;
+namespace Amethyst.Protocol;
 
 internal ref struct MemoryWriter(Memory<byte> memory)
 {

@@ -1,7 +1,7 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
 
-namespace Amethyst.Protocol.Transport;
+namespace Amethyst.Protocol;
 
 internal ref struct MemoryReader(ReadOnlyMemory<byte> memory)
 {

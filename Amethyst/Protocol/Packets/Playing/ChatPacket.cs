@@ -1,6 +1,5 @@
 ﻿using Amethyst.Api;
 using Amethyst.Api.Entities;
-using Amethyst.Protocol.Transport;
 
 namespace Amethyst.Protocol.Packets.Playing;
 

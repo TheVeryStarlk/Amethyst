@@ -3,7 +3,6 @@ using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshaking;
-using Amethyst.Protocol.Transport;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -38,6 +37,7 @@ internal sealed class Client(
     public async Task StartAsync()
     {
         source = new CancellationTokenSource();
+        state = State.Handshaking;
 
         logger.LogDebug("Started connection");
 
