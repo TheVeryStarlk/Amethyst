@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Connections;
 
 namespace Amethyst;
 
-internal sealed class Client(Server server, ConnectionContext connection) : IClient, IAsyncDisposable
+internal sealed class Client(int identifier, Server server, ConnectionContext connection) : IClient, IAsyncDisposable
 {
     private enum State
     {
@@ -17,30 +17,39 @@ internal sealed class Client(Server server, ConnectionContext connection) : ICli
 
     public IPlayer? Player { get; }
 
+    public int Identifier { get; } = identifier;
+
     private CancellationTokenSource? source;
-    private State state;
     private DateTimeOffset idle;
+    private State state;
 
     private readonly Queue<IOutgoingPacket> queue = [];
 
-    public void Start()
+    public async Task StartAsync()
     {
         source = new CancellationTokenSource();
 
         while (!source.IsCancellationRequested)
         {
-            // Read...
+            Stop();
         }
+
+        await HandleDisconnectedAsync();
     }
 
-    public void Tick()
+    public async Task TickAsync()
     {
-        if (idle.Subtract(DateTimeOffset.Now) > server.Options.IdleTimeOut)
+        if (Player is null)
         {
-            Player?.Kick();
+            return;
         }
 
-        foreach (var item in queue)
+        if (DateTimeOffset.Now.Subtract(idle) > server.Options.IdleTimeOut)
+        {
+            await Player.KickAsync();
+        }
+
+        foreach (var packet in queue)
         {
             // Do something.
         }
@@ -62,11 +71,15 @@ internal sealed class Client(Server server, ConnectionContext connection) : ICli
         await connection.DisposeAsync();
     }
 
-    private void HandeDisconnected()
+    private async Task HandleDisconnectedAsync()
     {
         state = State.Disconnected;
 
-        Player?.Kick();
+        if (Player is not null)
+        {
+            await Player.KickAsync();
+        }
+
         connection.Abort();
     }
 }

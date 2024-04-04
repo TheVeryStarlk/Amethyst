@@ -13,11 +13,11 @@ internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IHa
         throw new NotImplementedException();
     }
 
-    public void Handle(Server server, Player player, Client client)
+    public async Task HandleAsync(Server server, Player player, Client client)
     {
         foreach (var other in server.Players.Where(other => other.Identifier != player.Identifier))
         {
-            other.Kick();
+            await other.KickAsync();
         }
     }
 }

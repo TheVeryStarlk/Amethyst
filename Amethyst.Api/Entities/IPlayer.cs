@@ -2,5 +2,5 @@
 
 public interface IPlayer : IEntity
 {
-    public void Kick();
+    public Task KickAsync();
 }

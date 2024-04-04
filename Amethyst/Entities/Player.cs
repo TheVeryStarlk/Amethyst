@@ -9,8 +9,9 @@ internal sealed class Player(IServer server, IClient client) : IPlayer
 
     public IServer Server => server;
 
-    public void Kick()
+    public Task KickAsync()
     {
         client.Stop();
+        return Task.CompletedTask;
     }
 }
