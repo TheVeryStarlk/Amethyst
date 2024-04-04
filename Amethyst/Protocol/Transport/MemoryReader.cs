@@ -80,5 +80,4 @@ internal ref struct MemoryReader(ReadOnlyMemory<byte> memory)
     {
         return BinaryPrimitives.ReadDoubleBigEndian(span[position..(position += sizeof(double))]);
     }
-
 }
