@@ -2,13 +2,13 @@
 
 namespace Amethyst.Protocol.Playing;
 
-internal sealed class ChatMessagePacket : IIngoingPacket<ChatMessagePacket>, IHandler
+internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IHandler
 {
     public static int Identifier => 0x01;
 
     public required string Message { get; init; }
 
-    public static ChatMessagePacket Read(MemoryReader reader)
+    public static ChatPacket Read(MemoryReader reader)
     {
         throw new NotImplementedException();
     }
