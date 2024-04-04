@@ -1,6 +1,4 @@
-﻿using Starlk.Networking;
-
-namespace Amethyst.Protocol.Packets.Handshaking;
+﻿namespace Amethyst.Protocol.Packets.Handshaking;
 
 internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 {

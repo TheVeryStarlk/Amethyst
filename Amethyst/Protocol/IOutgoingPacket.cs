@@ -1,6 +1,4 @@
-﻿using Starlk.Networking;
-
-namespace Amethyst.Protocol;
+﻿namespace Amethyst.Protocol;
 
 public interface IOutgoingPacket
 {

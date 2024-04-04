@@ -1,6 +1,4 @@
-﻿using Starlk.Networking;
-
-namespace Amethyst.Protocol;
+﻿namespace Amethyst.Protocol;
 
 public sealed record Message(int Identifier, ReadOnlyMemory<byte> Memory)
 {

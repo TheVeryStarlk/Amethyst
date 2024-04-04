@@ -4,23 +4,70 @@ using Microsoft.AspNetCore.Connections;
 
 namespace Amethyst;
 
-internal sealed class Client(ConnectionContext connectionContext) : IClient, IAsyncDisposable
+internal sealed class Client(Server server, ConnectionContext connection) : IClient, IAsyncDisposable
 {
+    private enum State
+    {
+        Handshaking,
+        Status,
+        Login,
+        Playing,
+        Disconnected
+    }
+
     public IPlayer? Player { get; }
+
+    private CancellationTokenSource? source;
+    private State state;
+    private DateTimeOffset idle;
+
+    private readonly Queue<IOutgoingPacket> queue = [];
+
+    public void Start()
+    {
+        source = new CancellationTokenSource();
+
+        while (!source.IsCancellationRequested)
+        {
+            // Read...
+        }
+    }
+
+    public void Tick()
+    {
+        if (idle.Subtract(DateTimeOffset.Now) > server.Options.IdleTimeOut)
+        {
+            Player?.Kick();
+        }
+
+        foreach (var item in queue)
+        {
+            // Do something.
+        }
+    }
 
     public void Queue(IOutgoingPacket packet)
     {
-        throw new NotImplementedException();
+        queue.Enqueue(packet);
     }
 
     public void Stop()
     {
-        throw new NotImplementedException();
+        source?.Cancel();
     }
 
     public async ValueTask DisposeAsync()
     {
-        await connectionContext.DisposeAsync();
+        source?.Dispose();
+        await connection.DisposeAsync();
+    }
+
+    private void HandeDisconnected()
+    {
+        state = State.Disconnected;
+
+        Player?.Kick();
+        connection.Abort();
     }
 }
 

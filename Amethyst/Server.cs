@@ -5,5 +5,7 @@ namespace Amethyst;
 
 internal sealed class Server : IServer
 {
+    public ServerOptions Options { get; }
+
     public IEnumerable<IPlayer> Players { get; }
 }
