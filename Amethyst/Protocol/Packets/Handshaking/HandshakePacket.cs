@@ -16,6 +16,12 @@ internal sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 
     public static HandshakePacket Read(MemoryReader reader)
     {
-        throw new NotImplementedException();
+        return new HandshakePacket
+        {
+            ProtocolVersion = reader.ReadVariableInteger(),
+            Address = reader.ReadVariableString(),
+            Port = reader.ReadUnsignedShort(),
+            NextState = reader.ReadVariableInteger()
+        };
     }
 }

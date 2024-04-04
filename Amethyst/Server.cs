@@ -79,7 +79,7 @@ internal sealed class Server(
                 connection);
 
             clients[identifier++] = client;
-            await ExecuteAsync(client);
+            _ = ExecuteAsync(client);
         }
 
         await listener.UnbindAsync();

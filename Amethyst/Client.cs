@@ -2,6 +2,7 @@
 using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Protocol;
+using Amethyst.Protocol.Packets.Handshaking;
 using Amethyst.Protocol.Transport;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -123,6 +124,15 @@ internal sealed class Client(
 
     private Task HandleHandshakingAsync(Message message)
     {
+        var handshake = message.As<HandshakePacket>();
+
+        state = (State) handshake.NextState;
+
+        if (handshake.ProtocolVersion != server.ProtocolVersion)
+        {
+            Stop();
+        }
+
         return Task.CompletedTask;
     }
 
