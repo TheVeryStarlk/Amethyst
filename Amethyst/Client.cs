@@ -1,10 +1,15 @@
 ﻿using Amethyst.Api.Entities;
 using Amethyst.Protocol;
 using Microsoft.AspNetCore.Connections;
+using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(int identifier, Server server, ConnectionContext connection) : IClient, IAsyncDisposable
+internal sealed class Client(
+    ILogger<IClient> logger,
+    int identifier,
+    Server server,
+    ConnectionContext connection) : IClient, IAsyncDisposable
 {
     private enum State
     {
