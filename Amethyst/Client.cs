@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Entities;
+using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Transport;
@@ -22,7 +23,7 @@ internal sealed class Client(
         Disconnected
     }
 
-    public IPlayer? Player { get; }
+    public IPlayer? Player { get; private set; }
 
     public int Identifier { get; } = identifier;
 
@@ -39,7 +40,7 @@ internal sealed class Client(
 
         logger.LogDebug("Started connection");
 
-        while (!source.IsCancellationRequested)
+        while (true)
         {
             try
             {
@@ -49,6 +50,18 @@ internal sealed class Client(
                 {
                     break;
                 }
+
+                var task = state switch
+                {
+                    State.Handshaking => HandleHandshakingAsync(message),
+                    State.Status => HandleStatusAsync(message),
+                    State.Login => HandleLoginAsync(message),
+                    State.Playing => HandlePlayingAsync(message),
+                    State.Disconnected => Task.CompletedTask,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                await task;
             }
             catch (OperationCanceledException)
             {
@@ -64,7 +77,14 @@ internal sealed class Client(
             }
         }
 
-        await HandleDisconnectedAsync();
+        state = State.Disconnected;
+
+        if (Player is not null)
+        {
+            await Player.KickAsync();
+        }
+
+        connection.Abort();
     }
 
     public async Task TickAsync()
@@ -101,16 +121,25 @@ internal sealed class Client(
         await connection.DisposeAsync();
     }
 
-    private async Task HandleDisconnectedAsync()
+    private Task HandleHandshakingAsync(Message message)
     {
-        state = State.Disconnected;
+        return Task.CompletedTask;
+    }
 
-        if (Player is not null)
-        {
-            await Player.KickAsync();
-        }
+    private Task HandleStatusAsync(Message message)
+    {
+        return Task.CompletedTask;
+    }
 
-        connection.Abort();
+    private Task HandleLoginAsync(Message message)
+    {
+        Player = new Player(server, this);
+        return Task.CompletedTask;
+    }
+
+    private Task HandlePlayingAsync(Message message)
+    {
+        return Task.CompletedTask;
     }
 }
 
