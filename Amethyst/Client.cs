@@ -1,4 +1,5 @@
-﻿using Amethyst.Api.Entities;
+﻿using Amethyst.Api;
+using Amethyst.Api.Entities;
 using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Protocol;
@@ -11,7 +12,7 @@ namespace Amethyst;
 internal sealed class Client(
     ILogger<IClient> logger,
     int identifier,
-    Server server,
+    IServer server,
     ConnectionContext connection) : IClient, IAsyncDisposable
 {
     private enum State
@@ -143,7 +144,7 @@ internal sealed class Client(
 
     private Task HandleLoginAsync(Message message)
     {
-        Player = new Player(server, this);
+        Player = new Player(server, server.Worlds.Values.First(), this);
         return Task.CompletedTask;
     }
 

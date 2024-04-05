@@ -1,7 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using Amethyst.Api;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Worlds;
 using Amethyst.Extensions;
+using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -19,6 +22,8 @@ internal sealed class Server(
     public IEnumerable<IPlayer> Players => clients.Values
         .Where(client => client.Player is not null)
         .Select(client => client.Player!);
+
+    public IDictionary<string, IWorld> Worlds { get; } = new Dictionary<string, IWorld>();
 
     private CancellationTokenSource? source;
     private IConnectionListener? listener;
