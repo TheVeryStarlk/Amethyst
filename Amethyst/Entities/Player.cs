@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Worlds;
 
@@ -13,6 +14,11 @@ internal sealed class Player(IServer server, IWorld world, IClient client) : IPl
     public int Identifier { get; } = Random.Shared.Next();
 
     public Task SpawnAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SendChatAsync(Chat chat)
     {
         throw new NotImplementedException();
     }

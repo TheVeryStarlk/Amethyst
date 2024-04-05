@@ -17,7 +17,7 @@ internal sealed class Server(
     IConnectionListenerFactory listenerFactory,
     ServerOptions options,
     PluginService pluginService,
-    EventService eventService) : IServer, IAsyncDisposable
+    IEventService eventService) : IServer, IAsyncDisposable
 {
     public int ProtocolVersion => 47;
 

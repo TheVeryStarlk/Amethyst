@@ -1,9 +1,12 @@
 ﻿using Amethyst.Api;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Plugins.Events.Server;
+using Amethyst.Components;
 using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshaking;
+using Amethyst.Protocol.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -137,9 +140,49 @@ internal sealed class Client(
         return Task.CompletedTask;
     }
 
-    private Task HandleStatusAsync(Message message)
+    private async Task HandleStatusAsync(Message message)
     {
-        return Task.CompletedTask;
+        switch (message.Identifier)
+        {
+            case 0x00:
+                _ = message.As<StatusRequestPacket>();
+
+                var request = new ServerDescriptionRequestEvent
+                {
+                    Server = server,
+                    Description = server.Options.Description
+                };
+
+                await server.EventService.ExecuteAsync(request);
+
+                await transport.WriteAsync(
+                    new StatusResponsePacket
+                    {
+                        Status = ServerStatus.Create(
+                            nameof(Amethyst),
+                            server.ProtocolVersion,
+                            server.Options.MaximumPlayers,
+                            server.Players.Count(),
+                            request.Description)
+                    });
+
+                return;
+
+            case 0x01:
+            {
+                var ping = message.As<PingRequestPacket>();
+
+                await transport.WriteAsync(
+                    new PongResponsePacket
+                    {
+                        Payload = ping.Payload
+                    });
+
+                break;
+            }
+        }
+
+        Stop();
     }
 
     private Task HandleLoginAsync(Message message)
