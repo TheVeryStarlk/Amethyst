@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Api.Worlds;
+using Amethyst.Components;
 using Amethyst.Extensions;
 using Amethyst.Plugins;
 using Amethyst.Worlds;
@@ -55,7 +56,9 @@ internal sealed class WorldService(
 
         logger.LogDebug("Started ticking worlds");
 
-        while (!cancellationToken.IsCancellationRequested)
+        var timer = new BalancingTimer(50, source.Token);
+
+        while (await timer.WaitForNextTickAsync())
         {
             try
             {

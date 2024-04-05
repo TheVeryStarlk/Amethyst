@@ -5,9 +5,9 @@ using Amethyst.Api.Plugins;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Api.Worlds;
+using Amethyst.Components;
 using Amethyst.Extensions;
 using Amethyst.Plugins;
-using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -160,7 +160,9 @@ internal sealed class Server(
 
         logger.LogInformation("Started ticking connections");
 
-        while (!source.IsCancellationRequested)
+        var timer = new BalancingTimer(50, source.Token);
+
+        while (await timer.WaitForNextTickAsync())
         {
             try
             {
