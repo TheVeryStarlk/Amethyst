@@ -28,7 +28,7 @@ internal sealed class Server(
         .Where(client => client.Player is not null)
         .Select(client => client.Player!);
 
-    public IDictionary<string, IWorld> Worlds { get; } = new Dictionary<string, IWorld>();
+    public IDictionary<string, IWorld> Worlds { get; set; } = new Dictionary<string, IWorld>();
 
     public IPluginService PluginService => pluginService;
 
@@ -44,14 +44,6 @@ internal sealed class Server(
     {
         logger.LogInformation("Starting the server tasks");
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-        Worlds["Flat"] = new World
-        {
-            Server = this,
-            Type = WorldType.Flat,
-            Difficulty = Difficulty.Peaceful,
-            Dimension = Dimension.OverWorld
-        };
 
         pluginService.Register();
 

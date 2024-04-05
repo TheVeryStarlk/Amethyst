@@ -26,6 +26,7 @@ public static class HostBuilderExtensions
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
             services.AddSingleton<Server>();
 
+            services.AddHostedService<WorldService>();
             services.AddHostedService<ServerService>();
         });
 

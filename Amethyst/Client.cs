@@ -115,12 +115,21 @@ internal sealed class Client(
                 Payload = queue.Count
             });
 
-        // Hmm, I wonder if order matters.
-        await queue
-            .Select(packet => transport.WriteAsync(packet))
-            .WhenEach();
-
-        queue.Clear();
+        try
+        {
+            // Hmm, I wonder if order matters.
+            await queue
+                .Select(packet => transport.WriteAsync(packet))
+                .WhenEach();
+        }
+        catch
+        {
+            // Connection has been aborted, ignore.
+        }
+        finally
+        {
+            queue.Clear();
+        }
     }
 
     public void Queue(IOutgoingPacket packet)

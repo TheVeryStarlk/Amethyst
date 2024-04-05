@@ -18,6 +18,11 @@ internal sealed class World : IWorld
 
     private readonly List<IPlayer> players = [];
 
+    public Task TickAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     public Task SpawnAsync(IEntity entity)
     {
         if (entity is IPlayer player)
