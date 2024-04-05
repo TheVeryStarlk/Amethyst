@@ -6,6 +6,8 @@ using Amethyst.Entities;
 using Amethyst.Extensions;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshaking;
+using Amethyst.Protocol.Packets.Login;
+using Amethyst.Protocol.Packets.Playing;
 using Amethyst.Protocol.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -185,10 +187,45 @@ internal sealed class Client(
         Stop();
     }
 
-    private Task HandleLoginAsync(Message message)
+    private async Task HandleLoginAsync(Message message)
     {
-        Player = new Player(server, server.Worlds.Values.First(), this);
-        return Task.CompletedTask;
+        var start = message.As<LoginStartPacket>();
+
+        Player = new Player(this)
+        {
+            Server = server,
+            World = server.Worlds.Values.First(),
+            Guid = Guid.NewGuid(),
+            Username = start.Username,
+            GameMode = GameMode.Creative
+        };
+
+        await transport.WriteAsync(
+            new LoginSuccessPacket
+            {
+                Guid = Player.Guid,
+                Username = Player.Username
+            });
+
+        IOutgoingPacket[] packets =
+        [
+            new JoinGamePacket
+            {
+                Player = Player
+            },
+            new PlayerPositionAndLookPacket
+            {
+                Position = Player.Position,
+                Yaw = Player.Yaw,
+                Pitch = Player.Pitch,
+                OnGround = Player.OnGround
+            }
+        ];
+
+        foreach (var packet in packets)
+        {
+            Queue(packet);
+        }
     }
 
     private Task HandlePlayingAsync(Message message)

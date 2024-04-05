@@ -8,6 +8,12 @@ public interface IWorld
 
     public IEnumerable<IPlayer> Players { get; }
 
+    public WorldType Type { get; set; }
+
+    public Difficulty Difficulty { get; set; }
+
+    public Dimension Dimension { get; set; }
+
     public Task SpawnAsync(IEntity entity);
 
     public Task DestroyAsync(params IEntity[] entities);

@@ -4,11 +4,17 @@ using Amethyst.Api.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(Server server) : IWorld
+internal sealed class World : IWorld
 {
-    public IServer Server => server;
+    public required IServer Server { get; init; }
 
     public IEnumerable<IPlayer> Players => players;
+
+    public required WorldType Type { get; set; }
+
+    public required Difficulty Difficulty { get; set; }
+
+    public required Dimension Dimension { get; set; }
 
     private readonly List<IPlayer> players = [];
 

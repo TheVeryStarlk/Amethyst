@@ -11,5 +11,5 @@ public sealed class ServerOptions
 
     public Chat Description { get; init; } = "Hello, world!";
 
-    public int MaximumPlayers { get; init; }
+    public int MaximumPlayers { get; init; } = 20;
 }
