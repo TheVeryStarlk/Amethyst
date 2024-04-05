@@ -1,11 +1,16 @@
 ﻿using System.Reflection;
 using Amethyst.Api.Plugins;
+using Amethyst.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Plugins;
 
-internal sealed class PluginService(ILoggerFactory loggerFactory)
+internal sealed class PluginService(
+    ILoggerFactory loggerFactory,
+    IPluginRegistry pluginRegistry) : IPluginService, IAsyncDisposable
 {
+    public IEnumerable<PluginInformation> Plugins => plugins.Values.Select(plugin => plugin.Information);
+
     private readonly Dictionary<string, PluginBase> plugins = [];
     private readonly ILogger<PluginService> logger = loggerFactory.CreateLogger<PluginService>();
 
@@ -29,11 +34,19 @@ internal sealed class PluginService(ILoggerFactory loggerFactory)
             }
 
             plugin.Logger = loggerFactory.CreateLogger(type);
+            plugin.ConfigureRegistry(pluginRegistry);
         }
 
         if (plugins.Count != 0)
         {
             logger.LogInformation("Finished registering all plugins");
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await plugins.Values
+            .Select(plugin => plugin.DisposeAsync().AsTask())
+            .WhenEach();
     }
 }

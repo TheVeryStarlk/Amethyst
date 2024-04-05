@@ -1,10 +1,12 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Frozen;
 using Amethyst.Api;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Events;
+using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Api.Worlds;
 using Amethyst.Extensions;
-using Amethyst.Worlds;
+using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -13,7 +15,9 @@ namespace Amethyst;
 internal sealed class Server(
     ILoggerFactory loggerFactory,
     IConnectionListenerFactory listenerFactory,
-    ServerOptions options) : IServer, IAsyncDisposable
+    ServerOptions options,
+    PluginService pluginService,
+    EventService eventService) : IServer, IAsyncDisposable
 {
     public int ProtocolVersion => 47;
 
@@ -25,18 +29,31 @@ internal sealed class Server(
 
     public IDictionary<string, IWorld> Worlds { get; } = new Dictionary<string, IWorld>();
 
+    public IPluginService PluginService => pluginService;
+
+    public IEventService EventService => eventService;
+
     private CancellationTokenSource? source;
     private IConnectionListener? listener;
 
     private readonly ConcurrentDictionary<int, Client> clients = [];
     private readonly ILogger<IServer> logger = loggerFactory.CreateLogger<IServer>();
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Starting the server tasks");
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        return Task.WhenAll(ListeningAsync(), TickingAsync());
+        pluginService.Register();
+
+        await eventService.ExecuteAsync(
+            new ServerStartingEvent
+            {
+                Server = this,
+                DateTimeOffset = DateTimeOffset.Now
+            });
+
+        await Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
     public void Stop()

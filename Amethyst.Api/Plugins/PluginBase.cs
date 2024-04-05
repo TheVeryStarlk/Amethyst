@@ -8,6 +8,8 @@ public abstract class PluginBase : IAsyncDisposable
 
     public required ILogger Logger { get; set; }
 
+    public abstract void ConfigureRegistry(IPluginRegistry pluginRegistry);
+
     public virtual ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);

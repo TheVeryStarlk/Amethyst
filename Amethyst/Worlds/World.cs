@@ -10,7 +10,7 @@ internal sealed class World(Server server) : IWorld
 
     public IEnumerable<IPlayer> Players => players;
 
-    private readonly HashSet<IPlayer> players = [];
+    private readonly List<IPlayer> players = [];
 
     public async Task SpawnAsync(IEntity entity)
     {
@@ -32,6 +32,6 @@ internal sealed class World(Server server) : IWorld
             }
         }
 
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }
