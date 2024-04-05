@@ -56,10 +56,23 @@ internal sealed class Server(
         await Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
-    public void Stop()
+    public async Task StopAsync()
     {
+        if (source is null)
+        {
+            return;
+        }
+
         logger.LogInformation("Stopping the server tasks");
-        source?.Cancel();
+
+        await eventService.ExecuteAsync(
+            new ServerStoppingEvent
+            {
+                Server = this,
+                DateTimeOffset = DateTimeOffset.Now
+            });
+
+        await source.CancelAsync();
     }
 
     public async ValueTask DisposeAsync()
