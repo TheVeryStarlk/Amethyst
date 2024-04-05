@@ -7,6 +7,7 @@ using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Api.Worlds;
 using Amethyst.Extensions;
 using Amethyst.Plugins;
+using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -43,6 +44,14 @@ internal sealed class Server(
     {
         logger.LogInformation("Starting the server tasks");
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+        Worlds["Flat"] = new World
+        {
+            Server = this,
+            Type = WorldType.Flat,
+            Difficulty = Difficulty.Peaceful,
+            Dimension = Dimension.OverWorld
+        };
 
         pluginService.Register();
 
@@ -100,21 +109,36 @@ internal sealed class Server(
 
         while (!source.IsCancellationRequested)
         {
-            var connection = await listener.AcceptAsync();
+            try
+            {
+                var connection = await listener.AcceptAsync(source.Token);
 
-            if (connection is null)
+                if (connection is null)
+                {
+                    break;
+                }
+
+                var client = new Client(
+                    loggerFactory.CreateLogger<IClient>(),
+                    identifier,
+                    this,
+                    connection);
+
+                clients[identifier++] = client;
+                _ = ExecuteAsync(client);
+            }
+            catch (OperationCanceledException)
             {
                 break;
             }
+            catch (Exception exception)
+            {
+                logger.LogError(
+                    "Unexpected exception while listening for connections: \"{Message}\"",
+                    exception);
 
-            var client = new Client(
-                loggerFactory.CreateLogger<IClient>(),
-                identifier,
-                this,
-                connection);
-
-            clients[identifier++] = client;
-            _ = ExecuteAsync(client);
+                break;
+            }
         }
 
         await listener.UnbindAsync();
@@ -146,10 +170,22 @@ internal sealed class Server(
 
         while (!source.IsCancellationRequested)
         {
-            await clients.Values
-                .Where(client => client.Player is not null)
-                .Select(client => client.TickAsync())
-                .WhenEach();
+            try
+            {
+                await clients.Values
+                    .Select(client => client.TickAsync())
+                    .WhenEach();
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(
+                    "Unexpected exception while ticking: \"{Message}\"",
+                    exception);
+            }
         }
 
         foreach (var client in clients.Values)

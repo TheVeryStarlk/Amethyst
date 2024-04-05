@@ -29,12 +29,13 @@ internal sealed class Client(
         Disconnected
     }
 
-    public IPlayer? Player { get; private set; }
-
     public int Identifier { get; } = identifier;
 
+    public IPlayer? Player { get; private set; }
+
+    public DateTimeOffset Idle { get; set; }
+
     private CancellationTokenSource? source;
-    private DateTimeOffset idle;
     private State state;
 
     private readonly Queue<IOutgoingPacket> queue = [];
@@ -70,7 +71,7 @@ internal sealed class Client(
 
                 await task;
             }
-            catch (OperationCanceledException)
+            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
                 break;
             }
@@ -92,6 +93,8 @@ internal sealed class Client(
         }
 
         connection.Abort();
+
+        logger.LogDebug("Client stopped");
     }
 
     public async Task TickAsync()
@@ -101,15 +104,23 @@ internal sealed class Client(
             return;
         }
 
-        if (DateTimeOffset.Now.Subtract(idle) > server.Options.IdleTimeOut)
+        if (DateTimeOffset.Now.Subtract(Idle) > server.Options.IdleTimeOut)
         {
             await Player.KickAsync();
         }
+
+        queue.Enqueue(
+            new KeepAlivePacket
+            {
+                Payload = queue.Count
+            });
 
         // Hmm, I wonder if order matters.
         await queue
             .Select(packet => transport.WriteAsync(packet))
             .WhenEach();
+
+        queue.Clear();
     }
 
     public void Queue(IOutgoingPacket packet)
@@ -191,7 +202,7 @@ internal sealed class Client(
     {
         var start = message.As<LoginStartPacket>();
 
-        Player = new Player(this)
+        var player = new Player(this)
         {
             Server = server,
             World = server.Worlds.Values.First(),
@@ -203,22 +214,22 @@ internal sealed class Client(
         await transport.WriteAsync(
             new LoginSuccessPacket
             {
-                Guid = Player.Guid,
-                Username = Player.Username
+                Guid = player.Guid,
+                Username = player.Username
             });
 
         IOutgoingPacket[] packets =
         [
             new JoinGamePacket
             {
-                Player = Player
+                Player = player
             },
             new PlayerPositionAndLookPacket
             {
-                Position = Player.Position,
-                Yaw = Player.Yaw,
-                Pitch = Player.Pitch,
-                OnGround = Player.OnGround
+                Position = player.Position,
+                Yaw = player.Yaw,
+                Pitch = player.Pitch,
+                OnGround = player.OnGround
             }
         ];
 
@@ -226,17 +237,30 @@ internal sealed class Client(
         {
             Queue(packet);
         }
+
+        state = State.Playing;
+
+        Player = player;
+        Idle = DateTimeOffset.Now;
     }
 
-    private Task HandlePlayingAsync(Message message)
+    private async Task HandlePlayingAsync(Message message)
     {
-        return Task.CompletedTask;
+        var task = message.Identifier switch
+        {
+            0x00 => message.As<KeepAlivePacket>().HandleAsync(server, Player!, this),
+            _ => Task.CompletedTask
+        };
+
+        await task;
     }
 }
 
 internal interface IClient
 {
     public IPlayer? Player { get; }
+
+    public DateTimeOffset Idle { get; set; }
 
     public void Queue(IOutgoingPacket packet);
 
