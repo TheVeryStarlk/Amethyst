@@ -7,6 +7,6 @@ await Host
     .ConfigureLogging(configure => configure.SetMinimumLevel(LogLevel.Trace))
     .ConfigureServer((_, options) =>
     {
-        options.Description = "Hello, world!";
+        options.Description = "Hello world from the console!";
     })
     .RunConsoleAsync();

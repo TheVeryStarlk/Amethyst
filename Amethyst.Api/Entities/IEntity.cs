@@ -7,9 +7,9 @@ public interface IEntity
 {
     public IServer Server { get; }
 
-    public IWorld World { get; set; }
-
     public int Identifier { get; }
+
+    public IWorld World { get; set; }
 
     public VectorF Position { get; set; }
 
@@ -18,6 +18,4 @@ public interface IEntity
     public float Pitch { get; set; }
 
     public bool OnGround { get; set; }
-
-    public Task SpawnAsync();
 }

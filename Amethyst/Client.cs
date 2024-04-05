@@ -29,7 +29,7 @@ internal sealed class Client(
         Disconnected
     }
 
-    public int Identifier { get; } = identifier;
+    public int Identifier => identifier;
 
     public IPlayer? Player { get; private set; }
 

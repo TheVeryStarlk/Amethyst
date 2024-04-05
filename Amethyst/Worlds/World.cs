@@ -18,14 +18,14 @@ internal sealed class World : IWorld
 
     private readonly List<IPlayer> players = [];
 
-    public async Task SpawnAsync(IEntity entity)
+    public Task SpawnAsync(IEntity entity)
     {
         if (entity is IPlayer player)
         {
             players.Add(player);
         }
 
-        await entity.SpawnAsync();
+        return Task.CompletedTask;
     }
 
     public Task DestroyAsync(params IEntity[] entities)

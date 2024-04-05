@@ -10,8 +10,6 @@ public interface IPlayer : IEntity
 
     public GameMode GameMode { get; set; }
 
-    public Task SendChatAsync(Chat chat);
-
     public Task KickAsync();
 }
 
