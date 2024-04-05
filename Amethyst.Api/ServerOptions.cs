@@ -5,11 +5,11 @@ namespace Amethyst.Api;
 
 public sealed class ServerOptions
 {
-    public IPEndPoint EndPoint { get; init; } = new IPEndPoint(IPAddress.Any, 25565);
+    public IPEndPoint EndPoint { get; set; } = new IPEndPoint(IPAddress.Any, 25565);
 
-    public TimeSpan IdleTimeOut { get; init; } = TimeSpan.FromSeconds(5);
+    public TimeSpan IdleTimeOut { get; set; } = TimeSpan.FromSeconds(5);
 
-    public Chat Description { get; init; } = "Hello, world!";
+    public Chat Description { get; set; } = "Hello, world!";
 
-    public int MaximumPlayers { get; init; } = 20;
+    public int MaximumPlayers { get; set; } = 20;
 }

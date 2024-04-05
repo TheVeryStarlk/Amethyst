@@ -1,7 +1,4 @@
-﻿using Amethyst.Api.Components;
-using Amethyst.Protocol.Packets.Playing;
-
-namespace Amethyst.Protocol.Packets.Login;
+﻿namespace Amethyst.Protocol.Packets.Login;
 
 internal sealed class LoginStartPacket : IIngoingPacket<LoginStartPacket>
 {
