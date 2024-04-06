@@ -3,7 +3,7 @@ using Amethyst.Api.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class Chunk
+internal sealed class Chunk : IChunk
 {
     public required Position Position { get; init; }
 

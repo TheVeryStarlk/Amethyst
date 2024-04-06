@@ -11,7 +11,7 @@ public interface IEntity
 
     public IWorld World { get; set; }
 
-    public VectorF Position { get; set; }
+    public VectorF Vector { get; set; }
 
     public float Yaw { get; set; }
 

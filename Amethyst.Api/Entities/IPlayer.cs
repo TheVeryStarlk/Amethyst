@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api.Components;
+using Amethyst.Api.Worlds;
 
 namespace Amethyst.Api.Entities;
 
@@ -9,6 +10,8 @@ public interface IPlayer : IEntity
     public string Username { get; }
 
     public GameMode GameMode { get; set; }
+
+    public byte ViewDistance { get; set; }
 
     public Task SendChatAsync(Chat chat, ChatPosition position = ChatPosition.Box);
 

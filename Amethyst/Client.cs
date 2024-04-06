@@ -234,7 +234,7 @@ internal sealed class Client(
             },
             new PlayerPositionAndLookPacket
             {
-                Position = player.Position,
+                Vector = player.Vector,
                 Yaw = player.Yaw,
                 Pitch = player.Pitch,
                 OnGround = player.OnGround

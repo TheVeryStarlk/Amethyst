@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Worlds;
 using Amethyst.Protocol.Packets.Playing;
 
 namespace Amethyst.Entities;
@@ -11,6 +12,8 @@ internal sealed class Player(IClient client) : EntityBase, IPlayer
     public required string Username { get; init; }
 
     public GameMode GameMode { get; set; }
+
+    public byte ViewDistance { get; set; } = 4;
 
     public Task SendChatAsync(Chat chat, ChatPosition position)
     {

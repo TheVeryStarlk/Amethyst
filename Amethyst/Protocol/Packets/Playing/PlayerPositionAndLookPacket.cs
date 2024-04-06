@@ -8,7 +8,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
 
     public int Identifier => 0x08;
 
-    public required VectorF Position { get; init; }
+    public required VectorF Vector { get; init; }
 
     public float Yaw { get; init; }
 
@@ -20,7 +20,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
     {
         return new PlayerPositionAndLookPacket
         {
-            Position = new VectorF(
+            Vector = new VectorF(
                 reader.ReadDouble(),
                 reader.ReadDouble(),
                 reader.ReadDouble()),
@@ -33,9 +33,9 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
 
     public void Write(ref MemoryWriter writer)
     {
-        writer.WriteDouble(Position.X);
-        writer.WriteDouble(Position.Y);
-        writer.WriteDouble(Position.Z);
+        writer.WriteDouble(Vector.X);
+        writer.WriteDouble(Vector.Y);
+        writer.WriteDouble(Vector.Z);
         writer.WriteFloat(Yaw);
         writer.WriteFloat(Pitch);
         writer.WriteByte(0);
@@ -43,7 +43,7 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
 
     public Task HandleAsync(Client client)
     {
-        client.Player!.Position = Position;
+        client.Player!.Vector = Vector;
         client.Player.Yaw = Yaw;
         client.Player.Pitch = Pitch;
         client.Player.OnGround = OnGround;
