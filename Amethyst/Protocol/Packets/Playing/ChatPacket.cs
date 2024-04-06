@@ -46,7 +46,7 @@ internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IOutgoingPacket
         }
 
         await server.Players
-            .Select(other => other.SendChatAsync(Chat, Position))
+            .Select(other => other.SendChatAsync($"{player.Username}: {Chat.Text}", Position))
             .WhenEach();
     }
 
