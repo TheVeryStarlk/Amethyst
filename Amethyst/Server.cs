@@ -41,9 +41,9 @@ internal sealed class Server(
         logger.LogInformation("Starting the server tasks");
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        pluginService.Register();
+        pluginService.Initialize();
 
-        await pluginService.EventService.ExecuteAsync(
+        await pluginService.EventDispatcher.DispatchAsync(
             new ServerStartingEvent
             {
                 Server = this,
@@ -62,7 +62,7 @@ internal sealed class Server(
 
         logger.LogInformation("Stopping the server tasks");
 
-        await pluginService.EventService.ExecuteAsync(
+        await pluginService.EventDispatcher.DispatchAsync(
             new ServerStoppingEvent
             {
                 Server = this,

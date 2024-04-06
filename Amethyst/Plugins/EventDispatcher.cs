@@ -2,7 +2,7 @@
 
 namespace Amethyst.Plugins;
 
-internal sealed class EventService : IEventService
+internal sealed class EventDispatcher : IEventDispatcher
 {
     private readonly List<(Type Type, Delegate Delegate)> registeredEvents = [];
 
@@ -11,7 +11,7 @@ internal sealed class EventService : IEventService
         registeredEvents.Add((typeof(TEvent), @delegate));
     }
 
-    public async Task<TEvent> ExecuteAsync<TEvent>(TEvent @event) where TEvent : MinecraftEventBase
+    public async Task<TEvent> DispatchAsync<TEvent>(TEvent @event) where TEvent : MinecraftEventBase
     {
         var registeredEvent = registeredEvents.FirstOrDefault(registeredEvent => registeredEvent.Type == @event.GetType());
 

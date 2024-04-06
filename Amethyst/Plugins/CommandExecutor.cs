@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Plugins;
 
-internal sealed class CommandService(ILogger<CommandService> logger) : ICommandService
+internal sealed class CommandExecutor(ILogger<CommandExecutor> logger) : ICommandExecutor
 {
     public IEnumerable<string> Commands => registeredCommands.Keys;
 

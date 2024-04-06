@@ -11,7 +11,7 @@ namespace Amethyst.Hosting;
 
 internal sealed class WorldService(
     ILogger<WorldService> logger,
-    EventService eventService,
+    EventDispatcher eventDispatcher,
     Server server) : BackgroundService
 {
     private CancellationTokenSource? source;
@@ -39,7 +39,7 @@ internal sealed class WorldService(
             }
         };
 
-        eventService.Register<ServerStartingEvent>(_ =>
+        eventDispatcher.Register<ServerStartingEvent>(_ =>
         {
             source.Cancel();
             return Task.CompletedTask;

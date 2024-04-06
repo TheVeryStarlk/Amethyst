@@ -7,7 +7,7 @@ public interface IPluginService
 {
     public IEnumerable<PluginInformation> Plugins { get; }
 
-    public IEventService EventService { get; }
+    public IEventDispatcher EventDispatcher { get; }
 
-    public ICommandService CommandService { get; }
+    public ICommandExecutor CommandExecutor { get; }
 }

@@ -21,8 +21,8 @@ public static class HostBuilderExtensions
 
             services.AddSingleton<PluginService>();
             services.AddTransient<PluginRegistry>();
-            services.AddTransient<EventService>();
-            services.AddTransient<CommandService>();
+            services.AddTransient<EventDispatcher>();
+            services.AddTransient<CommandExecutor>();
 
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
             services.AddSingleton<Server>();

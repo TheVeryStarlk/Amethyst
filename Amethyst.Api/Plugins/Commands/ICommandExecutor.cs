@@ -2,7 +2,7 @@
 
 namespace Amethyst.Api.Plugins.Commands;
 
-public interface ICommandService
+public interface ICommandExecutor
 {
     public IEnumerable<string> Commands { get; }
 

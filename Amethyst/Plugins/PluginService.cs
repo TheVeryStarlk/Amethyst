@@ -9,21 +9,21 @@ namespace Amethyst.Plugins;
 
 internal sealed class PluginService(
     ILoggerFactory loggerFactory,
-    EventService eventService,
-    CommandService commandService) : IPluginService, IAsyncDisposable
+    EventDispatcher eventDispatcher,
+    CommandExecutor commandExecutor) : IPluginService, IAsyncDisposable
 {
     public IEnumerable<PluginInformation> Plugins => plugins.Values.Select(plugin => plugin.Information);
 
-    public IEventService EventService => eventService;
+    public IEventDispatcher EventDispatcher => eventDispatcher;
 
-    public ICommandService CommandService => commandService;
+    public ICommandExecutor CommandExecutor => commandExecutor;
 
     private readonly Dictionary<string, PluginBase> plugins = [];
     private readonly ILogger<PluginService> logger = loggerFactory.CreateLogger<PluginService>();
 
     private const string Folder = "Plugins";
 
-    public void Register()
+    public void Initialize()
     {
         Directory.CreateDirectory(Folder);
 
@@ -43,7 +43,7 @@ internal sealed class PluginService(
                 }
 
                 plugin.Logger = loggerFactory.CreateLogger(type);
-                plugin.ConfigureRegistry(new PluginRegistry(eventService, commandService));
+                plugin.ConfigureRegistry(new PluginRegistry(eventDispatcher, commandExecutor));
             }
             catch
             {

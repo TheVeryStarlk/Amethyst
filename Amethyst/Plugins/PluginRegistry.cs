@@ -5,16 +5,16 @@ using Amethyst.Api.Plugins.Events;
 namespace Amethyst.Plugins;
 
 internal sealed class PluginRegistry(
-    EventService eventService,
-    CommandService commandService) : IPluginRegistry
+    EventDispatcher eventDispatcher,
+    CommandExecutor commandExecutor) : IPluginRegistry
 {
     public void RegisterEvent<TEvent>(Func<TEvent, Task> @delegate) where TEvent : MinecraftEventBase
     {
-        eventService.Register(@delegate);
+        eventDispatcher.Register(@delegate);
     }
 
     public void RegisterCommand(string name, Func<CommandInformation, Task> @delegate)
     {
-        commandService.Register(name, @delegate);
+        commandExecutor.Register(name, @delegate);
     }
 }
