@@ -46,5 +46,7 @@ internal sealed class CommandService(ILogger<CommandService> logger) : ICommandS
                     ? Array.Empty<string>()
                     : [chat[(parts[0].Length + 1)..]]
             });
+
+        logger.LogInformation("Executed command: \"{Name}\"", name);
     }
 }

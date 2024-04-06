@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Commands;
+using Amethyst.Api.Plugins.Events;
 using Amethyst.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -7,9 +9,14 @@ namespace Amethyst.Plugins;
 
 internal sealed class PluginService(
     ILoggerFactory loggerFactory,
-    IPluginRegistry pluginRegistry) : IPluginService, IAsyncDisposable
+    EventService eventService,
+    CommandService commandService) : IPluginService, IAsyncDisposable
 {
     public IEnumerable<PluginInformation> Plugins => plugins.Values.Select(plugin => plugin.Information);
+
+    public IEventService EventService => eventService;
+
+    public ICommandService CommandService => commandService;
 
     private readonly Dictionary<string, PluginBase> plugins = [];
     private readonly ILogger<PluginService> logger = loggerFactory.CreateLogger<PluginService>();
@@ -36,7 +43,7 @@ internal sealed class PluginService(
                 }
 
                 plugin.Logger = loggerFactory.CreateLogger(type);
-                plugin.ConfigureRegistry(pluginRegistry);
+                plugin.ConfigureRegistry(new PluginRegistry(eventService, commandService));
             }
             catch
             {

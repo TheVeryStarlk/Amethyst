@@ -169,7 +169,7 @@ internal sealed class Client(
             case 0x00:
                 _ = message.As<StatusRequestPacket>();
 
-                var @event = await server.EventService.ExecuteAsync(
+                var @event = await server.PluginService.EventService.ExecuteAsync(
                     new ServerDescriptionRequestEvent
                     {
                         Server = server,

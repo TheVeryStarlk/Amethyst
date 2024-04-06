@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api;
-using Amethyst.Api.Plugins;
 using Amethyst.Plugins;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
@@ -21,9 +20,10 @@ public static class HostBuilderExtensions
             services.AddTransient(_ => options);
 
             services.AddSingleton<PluginService>();
-            services.AddSingleton<EventService>();
-            services.AddSingleton<CommandService>();
-            services.AddTransient<IPluginRegistry, PluginRegistry>();
+            services.AddTransient<PluginRegistry>();
+            services.AddTransient<EventService>();
+            services.AddTransient<CommandService>();
+
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
             services.AddSingleton<Server>();
 

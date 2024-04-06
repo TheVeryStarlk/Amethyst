@@ -2,8 +2,6 @@
 using Amethyst.Api;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins;
-using Amethyst.Api.Plugins.Commands;
-using Amethyst.Api.Plugins.Events;
 using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Api.Worlds;
 using Amethyst.Components;
@@ -18,25 +16,19 @@ internal sealed class Server(
     ILoggerFactory loggerFactory,
     IConnectionListenerFactory listenerFactory,
     ServerOptions options,
-    PluginService pluginService,
-    EventService eventService,
-    CommandService commandService) : IServer, IAsyncDisposable
+    PluginService pluginService) : IServer, IAsyncDisposable
 {
     public int ProtocolVersion => 47;
 
     public ServerOptions Options => options;
+
+    public IPluginService PluginService => pluginService;
 
     public IEnumerable<IPlayer> Players => clients.Values
         .Where(client => client.Player is not null)
         .Select(client => client.Player!);
 
     public IDictionary<string, IWorld> Worlds { get; set; } = new Dictionary<string, IWorld>();
-
-    public IPluginService PluginService => pluginService;
-
-    public IEventService EventService => eventService;
-
-    public ICommandService CommandService => commandService;
 
     private CancellationTokenSource? source;
     private IConnectionListener? listener;
@@ -51,7 +43,7 @@ internal sealed class Server(
 
         pluginService.Register();
 
-        await eventService.ExecuteAsync(
+        await pluginService.EventService.ExecuteAsync(
             new ServerStartingEvent
             {
                 Server = this,
@@ -70,7 +62,7 @@ internal sealed class Server(
 
         logger.LogInformation("Stopping the server tasks");
 
-        await eventService.ExecuteAsync(
+        await pluginService.EventService.ExecuteAsync(
             new ServerStoppingEvent
             {
                 Server = this,

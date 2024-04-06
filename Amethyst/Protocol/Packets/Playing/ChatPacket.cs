@@ -30,11 +30,11 @@ internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IOutgoingPacket
     {
         if (Chat.Text.StartsWith('/'))
         {
-            await server.CommandService.ExecuteAsync(player, Chat.Text);
+            await server.PluginService.CommandService.ExecuteAsync(player, Chat.Text);
             return;
         }
 
-        var @event = await server.EventService.ExecuteAsync(
+        var @event = await server.PluginService.EventService.ExecuteAsync(
             new ChatSentEvent
             {
                 Server = server,
