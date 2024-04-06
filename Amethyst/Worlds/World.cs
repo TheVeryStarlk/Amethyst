@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Worlds;
 
@@ -19,6 +20,16 @@ internal sealed class World : IWorld
     private readonly List<IPlayer> players = [];
 
     public Task TickAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public Block GetBlock(Position position)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SetBlockAsync(Block block, Position position)
     {
         return Task.CompletedTask;
     }
