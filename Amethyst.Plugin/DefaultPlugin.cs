@@ -9,7 +9,7 @@ namespace Amethyst.Plugin;
 /// <summary>
 /// A Minecraft <see cref="IServer"/> plugin that has a number of functionalities.
 /// </summary>
-internal sealed class DefaultPlugin : PluginBase
+public sealed class DefaultPlugin : PluginBase
 {
     /// <summary>
     /// Holds useful information about the plugin.

@@ -22,19 +22,26 @@ internal sealed class PluginService(
 
         foreach (var path in Directory.GetFiles(Folder))
         {
-            var type = Assembly
-                .LoadFile(Path.GetFullPath(path))
-                .ExportedTypes.FirstOrDefault(type => type.BaseType == typeof(PluginBase))!;
-
-            var plugin = (PluginBase) Activator.CreateInstance(type)!;
-
-            if (!plugins.TryAdd(plugin.Information.Name, plugin))
+            try
             {
-                continue;
-            }
+                var type = Assembly
+                    .LoadFile(Path.GetFullPath(path))
+                    .ExportedTypes.FirstOrDefault(type => type.BaseType == typeof(PluginBase))!;
 
-            plugin.Logger = loggerFactory.CreateLogger(type);
-            plugin.ConfigureRegistry(pluginRegistry);
+                var plugin = (PluginBase) Activator.CreateInstance(type)!;
+
+                if (!plugins.TryAdd(plugin.Information.Name, plugin))
+                {
+                    continue;
+                }
+
+                plugin.Logger = loggerFactory.CreateLogger(type);
+                plugin.ConfigureRegistry(pluginRegistry);
+            }
+            catch
+            {
+                logger.LogWarning("Could not load plugin: \"{Path}\"", path);
+            }
         }
 
         if (plugins.Count != 0)
