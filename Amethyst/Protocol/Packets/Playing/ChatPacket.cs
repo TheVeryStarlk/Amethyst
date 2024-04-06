@@ -1,24 +1,58 @@
-﻿using Amethyst.Api;
+﻿using System.Text.Json;
+using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
+using Amethyst.Api.Plugins.Events;
+using Amethyst.Components;
+using Amethyst.Extensions;
 
 namespace Amethyst.Protocol.Packets.Playing;
 
-internal sealed class ChatPacket : IIngoingPacket<ChatPacket>
+internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IOutgoingPacket
 {
-    public static int Identifier => 0x01;
+    static int IIngoingPacket<ChatPacket>.Identifier => 0x01;
 
-    public required string Message { get; init; }
+    public int Identifier => 0x02;
+
+    public required Chat Chat { get; init; }
+
+    public ChatPosition Position { get; init; }
 
     public static ChatPacket Read(MemoryReader reader)
     {
-        throw new NotImplementedException();
+        return new ChatPacket
+        {
+            Chat = Chat.Create(reader.ReadVariableString())
+        };
     }
 
     public async Task HandleAsync(IServer server, IPlayer player, IClient client)
     {
-        foreach (var other in server.Players.Where(other => other.Identifier != player.Identifier))
+        if (Chat.Text.StartsWith('/'))
         {
-            await other.KickAsync();
+            return;
         }
+
+        var @event = await server.EventService.ExecuteAsync(
+            new ChatSentEvent
+            {
+                Server = server,
+                Chat = Chat
+            });
+
+        if (@event.IsHandled)
+        {
+            return;
+        }
+
+        await server.Players
+            .Select(other => other.SendChatAsync(Chat, Position))
+            .WhenEach();
+    }
+
+    public void Write(ref MemoryWriter writer)
+    {
+        writer.WriteVariableString(JsonSerializer.Serialize(Chat, MinecraftSerializerOptions.Instance));
+        writer.WriteByte((byte) Position);
     }
 }

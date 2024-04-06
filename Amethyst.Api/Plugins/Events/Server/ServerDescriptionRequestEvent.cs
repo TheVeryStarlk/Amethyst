@@ -4,5 +4,5 @@ namespace Amethyst.Api.Plugins.Events.Server;
 
 public sealed class ServerDescriptionRequestEvent : MinecraftNotificationEventBase
 {
-    public required Chat Description { get; init; }
+    public required Chat Description { get; set; }
 }

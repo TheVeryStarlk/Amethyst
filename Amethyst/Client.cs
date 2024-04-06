@@ -169,13 +169,12 @@ internal sealed class Client(
             case 0x00:
                 _ = message.As<StatusRequestPacket>();
 
-                var request = new ServerDescriptionRequestEvent
-                {
-                    Server = server,
-                    Description = server.Options.Description
-                };
-
-                await server.EventService.ExecuteAsync(request);
+                var @event = await server.EventService.ExecuteAsync(
+                    new ServerDescriptionRequestEvent
+                    {
+                        Server = server,
+                        Description = server.Options.Description
+                    });
 
                 await transport.WriteAsync(
                     new StatusResponsePacket
@@ -185,7 +184,7 @@ internal sealed class Client(
                             server.ProtocolVersion,
                             server.Options.MaximumPlayers,
                             server.Players.Count(),
-                            request.Description)
+                            @event.Description)
                     });
 
                 return;
@@ -258,6 +257,7 @@ internal sealed class Client(
         var task = message.Identifier switch
         {
             0x00 => message.As<KeepAlivePacket>().HandleAsync(server, Player!, this),
+            0x01 => message.As<ChatPacket>().HandleAsync(server, Player!, this),
             _ => Task.CompletedTask
         };
 
