@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Api.Plugins;
 using Amethyst.Api.Plugins.Events.Server;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,23 @@ internal sealed class DefaultPlugin : PluginBase
             {
                 Logger.LogInformation("Server began starting @ {DateTimeOffset}!", @event.DateTimeOffset);
                 return Task.CompletedTask;
+            });
+
+        pluginRegistry.RegisterCommand(
+            "broadcast",
+            async command =>
+            {
+                if (command.Arguments.Length == 0)
+                {
+                    var error = Chat.Create("Specify a message.", Color.Red);
+                    await command.Player.SendChatAsync(error);
+                    return;
+                }
+
+                foreach (var player in command.Server.Players)
+                {
+                    await player.SendChatAsync(command.Arguments[0]);
+                }
             });
     }
 }

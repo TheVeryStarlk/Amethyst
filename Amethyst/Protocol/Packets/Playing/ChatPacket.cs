@@ -30,6 +30,7 @@ internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IOutgoingPacket
     {
         if (Chat.Text.StartsWith('/'))
         {
+            await server.CommandService.ExecuteAsync(player, Chat.Text);
             return;
         }
 

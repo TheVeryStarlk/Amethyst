@@ -20,8 +20,9 @@ public static class HostBuilderExtensions
             configure.Invoke(context, options);
             services.AddTransient(_ => options);
 
-            services.AddSingleton<EventService>();
             services.AddSingleton<PluginService>();
+            services.AddSingleton<EventService>();
+            services.AddSingleton<CommandService>();
             services.AddTransient<IPluginRegistry, PluginRegistry>();
             services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
             services.AddSingleton<Server>();

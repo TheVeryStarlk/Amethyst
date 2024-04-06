@@ -2,6 +2,7 @@
 using Amethyst.Api;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Commands;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Api.Worlds;
@@ -18,7 +19,8 @@ internal sealed class Server(
     IConnectionListenerFactory listenerFactory,
     ServerOptions options,
     PluginService pluginService,
-    EventService eventService) : IServer, IAsyncDisposable
+    EventService eventService,
+    CommandService commandService) : IServer, IAsyncDisposable
 {
     public int ProtocolVersion => 47;
 
@@ -33,6 +35,8 @@ internal sealed class Server(
     public IPluginService PluginService => pluginService;
 
     public IEventService EventService => eventService;
+
+    public ICommandService CommandService => commandService;
 
     private CancellationTokenSource? source;
     private IConnectionListener? listener;

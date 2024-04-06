@@ -1,5 +1,6 @@
 ﻿using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins;
+using Amethyst.Api.Plugins.Commands;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Api.Worlds;
 
@@ -18,4 +19,6 @@ public interface IServer
     public IPluginService PluginService { get; }
 
     public IEventService EventService { get; }
+
+    public ICommandService CommandService { get; }
 }
