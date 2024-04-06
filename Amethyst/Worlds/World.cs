@@ -29,9 +29,8 @@ internal sealed class World : IWorld
         throw new NotImplementedException();
     }
 
-    public Task SetBlockAsync(Block block, Position position)
+    public void SetBlock(Block block, Position position)
     {
-        return Task.CompletedTask;
     }
 
     public Task SpawnAsync(IEntity entity)
