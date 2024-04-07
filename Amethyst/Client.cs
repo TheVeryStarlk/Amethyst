@@ -223,32 +223,15 @@ internal sealed class Client(
             new LoginSuccessPacket
             {
                 Guid = player.Guid,
-                Username = player.Username
+                Username = start.Username
             });
 
-        IOutgoingPacket[] packets =
-        [
-            new JoinGamePacket
-            {
-                Player = player
-            },
-            new PlayerPositionAndLookPacket
-            {
-                Vector = player.Vector,
-                Yaw = player.Yaw,
-                Pitch = player.Pitch,
-                OnGround = player.OnGround
-            }
-        ];
-
-        foreach (var packet in packets)
-        {
-            Queue(packet);
-        }
+        player.Join();
 
         state = State.Playing;
 
         Player = player;
+
         Idle = DateTimeOffset.Now;
     }
 
