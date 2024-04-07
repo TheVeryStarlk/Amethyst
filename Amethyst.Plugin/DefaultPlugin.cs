@@ -35,19 +35,22 @@ public sealed class DefaultPlugin : PluginBase
 
         pluginRegistry.RegisterCommand(
             "broadcast",
-            async command =>
+            command =>
             {
                 if (command.Arguments.Length == 0)
                 {
                     var error = Chat.Create("Specify a message.", Color.Red);
-                    await command.Player.SendChatAsync(error);
-                    return;
+                    command.Player.SendChat(error);
+
+                    return Task.CompletedTask;
                 }
 
                 foreach (var player in command.Server.Players)
                 {
-                    await player.SendChatAsync(command.Arguments[0]);
+                    player.SendChat(command.Arguments[0]);
                 }
+
+                return Task.CompletedTask;
             });
     }
 }

@@ -21,7 +21,7 @@ internal sealed class CommandExecutor(ILogger<CommandExecutor> logger) : IComman
         if (chat.Length == 1 || chat.Length > 1 && char.IsWhiteSpace(chat[1]))
         {
             var error = Chat.Create("Invalid command syntax.", Color.Red);
-            await player.SendChatAsync(error);
+            player.SendChat(error);
             return;
         }
 
@@ -31,7 +31,7 @@ internal sealed class CommandExecutor(ILogger<CommandExecutor> logger) : IComman
         if (registeredCommands.All(command => command.Key != name))
         {
             var error = Chat.Create("Unknown command.", Color.Red);
-            await player.SendChatAsync(error);
+            player.SendChat(error);
             return;
         }
 

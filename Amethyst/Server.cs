@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins;
 using Amethyst.Api.Plugins.Events.Server;
@@ -84,6 +85,19 @@ internal sealed class Server(
         await clients.Values
             .Select(client => client.DisposeAsync().AsTask())
             .WhenEach();
+    }
+
+    public void Broadcast(Chat chat, ChatPosition position)
+    {
+        foreach (var player in Players)
+        {
+            player.SendChat(chat);
+        }
+    }
+
+    public void Kick(IPlayer player, Chat reason)
+    {
+        player.Kick(reason);
     }
 
     private async Task ListeningAsync()

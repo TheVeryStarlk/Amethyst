@@ -46,9 +46,7 @@ internal sealed class ChatPacket : IIngoingPacket<ChatPacket>, IOutgoingPacket
             return;
         }
 
-        await server.Players
-            .Select(other => other.SendChatAsync($"{player.Username}: {Chat.Text}", Position))
-            .WhenEach();
+        server.Broadcast($"{player.Username}: {Chat.Text}", Position);
     }
 
     public void Write(ref MemoryWriter writer)

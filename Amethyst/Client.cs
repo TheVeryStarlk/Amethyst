@@ -1,4 +1,5 @@
 ﻿using Amethyst.Api;
+using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Components;
@@ -87,11 +88,7 @@ internal sealed class Client(
 
         state = State.Disconnected;
 
-        if (Player is not null)
-        {
-            await Player.KickAsync();
-        }
-
+        Player?.Kick(Chat.Create("Connection stopped.", Color.Red));
         connection.Abort();
 
         logger.LogDebug("Client stopped");
@@ -106,7 +103,7 @@ internal sealed class Client(
 
         if (DateTimeOffset.Now.Subtract(Idle) > server.Options.IdleTimeOut)
         {
-            await Player.KickAsync();
+            Player.Kick(Chat.Create("Timed out.", Color.Red));
         }
 
         queue.Enqueue(
@@ -226,10 +223,9 @@ internal sealed class Client(
                 Username = start.Username
             });
 
-        player.Join();
-
         state = State.Playing;
 
+        player.Join();
         Player = player;
 
         Idle = DateTimeOffset.Now;

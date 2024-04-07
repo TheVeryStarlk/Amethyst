@@ -12,9 +12,9 @@ public interface IPlayer : IEntity
 
     public byte ViewDistance { get; set; }
 
-    public Task SendChatAsync(Chat chat, ChatPosition position = ChatPosition.Box);
+    public void SendChat(Chat chat, ChatPosition position = ChatPosition.Box);
 
-    public Task KickAsync();
+    public void Kick(Chat reason);
 }
 
 public enum GameMode

@@ -46,7 +46,7 @@ internal sealed class Player(IClient client) : EntityBase, IPlayer
         }
     }
 
-    public Task SendChatAsync(Chat chat, ChatPosition position)
+    public void SendChat(Chat chat, ChatPosition position)
     {
         client.Queue(
             new ChatPacket
@@ -54,13 +54,10 @@ internal sealed class Player(IClient client) : EntityBase, IPlayer
                 Chat = chat,
                 Position = position
             });
-
-        return Task.CompletedTask;
     }
 
-    public Task KickAsync()
+    public void Kick(Chat reason)
     {
         client.Stop();
-        return Task.CompletedTask;
     }
 }

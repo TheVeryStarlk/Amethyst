@@ -1,4 +1,5 @@
-﻿using Amethyst.Api.Entities;
+﻿using Amethyst.Api.Components;
+using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins;
 using Amethyst.Api.Worlds;
 
@@ -15,4 +16,8 @@ public interface IServer
     public IEnumerable<IPlayer> Players { get; }
 
     public IDictionary<string, IWorld> Worlds { get; }
+
+    public void Broadcast(Chat chat, ChatPosition position);
+
+    public void Kick(IPlayer player, Chat reason);
 }
