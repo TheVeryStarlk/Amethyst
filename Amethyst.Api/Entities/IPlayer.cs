@@ -1,5 +1,4 @@
 ﻿using Amethyst.Api.Components;
-using Amethyst.Api.Worlds;
 
 namespace Amethyst.Api.Entities;
 

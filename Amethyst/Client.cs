@@ -258,6 +258,7 @@ internal sealed class Client(
         {
             0x00 => message.As<KeepAlivePacket>().HandleAsync(server, Player!, this),
             0x01 => message.As<ChatPacket>().HandleAsync(server, Player!, this),
+            0x15 => message.As<ClientSettingsPacket>().HandleAsync(server, Player!, this),
             _ => Task.CompletedTask
         };
 

@@ -12,4 +12,6 @@ public sealed class ServerOptions
     public Chat Description { get; set; } = "Hello, world!";
 
     public int MaximumPlayers { get; set; } = 20;
+
+    public byte ViewDistance { get; set; } = 2;
 }
