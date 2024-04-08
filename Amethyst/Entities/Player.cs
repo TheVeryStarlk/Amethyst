@@ -5,7 +5,7 @@ using Amethyst.Protocol.Packets.Playing;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(IClient client) : EntityBase, IPlayer
+internal sealed class Player(IClient client, Server server) : EntityBase, IPlayer
 {
     public required Guid Guid { get; init; }
 
@@ -37,6 +37,11 @@ internal sealed class Player(IClient client) : EntityBase, IPlayer
                 Yaw = Yaw,
                 Pitch = Pitch,
                 OnGround = OnGround
+            },
+            new PlayerListItemPacket
+            {
+                Action = new AddPlayerAction(),
+                Players = Server.Players
             }
         ];
 
@@ -44,6 +49,13 @@ internal sealed class Player(IClient client) : EntityBase, IPlayer
         {
             client.Queue(packet);
         }
+
+        server.Broadcast(
+            new PlayerListItemPacket
+            {
+                Action = new AddPlayerAction(),
+                Players = [ this ]
+            });
     }
 
     public void SendChat(Chat chat, ChatPosition position)
@@ -56,8 +68,15 @@ internal sealed class Player(IClient client) : EntityBase, IPlayer
             });
     }
 
-    public void Kick(Chat reason)
+    public void Disconnect(Chat reason)
     {
+        server.Broadcast(
+            new PlayerListItemPacket
+            {
+                Action = new RemovePlayerAction(),
+                Players = [ this ]
+            });
+
         client.Stop();
     }
 }

@@ -8,6 +8,7 @@ using Amethyst.Api.Worlds;
 using Amethyst.Components;
 using Amethyst.Extensions;
 using Amethyst.Plugins;
+using Amethyst.Protocol;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -95,9 +96,17 @@ internal sealed class Server(
         }
     }
 
+    public void Broadcast(IOutgoingPacket packet)
+    {
+        foreach (var client in clients.Values.Where(client => client.Player is not null))
+        {
+            client.Queue(packet);
+        }
+    }
+
     public void Kick(IPlayer player, Chat reason)
     {
-        player.Kick(reason);
+        player.Disconnect(reason);
     }
 
     private async Task ListeningAsync()

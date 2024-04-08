@@ -18,7 +18,7 @@ namespace Amethyst;
 internal sealed class Client(
     ILogger<IClient> logger,
     int identifier,
-    IServer server,
+    Server server,
     ConnectionContext connection) : IClient, IAsyncDisposable
 {
     private enum State
@@ -86,10 +86,10 @@ internal sealed class Client(
             }
         }
 
-        state = State.Disconnected;
-
-        Player?.Kick(Chat.Create("Connection stopped.", Color.Red));
+        Player?.Disconnect(Chat.Create("Connection stopped.", Color.Red));
         connection.Abort();
+
+        state = State.Disconnected;
 
         logger.LogDebug("Client stopped");
     }
@@ -103,7 +103,7 @@ internal sealed class Client(
 
         if (DateTimeOffset.Now.Subtract(Idle) > server.Options.IdleTimeOut)
         {
-            Player.Kick(Chat.Create("Timed out.", Color.Red));
+            Player.Disconnect(Chat.Create("Timed out.", Color.Red));
         }
 
         queue.Enqueue(
@@ -207,7 +207,7 @@ internal sealed class Client(
     {
         var start = message.As<LoginStartPacket>();
 
-        var player = new Player(this)
+        var player = new Player(this, server)
         {
             Server = server,
             World = server.Worlds.Values.First(),
@@ -223,12 +223,12 @@ internal sealed class Client(
                 Username = start.Username
             });
 
-        state = State.Playing;
-
         player.Join();
-        Player = player;
 
+        Player = player;
         Idle = DateTimeOffset.Now;
+
+        state = State.Playing;
     }
 
     private async Task HandlePlayingAsync(Message message)

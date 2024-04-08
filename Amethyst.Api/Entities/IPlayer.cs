@@ -14,7 +14,7 @@ public interface IPlayer : IEntity
 
     public void SendChat(Chat chat, ChatPosition position = ChatPosition.Box);
 
-    public void Kick(Chat reason);
+    public void Disconnect(Chat reason);
 }
 
 public enum GameMode
