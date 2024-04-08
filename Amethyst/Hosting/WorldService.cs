@@ -39,11 +39,12 @@ internal sealed class WorldService(
             }
         };
 
-        eventDispatcher.Register<ServerStartingEvent>(_ =>
-        {
-            source.Cancel();
-            return Task.CompletedTask;
-        });
+        eventDispatcher.Register<ServerStartingEvent>(
+            _ =>
+            {
+                source.Cancel();
+                return Task.CompletedTask;
+            });
 
         try
         {
@@ -56,7 +57,7 @@ internal sealed class WorldService(
 
         logger.LogDebug("Started ticking worlds");
 
-        var timer = new BalancingTimer(50, source.Token);
+        var timer = new BalancingTimer(50, cancellationToken);
 
         while (await timer.WaitForNextTickAsync())
         {

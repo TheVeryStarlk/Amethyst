@@ -1,4 +1,7 @@
-﻿namespace Amethyst.Protocol.Packets.Playing;
+﻿using Amethyst.Api;
+using Amethyst.Api.Entities;
+
+namespace Amethyst.Protocol.Packets.Playing;
 
 internal sealed class OnGroundPacket : IIngoingPacket<OnGroundPacket>
 {
@@ -14,9 +17,9 @@ internal sealed class OnGroundPacket : IIngoingPacket<OnGroundPacket>
         };
     }
 
-    public Task HandleAsync(Client client)
+    public Task HandleAsync(IServer server, IPlayer player, IClient client)
     {
-        client.Player!.OnGround = OnGround;
+        player.OnGround = OnGround;
         return Task.CompletedTask;
     }
 }

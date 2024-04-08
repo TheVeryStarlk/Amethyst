@@ -1,5 +1,4 @@
-﻿using Amethyst.Api;
-using Amethyst.Api.Components;
+﻿using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins.Events.Server;
 using Amethyst.Components;
@@ -213,7 +212,8 @@ internal sealed class Client(
             World = server.Worlds.Values.First(),
             Guid = Guid.NewGuid(),
             Username = start.Username,
-            GameMode = GameMode.Creative
+            GameMode = GameMode.Creative,
+            Vector = new VectorF(0, 8, 0)
         };
 
         await transport.WriteAsync(
@@ -237,6 +237,10 @@ internal sealed class Client(
         {
             0x00 => message.As<KeepAlivePacket>().HandleAsync(server, Player!, this),
             0x01 => message.As<ChatPacket>().HandleAsync(server, Player!, this),
+            0x03 => message.As<OnGroundPacket>().HandleAsync(server, Player!, this),
+            0x04 => message.As<PlayerPositionPacket>().HandleAsync(server, Player!, this),
+            0x05 => message.As<PlayerLookPacket>().HandleAsync(server, Player!, this),
+            0x06 => message.As<PlayerPositionAndLookPacket>().HandleAsync(server, Player!, this),
             0x15 => message.As<ClientSettingsPacket>().HandleAsync(server, Player!, this),
             _ => Task.CompletedTask
         };

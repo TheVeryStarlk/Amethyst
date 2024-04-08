@@ -2,6 +2,7 @@
 using Amethyst.Api.Entities;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Playing;
+using Amethyst.Worlds;
 
 namespace Amethyst.Entities;
 
@@ -13,6 +14,8 @@ internal sealed class Player(IClient client, Server server) : EntityBase, IPlaye
 
     public GameMode GameMode { get; set; }
 
+    public IClient Client => client;
+
     public byte ViewDistance
     {
         get => viewDistance;
@@ -21,7 +24,9 @@ internal sealed class Player(IClient client, Server server) : EntityBase, IPlaye
             : value;
     }
 
-    private byte viewDistance;
+    public List<Chunk> Chunks { get; } = [];
+
+    private byte viewDistance = 2;
 
     public void Join()
     {

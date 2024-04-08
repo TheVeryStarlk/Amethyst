@@ -4,7 +4,6 @@ using Amethyst.Api.Components;
 using Amethyst.Api.Entities;
 using Amethyst.Api.Plugins.Events;
 using Amethyst.Components;
-using Amethyst.Extensions;
 
 namespace Amethyst.Protocol.Packets.Playing;
 

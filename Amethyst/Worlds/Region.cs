@@ -48,6 +48,17 @@ internal sealed class Region
             Position = position
         };
 
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                chunk.SetBlock(new Block
+                {
+                    Type = 7
+                }, new Position(x,0 ,z));
+            }
+        }
+
         chunks.Add(chunk);
         return chunk;
     }

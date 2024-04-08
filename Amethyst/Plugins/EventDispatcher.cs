@@ -13,18 +13,14 @@ internal sealed class EventDispatcher : IEventDispatcher
 
     public async Task<TEvent> DispatchAsync<TEvent>(TEvent @event) where TEvent : MinecraftEventBase
     {
-        var registeredEvent = registeredEvents.FirstOrDefault(registeredEvent => registeredEvent.Type == @event.GetType());
-
-        if (registeredEvent.Delegate is null)
+        foreach (var registered in registeredEvents.Where(registeredEvent => registeredEvent.Type == @event.GetType()))
         {
-            return @event;
-        }
+            var task = (Task?) registered.Delegate.DynamicInvoke(@event);
 
-        var task = (Task?) registeredEvent.Delegate.DynamicInvoke(@event);
-
-        if (task is not null)
-        {
-            await task;
+            if (task is not null)
+            {
+                await task;
+            }
         }
 
         return @event;

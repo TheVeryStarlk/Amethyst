@@ -1,4 +1,6 @@
-﻿using Amethyst.Api.Components;
+﻿using Amethyst.Api;
+using Amethyst.Api.Components;
+using Amethyst.Api.Entities;
 
 namespace Amethyst.Protocol.Packets.Playing;
 
@@ -41,12 +43,12 @@ internal sealed class PlayerPositionAndLookPacket : IIngoingPacket<PlayerPositio
         writer.WriteByte(0);
     }
 
-    public Task HandleAsync(Client client)
+    public Task HandleAsync(IServer server, IPlayer player, IClient client)
     {
-        client.Player!.Vector = Vector;
-        client.Player.Yaw = Yaw;
-        client.Player.Pitch = Pitch;
-        client.Player.OnGround = OnGround;
+        player.Vector = Vector;
+        player.Yaw = Yaw;
+        player.Pitch = Pitch;
+        player.OnGround = OnGround;
         return Task.CompletedTask;
     }
 }
