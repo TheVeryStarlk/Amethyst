@@ -3,7 +3,7 @@
 </p>
 
 # Amethyst
-A bare-bones implementation of the Minecraft Java edition protocol optimized for mini-games servers.
+A bare-bones implementation of the Minecraft Java edition protocol optimized for mini-games servers.\
 Amethyst is customizable and sacrifices many of the vanilla mechanics in favor of performance and memory usage.
 
 ## Credits
