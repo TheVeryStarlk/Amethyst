@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Console", "Amethys
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Protocol", "Amethyst.Protocol\Amethyst.Protocol.csproj", "{9E42B3E4-168C-464F-A6DA-A867CA3B967D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Components", "Amethyst.Components\Amethyst.Components.csproj", "{60AC6B47-1551-4BC8-A44D-C7D275D2CE73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{9E42B3E4-168C-464F-A6DA-A867CA3B967D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E42B3E4-168C-464F-A6DA-A867CA3B967D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E42B3E4-168C-464F-A6DA-A867CA3B967D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60AC6B47-1551-4BC8-A44D-C7D275D2CE73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60AC6B47-1551-4BC8-A44D-C7D275D2CE73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60AC6B47-1551-4BC8-A44D-C7D275D2CE73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60AC6B47-1551-4BC8-A44D-C7D275D2CE73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
