@@ -4,8 +4,12 @@ public sealed class StatusResponsePacket : IOutgoingPacket
 {
     public int Identifier => 0;
 
-    public void Write()
+    int IOutgoingPacket.Length => Variable.GetByteCount(Message);
+
+    public required string Message { get; init; }
+
+    void IOutgoingPacket.Write(ref SpanWriter writer)
     {
-        // Soon.
+        writer.WriteVariableString(Message);
     }
 }

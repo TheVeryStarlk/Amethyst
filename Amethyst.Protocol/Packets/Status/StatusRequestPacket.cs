@@ -4,7 +4,7 @@ public sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {
     public static int Identifier => 0;
 
-    public static StatusRequestPacket Create()
+    static StatusRequestPacket IIngoingPacket<StatusRequestPacket>.Create(SpanReader reader)
     {
         return new StatusRequestPacket();
     }

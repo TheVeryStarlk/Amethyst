@@ -1,8 +1,26 @@
-﻿namespace Amethyst.Protocol;
+﻿using System.Buffers;
 
-internal interface IIngoingPacket<out T> where T : IIngoingPacket<T>
+namespace Amethyst.Protocol;
+
+public interface IIngoingPacket<out T> where T : IIngoingPacket<T>
 {
     public static abstract int Identifier { get; }
 
-    public static abstract T Create();
+    internal static abstract T Create(SpanReader reader);
+}
+
+public readonly struct Message(int identifier, ReadOnlySequence<byte> sequence)
+{
+    public int Identifier => identifier;
+
+    public void Out<T>(out T packet) where T : IIngoingPacket<T>
+    {
+        if (T.Identifier != identifier)
+        {
+            throw new InvalidOperationException("Unexpected packet identifier.");
+        }
+
+        var reader = new SpanReader(sequence.IsSingleSegment ? sequence.FirstSpan : sequence.ToArray());
+        packet = T.Create(reader);
+    }
 }

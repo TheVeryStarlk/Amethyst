@@ -1,8 +1,10 @@
 ﻿namespace Amethyst.Protocol;
 
-internal interface IOutgoingPacket
+public interface IOutgoingPacket
 {
     public int Identifier { get; }
 
-    public void Write();
+    internal int Length { get; }
+
+    internal void Write(ref SpanWriter writer);
 }

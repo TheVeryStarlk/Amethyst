@@ -4,7 +4,7 @@ public sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 {
     public static int Identifier => 0;
 
-    public static HandshakePacket Create()
+    static HandshakePacket IIngoingPacket<HandshakePacket>.Create(SpanReader reader)
     {
         return new HandshakePacket();
     }
