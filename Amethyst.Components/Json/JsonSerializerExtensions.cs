@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Amethyst.Components.Messages;
 
-namespace Amethyst.Components;
+namespace Amethyst.Components.Json;
 
 public static class JsonSerializerExtensions
 {

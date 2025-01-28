@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Amethyst.Components.Messages;
 
-namespace Amethyst.Components;
+namespace Amethyst.Components.Json;
 
 [JsonSerializable(typeof(Message))]
-public partial class AmethystJsonSerializerContext : JsonSerializerContext;
+internal partial class AmethystJsonSerializerContext : JsonSerializerContext;
