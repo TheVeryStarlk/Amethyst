@@ -4,7 +4,7 @@ public sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
 {
     public static int Identifier => 0;
 
-    public required int Version { get; init; }
+    public required int Protocol { get; init; }
 
     public required string Address { get; init; }
 
@@ -16,7 +16,7 @@ public sealed class HandshakePacket : IIngoingPacket<HandshakePacket>
     {
         return new HandshakePacket
         {
-            Version = reader.ReadVariableInteger(),
+            Protocol = reader.ReadVariableInteger(),
             Address = reader.ReadVariableString(),
             Port = reader.ReadUnsignedShort(),
             State = reader.ReadVariableInteger()
