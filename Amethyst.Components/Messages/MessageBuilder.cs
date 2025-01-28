@@ -26,7 +26,7 @@ public sealed class MessageBuilder
     {
         return new Message
         {
-            Extra = extras.ToArray()
+            Extra = extras
         };
     }
 }
