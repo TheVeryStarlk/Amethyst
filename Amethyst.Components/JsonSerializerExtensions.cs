@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Amethyst.Components.Messages;
@@ -7,7 +8,7 @@ namespace Amethyst.Components;
 
 public static class JsonSerializerExtensions
 {
-    public static JsonSerializerOptions Options { get; } =
+    private static JsonSerializerOptions Options { get; } =
         new()
         {
             AllowTrailingCommas = true,
@@ -16,9 +17,23 @@ public static class JsonSerializerExtensions
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            TypeInfoResolver = AmethystJsonSerializerContext.Default,
             Converters =
             {
                 new JsonStringEnumConverter<Color>(JsonNamingPolicy.SnakeCaseLower)
             }
         };
+
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026",
+        Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050",
+        Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
+    public static string Serialize<T>(this T value)
+    {
+        return JsonSerializer.Serialize(value, Options);
+    }
 }
