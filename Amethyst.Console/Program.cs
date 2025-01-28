@@ -1,4 +1,10 @@
-﻿using Amethyst.Components;
-using Amethyst.Components.Messages;
+﻿using Amethyst.Hosting;
+using Microsoft.Extensions.Hosting;
 
-Console.WriteLine(Message.Create().Build().Serialize());
+var builder = Host.CreateApplicationBuilder();
+
+builder.Services.AddAmethyst();
+
+var host = builder.Build();
+
+host.Run();
