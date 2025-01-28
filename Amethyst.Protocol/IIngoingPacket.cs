@@ -9,7 +9,7 @@ public interface IIngoingPacket<out T> where T : IIngoingPacket<T>
     internal static abstract T Create(SpanReader reader);
 }
 
-public readonly struct Message(int identifier, ReadOnlySequence<byte> sequence)
+public readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
 {
     public int Identifier => identifier;
 
