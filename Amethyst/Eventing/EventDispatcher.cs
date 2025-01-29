@@ -1,0 +1,32 @@
+﻿using System.Collections.Frozen;
+using Amethyst.Components.Eventing;
+using Microsoft.Extensions.Logging;
+
+namespace Amethyst.Eventing;
+
+internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, Subscriber subscriber)
+{
+    private readonly FrozenDictionary<Type, Delegate> events = Registry.Create(subscriber);
+
+    public async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
+    {
+        if (!events.TryGetValue(typeof(TEvent), out var value))
+        {
+            return original;
+        }
+
+        try
+        {
+            if (value is TaskDelegate<TSource, TEvent> callback)
+            {
+                await callback(source, original, cancellationToken);
+            }
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "An exception occurred while running event.");
+        }
+
+        return original;
+    }
+}

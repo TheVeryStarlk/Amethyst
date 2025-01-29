@@ -1,9 +1,9 @@
 ﻿namespace Amethyst.Components.Eventing;
 
 // Perhaps consider renaming this to avoid confusion.
-public interface ISubscriber
+public abstract class Subscriber
 {
-    public void Subscribe(IRegistry registry);
+    public abstract void Subscribe(IRegistry registry);
 }
 
 public interface ISubscriber<TSource>
