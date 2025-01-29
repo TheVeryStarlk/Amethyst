@@ -1,5 +1,6 @@
-﻿namespace Amethyst.Hosting.Subscriber;
+﻿namespace Amethyst.Components.Eventing;
 
+// Perhaps consider renaming this to avoid confusion.
 public interface ISubscriber
 {
     public void Subscribe(IRegistry registry);
