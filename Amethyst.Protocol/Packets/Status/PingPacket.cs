@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Protocol.Packets.Ping;
+﻿namespace Amethyst.Protocol.Packets.Status;
 
 public sealed class PingPacket : IIngoingPacket<PingPacket>
 {

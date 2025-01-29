@@ -1,10 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Amethyst.Components.Messages;
 
-namespace Amethyst.Components.Json;
+namespace Amethyst.Components;
 
 public static class JsonSerializerExtensions
 {
@@ -24,16 +23,12 @@ public static class JsonSerializerExtensions
             }
         };
 
-    [UnconditionalSuppressMessage(
-        "Trimming",
-        "IL2026",
-        Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
-    [UnconditionalSuppressMessage(
-        "AOT",
-        "IL3050",
-        Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
     public static string Serialize<T>(this T value)
     {
+#pragma warning disable IL2026
+#pragma warning disable IL3050
         return JsonSerializer.Serialize(value, Options);
+#pragma warning restore IL3050
+#pragma warning restore IL2026
     }
 }
