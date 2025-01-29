@@ -6,7 +6,7 @@ public interface ISubscriber
     public void Subscribe(IRegistry registry);
 }
 
-public interface ISubscriber<T>
+public interface ISubscriber<TSource>
 {
-    public void On<TEvent>(Action<T, TEvent> callback) where TEvent : Event<T>;
+    public void On<TEvent>(TaskDelegate<TSource, TEvent> callback) where TEvent : Event<TSource>;
 }

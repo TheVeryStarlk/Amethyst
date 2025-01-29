@@ -2,9 +2,9 @@
 
 namespace Amethyst.Eventing;
 
-public sealed class Subscriber<T>(Dictionary<Type, Delegate> events) : ISubscriber<T>
+public sealed class Subscriber<TSource>(Dictionary<Type, Delegate> events) : ISubscriber<TSource>
 {
-    public void On<TEvent>(Action<T, TEvent> callback) where TEvent : Event<T>
+    public void On<TEvent>(TaskDelegate<TSource, TEvent> callback) where TEvent : Event<TSource>
     {
         if (!events.TryAdd(typeof(TEvent), callback))
         {
