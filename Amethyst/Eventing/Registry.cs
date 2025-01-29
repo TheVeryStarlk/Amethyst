@@ -16,9 +16,9 @@ public sealed class Registry : IRegistry
         return registry.events.ToFrozenDictionary();
     }
 
-    public void For<T>(Action<ISubscriber<T>> configure)
+    public void For<T>(Action<IListener<T>> configure)
     {
-        var subscriber = new Subscriber<T>(events);
-        configure(subscriber);
+        var listener = new Listener<T>(events);
+        configure(listener);
     }
 }

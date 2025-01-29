@@ -10,17 +10,14 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, Subscribe
 
     public async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
     {
-        if (!events.TryGetValue(typeof(TEvent), out var value))
+        if (!events.TryGetValue(typeof(TEvent), out var value) || value is not TaskDelegate<TSource, TEvent> callback)
         {
             return original;
         }
 
         try
         {
-            if (value is TaskDelegate<TSource, TEvent> callback)
-            {
-                await callback(source, original, cancellationToken);
-            }
+            await callback(source, original, cancellationToken);
         }
         catch (Exception exception)
         {
