@@ -7,7 +7,7 @@ public sealed class Registry : IRegistry
 {
     private readonly Dictionary<Type, Delegate> events = [];
 
-    public static FrozenDictionary<Type, Delegate> Create(Subscriber subscriber)
+    public static FrozenDictionary<Type, Delegate> Create(ISubscriber subscriber)
     {
         var registry = new Registry();
 

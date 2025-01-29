@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Console;
 
-internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : Subscriber
+internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISubscriber
 {
-    public override void Subscribe(IRegistry registry)
+    public void Subscribe(IRegistry registry)
     {
+        logger.LogInformation("Registering events");
     }
 }

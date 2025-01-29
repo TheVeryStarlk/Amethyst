@@ -6,12 +6,12 @@ namespace Amethyst.Hosting;
 
 public static class ServiceCollectionServiceExtensions
 {
-    public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services, Action<AmethystOptions> configure) where T : Subscriber
+    public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services, Action<AmethystOptions> configure) where T : class, ISubscriber
     {
         var options = new AmethystOptions();
         configure(options);
 
-        services.AddTransient<Subscriber, T>();
+        services.AddTransient<ISubscriber, T>();
 
         return services;
     }

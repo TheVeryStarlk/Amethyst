@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Components.Eventing;
 
-public abstract class Subscriber
+public interface ISubscriber
 {
-    public abstract void Subscribe(IRegistry registry);
+    public void Subscribe(IRegistry registry);
 }

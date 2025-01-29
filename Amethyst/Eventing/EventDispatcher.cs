@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, Subscriber subscriber)
+internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
 {
     private readonly FrozenDictionary<Type, Delegate> events = Registry.Create(subscriber);
 
