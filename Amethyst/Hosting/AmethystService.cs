@@ -7,9 +7,11 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        await Task.Yield();
+
         try
         {
-            await server.StartAsync(cancellationToken);
+            await server.StartAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {

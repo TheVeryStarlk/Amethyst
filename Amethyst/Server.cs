@@ -37,14 +37,14 @@ internal sealed class Server(
 
     private async Task ListeningAsync()
     {
-        await using var listener = await listenerFactory.BindAsync(options.EndPoint, source!.Token);
+        await using var listener = await listenerFactory.BindAsync(options.EndPoint, source!.Token).ConfigureAwait(false);
         logger.LogInformation("Started listening");
 
         while (true)
         {
             try
             {
-                var connection = await listener.AcceptAsync(source.Token);
+                var connection = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
 
                 var client = new Client(
                     loggerFactory.CreateLogger<Client>(),
@@ -65,7 +65,7 @@ internal sealed class Server(
             }
         }
 
-        await listener.UnbindAsync();
+        await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogInformation("Stopped listening");
 
         return;
@@ -74,8 +74,8 @@ internal sealed class Server(
         {
             await Task.Yield();
 
-            await client.StartAsync();
-            await client.DisposeAsync();
+            await client.StartAsync().ConfigureAwait(false);
+            await client.DisposeAsync().ConfigureAwait(false);
 
             if (!pairs.TryRemove(client.Identifier, out _))
             {
@@ -86,7 +86,7 @@ internal sealed class Server(
 
     private async Task TickingAsync()
     {
-        await eventDispatcher.DispatchAsync(this, new Starting(), source!.Token);
+        await eventDispatcher.DispatchAsync(this, new Starting(), source!.Token).ConfigureAwait(false);
 
         while (true)
         {
@@ -105,7 +105,7 @@ internal sealed class Server(
             }
         }
 
-        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token);
+        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token).ConfigureAwait(false);
 
         foreach (var pair in pairs.Values)
         {
@@ -116,6 +116,6 @@ internal sealed class Server(
 
         await Task
             .WhenAll(pairs.Values.Select(pair => pair.Task))
-            .TimeoutAfter(stopping.Timeout);
+            .TimeoutAfter(stopping.Timeout).ConfigureAwait(false);
     }
 }

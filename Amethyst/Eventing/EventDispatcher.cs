@@ -17,7 +17,7 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, ISubscrib
 
         try
         {
-            await callback(source, original, cancellationToken);
+            await callback(source, original, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {

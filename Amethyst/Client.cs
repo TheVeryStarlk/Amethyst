@@ -52,8 +52,8 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         {
             try
             {
-                var message = await protocol.Input.ReadAsync(source.Token);
-                await eventDispatcher.DispatchAsync(this, new Received(message), source.Token);
+                var message = await protocol.Input.ReadAsync(source.Token).ConfigureAwait(false);
+                await eventDispatcher.DispatchAsync(this, new Received(message), source.Token).ConfigureAwait(false);
                 protocol.Input.Advance();
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
@@ -72,9 +72,9 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     {
         try
         {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token))
+            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token).ConfigureAwait(false))
             {
-                await protocol.Output.WriteAsync(packet, source.Token);
+                await protocol.Output.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
         }
         catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
