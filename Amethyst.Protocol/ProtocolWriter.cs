@@ -20,6 +20,6 @@ public sealed class ProtocolWriter(PipeWriter output)
 
         output.Advance(total);
 
-        await output.FlushAsync(cancellationToken);
+        await output.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 }

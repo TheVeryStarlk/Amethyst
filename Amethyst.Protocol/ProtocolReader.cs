@@ -12,7 +12,7 @@ public sealed class ProtocolReader(PipeReader input)
     {
         while (true)
         {
-            var result = await input.ReadAsync(cancellationToken);
+            var result = await input.ReadAsync(cancellationToken).ConfigureAwait(false);
             var buffer = result.Buffer;
 
             // In the event that no message is parsed successfully,

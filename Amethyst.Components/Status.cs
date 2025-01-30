@@ -18,4 +18,7 @@ public sealed record Status(
 
 public sealed record Version(string Name, int Protocol);
 
-public sealed record Information(int Maximum, int Online);
+public sealed record Information(
+    [property: JsonPropertyName("max")]
+    int Maximum,
+    int Online);

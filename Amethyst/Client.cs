@@ -77,20 +77,20 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
                                 {
                                     Message = request.Status.Serialize()
                                 });
+
                                 break;
 
                             case 1:
                                 message.Out(out PingPacket ping);
-                                
+
                                 Write(new PongPacket
                                 {
                                     Magic = ping.Magic
                                 });
 
-                                State = State.Dead;
-
                                 break;
                         }
+
                         break;
 
                     case State.Login:
@@ -98,9 +98,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
                     case State.Play:
                         break;
-
-                    case State.Dead:
-                        throw new OperationCanceledException();
 
                     default:
                         throw new ArgumentOutOfRangeException();

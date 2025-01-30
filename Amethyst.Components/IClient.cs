@@ -16,6 +16,5 @@ public enum State
     Handshake,
     Status,
     Login,
-    Play,
-    Dead
+    Play
 }
