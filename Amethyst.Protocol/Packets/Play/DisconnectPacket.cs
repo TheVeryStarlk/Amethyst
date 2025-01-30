@@ -1,12 +1,10 @@
 ﻿namespace Amethyst.Protocol.Packets.Play;
 
-public sealed class DisconnectPacket : IOutgoingPacket
+public sealed record DisconnectPacket(string Reason) : IOutgoingPacket
 {
     public int Identifier => 64;
 
     int IOutgoingPacket.Length => Variable.GetByteCount(Reason);
-
-    public required string Reason { get; init; }
 
     void IOutgoingPacket.Write(ref SpanWriter writer)
     {

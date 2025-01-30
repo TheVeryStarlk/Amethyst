@@ -82,20 +82,12 @@ internal sealed class Client(
                                     .DispatchAsync(this, new StatusRequest(), source.Token)
                                     .ConfigureAwait(false);
 
-                                Write(new StatusResponsePacket
-                                {
-                                    Message = request.Status.Serialize()
-                                });
-
+                                Write(new StatusResponsePacket(request.Status.Serialize()));
                                 break;
 
                             case 1:
                                 packet.Out(out PingPacket ping);
-
-                                Write(new PongPacket
-                                {
-                                    Magic = ping.Magic
-                                });
+                                Write(new PongPacket(ping.Magic));
 
                                 break;
                         }
@@ -109,12 +101,8 @@ internal sealed class Client(
                             .DispatchAsync(this, new Joining(loginStart.Username), source.Token)
                             .ConfigureAwait(false);
 
-                        Write(new LoginSuccessPacket
-                        {
-                            Guid = Guid.NewGuid().ToString(),
-                            Username = loginStart.Username
-                        });
-
+                        // Should be able to send a login failure packet as well.
+                        Write(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username));
                         State = State.Play;
 
                         break;
@@ -139,11 +127,7 @@ internal sealed class Client(
             }
         }
 
-        Write(new DisconnectPacket
-        {
-            Reason = message.Serialize()
-        });
-
+        Write(new DisconnectPacket(message.Serialize()));
         outgoing.Writer.Complete();
     }
 

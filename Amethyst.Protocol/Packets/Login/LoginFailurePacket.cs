@@ -1,12 +1,10 @@
 ﻿namespace Amethyst.Protocol.Packets.Login;
 
-public sealed class LoginFailurePacket : IOutgoingPacket
+public sealed record LoginFailurePacket(string Reason) : IOutgoingPacket
 {
     public int Identifier => 0;
 
     int IOutgoingPacket.Length => Variable.GetByteCount(Reason);
-
-    public required string Reason { get; init; }
 
     void IOutgoingPacket.Write(ref SpanWriter writer)
     {
