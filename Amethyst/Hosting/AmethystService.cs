@@ -13,7 +13,7 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Unexpected exception in server");
+            logger.LogError(exception, "Unexpected exception");
         }
         finally
         {

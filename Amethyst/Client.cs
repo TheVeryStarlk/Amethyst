@@ -1,11 +1,14 @@
 ﻿using System.Threading.Channels;
+using Amethyst.Components;
+using Amethyst.Components.Eventing.Sources.Client;
+using Amethyst.Eventing;
 using Amethyst.Protocol;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, int identifier) : IAsyncDisposable
+internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher, int identifier) : IClient, IAsyncDisposable
 {
     public int Identifier => identifier;
 
@@ -50,18 +53,17 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             try
             {
                 var message = await protocol.Input.ReadAsync(source.Token);
+                await eventDispatcher.DispatchAsync(this, new Received(message), source.Token);
+                protocol.Input.Advance();
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
-                // Nothing.
+                break;
             }
             catch (Exception exception)
             {
                 logger.LogError(exception, "Unexpected exception while reading from client");
-            }
-            finally
-            {
-                protocol.Input.Advance();
+                break;
             }
         }
     }

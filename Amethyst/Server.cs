@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using Amethyst.Components;
+using Amethyst.Components.Eventing.Sources.Server;
 using Amethyst.Eventing;
 using Amethyst.Hosting;
 using Microsoft.AspNetCore.Connections;
@@ -10,7 +12,7 @@ internal sealed class Server(
     ILoggerFactory loggerFactory,
     IConnectionListenerFactory listenerFactory,
     EventDispatcher eventDispatcher,
-    AmethystOptions options) : IDisposable
+    AmethystOptions options) : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
@@ -36,7 +38,6 @@ internal sealed class Server(
     private async Task ListeningAsync()
     {
         await using var listener = await listenerFactory.BindAsync(options.EndPoint, source!.Token);
-
         logger.LogInformation("Started listening");
 
         while (true)
@@ -44,7 +45,12 @@ internal sealed class Server(
             try
             {
                 var connection = await listener.AcceptAsync(source.Token);
-                var client = new Client(loggerFactory.CreateLogger<Client>(), connection!, Random.Shared.Next());
+
+                var client = new Client(
+                    loggerFactory.CreateLogger<Client>(),
+                    connection!,
+                    eventDispatcher,
+                    Random.Shared.Next());
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
             }
@@ -60,19 +66,7 @@ internal sealed class Server(
         }
 
         await listener.UnbindAsync();
-
         logger.LogInformation("Stopped listening");
-
-        foreach (var pair in pairs.Values)
-        {
-            pair.Client.Stop("No reason provided.");
-        }
-
-        logger.LogInformation("Waiting for clients to disconnect");
-
-        await Task
-            .WhenAll(pairs.Values.Select(pair => pair.Task))
-            .TimeoutAfter(TimeSpan.FromSeconds(5));
 
         return;
 
@@ -90,8 +84,38 @@ internal sealed class Server(
         }
     }
 
-    private Task TickingAsync()
+    private async Task TickingAsync()
     {
-        return Task.CompletedTask;
+        await eventDispatcher.DispatchAsync(this, new Starting(), source!.Token);
+
+        while (true)
+        {
+            try
+            {
+                source.Token.ThrowIfCancellationRequested();
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while ticking");
+                break;
+            }
+        }
+
+        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token);
+
+        foreach (var pair in pairs.Values)
+        {
+            pair.Client.Stop(stopping.Message);
+        }
+
+        logger.LogInformation("Waiting for clients to stop");
+
+        await Task
+            .WhenAll(pairs.Values.Select(pair => pair.Task))
+            .TimeoutAfter(stopping.Timeout);
     }
 }

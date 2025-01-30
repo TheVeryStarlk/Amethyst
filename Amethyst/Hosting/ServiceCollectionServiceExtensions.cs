@@ -21,6 +21,8 @@ public static class ServiceCollectionServiceExtensions
         services.AddTransient<EventDispatcher>();
         services.AddTransient<Server>();
 
+        services.AddHostedService<AmethystService>();
+
         return services;
     }
 }
