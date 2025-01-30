@@ -12,17 +12,34 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
     {
         logger.LogInformation("Registering events");
 
-        registry.For<IClient>(consumer => consumer.On<StatusRequest>((_, request, _) =>
+        registry.For<IClient>(consumer =>
         {
-            var description = Message
-                .Create()
-                .WriteLine("Hello, world!").Bold()
-                .Write("Powered by ").Gray()
-                .Write("Amethyst").LightPurple()
-                .Build();
+            consumer.On<StatusRequest>((_, request, _) =>
+            {
+                var description = Message
+                    .Create()
+                    .WriteLine("Hello, world!").Bold()
+                    .Write("Powered by ").Gray()
+                    .Write("Amethyst").LightPurple()
+                    .Build();
 
-            request.Status = Status.Create("Amethyst", 47, 0, 0, description, string.Empty);
-            return Task.CompletedTask;
-        }));
+                request.Status = Status.Create("Amethyst", 47, 0, 0, description, string.Empty);
+                return Task.CompletedTask;
+            });
+
+            consumer.On<Joining>((client, joining, _) =>
+            {
+                var message = Message
+                    .Create()
+                    .Write("Sorry, ")
+                    .Write(joining.Username).Yellow().Bold()
+                    .WriteLine("...")
+                    .Write("Come back later!").Gray()
+                    .Build();
+
+                client.Stop(message);
+                return Task.CompletedTask;
+            });
+        });
     }
 }

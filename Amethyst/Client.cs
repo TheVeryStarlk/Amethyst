@@ -5,6 +5,8 @@ using Amethyst.Components.Messages;
 using Amethyst.Eventing;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshake;
+using Amethyst.Protocol.Packets.Login;
+using Amethyst.Protocol.Packets.Play;
 using Amethyst.Protocol.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -21,8 +23,8 @@ internal sealed class Client(
 
     public State State { get; private set; }
 
-    private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly (ProtocolReader Input, ProtocolWriter Output) protocol = connection.CreateProtocol();
+    private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
     private Message reason = "No reason provided.";
@@ -46,6 +48,18 @@ internal sealed class Client(
     public void Stop(Message message)
     {
         reason = message;
+
+        var serialized = reason.Serialize();
+
+        IOutgoingPacket packet = State is State.Login
+            ? new LoginFailurePacket { Reason = serialized }
+            : new DisconnectPacket { Reason = serialized };
+
+        if (outgoing.Writer.TryWrite(packet))
+        {
+            outgoing.Writer.Complete();
+        }
+
         source.Cancel();
     }
 
@@ -99,6 +113,16 @@ internal sealed class Client(
                         break;
 
                     case State.Login:
+                        packet.Out(out LoginStartPacket loginStart);
+
+                        await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
+
+                        Write(new LoginSuccessPacket
+                        {
+                            Guid = Guid.NewGuid().ToString(),
+                            Username = loginStart.Username
+                        });
+
                         break;
 
                     case State.Play:
@@ -126,9 +150,9 @@ internal sealed class Client(
     {
         try
         {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token).ConfigureAwait(false))
+            await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
             {
-                await protocol.Output.WriteAsync(packet, source.Token).ConfigureAwait(false);
+                await protocol.Output.WriteAsync(packet).ConfigureAwait(false);
             }
         }
         catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
