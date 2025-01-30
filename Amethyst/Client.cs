@@ -84,7 +84,10 @@ internal sealed class Client(
                                 .Write("...").Red()
                                 .Build();
 
-                            Stop(reason);
+                            if (State is State.Login)
+                            {
+                                Stop(reason);
+                            }
                         }
 
                         break;
