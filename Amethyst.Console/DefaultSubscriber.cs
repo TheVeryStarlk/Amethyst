@@ -16,10 +16,10 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
         {
             var description = Message
                 .Create()
-                .WriteLine("Hello, world!", true)
-                .Write("Powered by ", color: Color.Gray)
-                .Write("Amethyst", underlined: true, color: Color.LightPurple)
-                .Write(".", color: Color.Gray)
+                .WriteLine("Hello, world!").Bold()
+                .Write("Powered by ").Gray()
+                .Write("Amethyst").Underlined().LightPurple()
+                .Write(".").Gray()
                 .Build();
 
             request.Status = Status.Create("Amethyst", 47, 0, 0, description, string.Empty);
