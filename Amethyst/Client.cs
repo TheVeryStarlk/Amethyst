@@ -23,6 +23,8 @@ internal sealed class Client(
 
     public State State { get; private set; }
 
+    private const int Version = 47;
+
     private readonly (ProtocolReader Input, ProtocolWriter Output) protocol = connection.CreateProtocol();
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
@@ -69,7 +71,22 @@ internal sealed class Client(
                 {
                     case State.Handshake:
                         packet.Out(out HandshakePacket handshake);
+
                         State = (State) handshake.State;
+
+                        if (handshake.Version is not Version)
+                        {
+                            // Eh, should probably cache this.
+                            var reason = Message
+                                .Create()
+                                .Write("Sorry! I'm still rocking ").Red()
+                                .Write("1.8").Red().Bold()
+                                .Write("...").Red()
+                                .Build();
+
+                            Stop(reason);
+                        }
+
                         break;
 
                     case State.Status:
@@ -101,7 +118,12 @@ internal sealed class Client(
                             .DispatchAsync(this, new Joining(loginStart.Username), source.Token)
                             .ConfigureAwait(false);
 
-                        // Should be able to send a login failure packet as well.
+                        // Stop was called, do not continue execution.
+                        if (source.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
                         Write(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username));
                         State = State.Play;
 
@@ -127,7 +149,12 @@ internal sealed class Client(
             }
         }
 
-        Write(new DisconnectPacket(message.Serialize()));
+        IOutgoingPacket bye = State is State.Login
+            ? new LoginFailurePacket(message.Serialize())
+            : new DisconnectPacket(message.Serialize());
+
+        Write(bye);
+
         outgoing.Writer.Complete();
     }
 

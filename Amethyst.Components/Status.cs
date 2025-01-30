@@ -10,13 +10,16 @@ public sealed record Status(
     Message Description,
     string Favicon)
 {
-    public static Status Create(string name, int protocol, int maximum, int online, Message description, string favicon)
+    public static Status Create(string name, int numerical, int maximum, int online, Message description, string favicon)
     {
-        return new Status(new Version(name, protocol), new Information(maximum, online), description, favicon);
+        return new Status(new Version(name, numerical), new Information(maximum, online), description, favicon);
     }
 }
 
-public sealed record Version(string Name, int Protocol);
+public sealed record Version(
+    string Name,
+    [property: JsonPropertyName("protocol")]
+    int Numerical);
 
 public sealed record Information(
     [property: JsonPropertyName("max")]
