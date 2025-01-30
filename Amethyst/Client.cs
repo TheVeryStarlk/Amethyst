@@ -27,7 +27,7 @@ internal sealed class Client(
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
-    private Message reason = "No reason provided.";
+    private Message message = "No reason provided.";
 
     public Task StartAsync()
     {
@@ -45,21 +45,9 @@ internal sealed class Client(
         }
     }
 
-    public void Stop(Message message)
+    public void Stop(Message reason)
     {
-        reason = message;
-
-        var serialized = reason.Serialize();
-
-        IOutgoingPacket packet = State is State.Login
-            ? new LoginFailurePacket { Reason = serialized }
-            : new DisconnectPacket { Reason = serialized };
-
-        if (outgoing.Writer.TryWrite(packet))
-        {
-            outgoing.Writer.Complete();
-        }
-
+        message = reason;
         source.Cancel();
     }
 
@@ -90,7 +78,9 @@ internal sealed class Client(
                             case 0:
                                 packet.Out(out StatusRequestPacket _);
 
-                                var request = await eventDispatcher.DispatchAsync(this, new StatusRequest(), source.Token).ConfigureAwait(false);
+                                var request = await eventDispatcher
+                                    .DispatchAsync(this, new StatusRequest(), source.Token)
+                                    .ConfigureAwait(false);
 
                                 Write(new StatusResponsePacket
                                 {
@@ -115,13 +105,17 @@ internal sealed class Client(
                     case State.Login:
                         packet.Out(out LoginStartPacket loginStart);
 
-                        await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
+                        await eventDispatcher
+                            .DispatchAsync(this, new Joining(loginStart.Username), source.Token)
+                            .ConfigureAwait(false);
 
                         Write(new LoginSuccessPacket
                         {
                             Guid = Guid.NewGuid().ToString(),
                             Username = loginStart.Username
                         });
+
+                        State = State.Play;
 
                         break;
 
@@ -144,6 +138,13 @@ internal sealed class Client(
                 break;
             }
         }
+
+        Write(new DisconnectPacket
+        {
+            Reason = message.Serialize()
+        });
+
+        outgoing.Writer.Complete();
     }
 
     private async Task WritingAsync()

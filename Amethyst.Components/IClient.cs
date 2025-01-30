@@ -9,7 +9,7 @@ public interface IClient
 
     public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
 
-    public void Stop(Message message);
+    public void Stop(Message reason);
 }
 
 public enum State

@@ -68,7 +68,9 @@ internal sealed class Server(
         await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogInformation("Stopped listening");
 
-        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token).ConfigureAwait(false);
+        var stopping = await eventDispatcher
+            .DispatchAsync(this, new Stopping(), source.Token)
+            .ConfigureAwait(false);
 
         foreach (var pair in pairs.Values)
         {
@@ -99,7 +101,9 @@ internal sealed class Server(
 
     private async Task TickingAsync()
     {
-        await eventDispatcher.DispatchAsync(this, new Starting(), source!.Token).ConfigureAwait(false);
+        await eventDispatcher
+            .DispatchAsync(this, new Starting(), source!.Token)
+            .ConfigureAwait(false);
 
         while (true)
         {
