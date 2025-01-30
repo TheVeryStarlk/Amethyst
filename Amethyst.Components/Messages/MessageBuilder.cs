@@ -22,6 +22,19 @@ public sealed class MessageBuilder
         return this;
     }
 
+    public MessageBuilder WriteLine(
+        string text,
+        bool bold = false,
+        bool italic = false,
+        bool underlined = false,
+        bool strikeThrough = false,
+        bool obfuscated = false,
+        Color color = Color.White)
+    {
+        extras.Add(Message.Create($"{text}\n", bold, italic, underlined, strikeThrough, obfuscated, color));
+        return this;
+    }
+
     public Message Build()
     {
         return new Message
