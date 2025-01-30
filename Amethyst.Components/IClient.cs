@@ -4,7 +4,18 @@ namespace Amethyst.Components;
 
 public interface IClient
 {
+    public State State { get; }
+
     public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
 
     public void Stop(string message);
+}
+
+public enum State
+{
+    Handshake,
+    Status,
+    Login,
+    Play,
+    Dead
 }
