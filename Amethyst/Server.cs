@@ -68,6 +68,19 @@ internal sealed class Server(
         await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogInformation("Stopped listening");
 
+        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token).ConfigureAwait(false);
+
+        foreach (var pair in pairs.Values)
+        {
+            pair.Client.Stop(stopping.Message);
+        }
+
+        logger.LogInformation("Waiting for clients to stop");
+
+        await Task
+            .WhenAll(pairs.Values.Select(pair => pair.Task))
+            .TimeoutAfter(stopping.Timeout).ConfigureAwait(false);
+
         return;
 
         async Task ExecuteAsync(Client client)
@@ -104,18 +117,5 @@ internal sealed class Server(
                 break;
             }
         }
-
-        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token).ConfigureAwait(false);
-
-        foreach (var pair in pairs.Values)
-        {
-            pair.Client.Stop(stopping.Message);
-        }
-
-        logger.LogInformation("Waiting for clients to stop");
-
-        await Task
-            .WhenAll(pairs.Values.Select(pair => pair.Task))
-            .TimeoutAfter(stopping.Timeout).ConfigureAwait(false);
     }
 }

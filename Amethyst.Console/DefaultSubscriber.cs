@@ -18,8 +18,7 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
                 .Create()
                 .WriteLine("Hello, world!").Bold()
                 .Write("Powered by ").Gray()
-                .Write("Amethyst").Underlined().LightPurple()
-                .Write(".").Gray()
+                .Write("Amethyst").LightPurple()
                 .Build();
 
             request.Status = Status.Create("Amethyst", 47, 0, 0, description, string.Empty);

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Client;
+using Amethyst.Components.Messages;
 using Amethyst.Eventing;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshake;
@@ -10,7 +11,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher, int identifier) : IClient, IAsyncDisposable
+internal sealed class Client(
+    ILogger<Client> logger,
+    ConnectionContext connection,
+    EventDispatcher eventDispatcher,
+    int identifier) : IClient, IAsyncDisposable
 {
     public int Identifier => identifier;
 
@@ -20,7 +25,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     private readonly (ProtocolReader Input, ProtocolWriter Output) protocol = connection.CreateProtocol();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
-    private string reason = "No reason provided.";
+    private Message reason = "No reason provided.";
 
     public Task StartAsync()
     {
@@ -38,7 +43,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         }
     }
 
-    public void Stop(string message)
+    public void Stop(Message message)
     {
         reason = message;
         source.Cancel();
@@ -56,20 +61,20 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         {
             try
             {
-                var message = await protocol.Input.ReadAsync(source.Token).ConfigureAwait(false);
+                var packet = await protocol.Input.ReadAsync(source.Token).ConfigureAwait(false);
 
                 switch (State)
                 {
                     case State.Handshake:
-                        message.Out(out HandshakePacket packet);
-                        State = (State) packet.State;
+                        packet.Out(out HandshakePacket handshake);
+                        State = (State) handshake.State;
                         break;
 
                     case State.Status:
-                        switch (message.Identifier)
+                        switch (packet.Identifier)
                         {
                             case 0:
-                                message.Out(out StatusRequestPacket _);
+                                packet.Out(out StatusRequestPacket _);
 
                                 var request = await eventDispatcher.DispatchAsync(this, new StatusRequest(), source.Token).ConfigureAwait(false);
 
@@ -81,7 +86,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
                                 break;
 
                             case 1:
-                                message.Out(out PingPacket ping);
+                                packet.Out(out PingPacket ping);
 
                                 Write(new PongPacket
                                 {

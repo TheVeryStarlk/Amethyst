@@ -8,29 +8,29 @@ public sealed class ProtocolReader(PipeReader input)
     private SequencePosition consumed;
     private SequencePosition examined;
 
-    public async ValueTask<Message> ReadAsync(CancellationToken cancellationToken)
+    public async ValueTask<Packet> ReadAsync(CancellationToken cancellationToken)
     {
         while (true)
         {
             var result = await input.ReadAsync(cancellationToken).ConfigureAwait(false);
             var buffer = result.Buffer;
 
-            // In the event that no message is parsed successfully,
+            // In the event that no packet is parsed successfully,
             // mark consumed as nothing and examined as the entire buffer.
             consumed = buffer.Start;
             examined = buffer.End;
 
-            if (TryRead(ref buffer, out var message))
+            if (TryRead(ref buffer, out var packet))
             {
-                // A single message was successfully parsed so mark the start of the parsed buffer as consumed.
-                // TryRead trims the buffer to point to the data after the message was parsed.
+                // A single packet was successfully parsed so mark the start of the parsed buffer as consumed.
+                // TryRead trims the buffer to point to the data after the packet was parsed.
                 consumed = buffer.Start;
 
                 // Examined is marked the same as consumed here,
-                // so the next call to ReadAsync will process the next message if there's one.
+                // so the next call to ReadAsync will process the next packet if there's one.
                 examined = consumed;
 
-                return message;
+                return packet;
             }
 
             input.AdvanceTo(consumed, examined);
@@ -46,10 +46,10 @@ public sealed class ProtocolReader(PipeReader input)
             }
         }
 
-        static bool TryRead(ref ReadOnlySequence<byte> buffer, out Message message)
+        static bool TryRead(ref ReadOnlySequence<byte> buffer, out Packet packet)
         {
             var reader = new SequenceReader<byte>(buffer);
-            message = default;
+            packet = default;
 
             if (!reader.TryReadVariableInteger(out var length) || !reader.TryReadVariableInteger(out var identifier))
             {
@@ -63,7 +63,7 @@ public sealed class ProtocolReader(PipeReader input)
                 return false;
             }
 
-            message = new Message(identifier, sequence);
+            packet = new Packet(identifier, sequence);
             buffer = buffer.Slice(sequence.End);
 
             return true;

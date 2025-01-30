@@ -1,8 +1,10 @@
-﻿namespace Amethyst.Components.Eventing.Sources.Server;
+﻿using Amethyst.Components.Messages;
+
+namespace Amethyst.Components.Eventing.Sources.Server;
 
 public sealed class Stopping : Event<IServer>
 {
-    public string Message { get; set; } = "No reason specified.";
+    public Message Message { get; set; } = "No reason specified.";
 
     public TimeSpan Timeout { get; set; }
 }
