@@ -13,6 +13,12 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
     {
         logger.LogInformation("Registering events");
 
+        registry.For<IServer>(consumer => consumer.On<Stopping>((_, stopping, _) =>
+        {
+            stopping.Message = Message.Create("Come back later!");
+            return Task.CompletedTask;
+        }));
+
         registry.For<IClient>(consumer =>
         {
             consumer.On<StatusRequest>((_, request, _) =>
@@ -28,11 +34,5 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
                 return Task.CompletedTask;
             });
         });
-
-        registry.For<IServer>(consumer => consumer.On<Stopping>((_, stopping, _) =>
-        {
-            stopping.Message = Message.Create("Come back later!");
-            return Task.CompletedTask;
-        }));
     }
 }

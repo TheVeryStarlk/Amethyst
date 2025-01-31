@@ -7,7 +7,7 @@ var builder = Host.CreateApplicationBuilder();
 
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
-builder.Services.AddAmethyst<DefaultSubscriber>(options => options.Timeout = TimeSpan.Zero);
+builder.Services.AddAmethyst<DefaultSubscriber>();
 
 var host = builder.Build();
 

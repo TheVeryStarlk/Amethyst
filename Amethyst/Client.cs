@@ -28,7 +28,7 @@ internal sealed class Client(
     private readonly ProtocolDuplex protocol = connection.CreateProtocol();
 
     private State state;
-    private Message message = "No reason provided.";
+    private Message message = "No reason specified.";
 
     public Task StartAsync()
     {

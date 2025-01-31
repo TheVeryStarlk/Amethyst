@@ -2,7 +2,6 @@
 using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Server;
 using Amethyst.Eventing;
-using Amethyst.Hosting;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -11,8 +10,7 @@ namespace Amethyst;
 internal sealed class Server(
     ILoggerFactory loggerFactory,
     IConnectionListenerFactory listenerFactory,
-    EventDispatcher eventDispatcher,
-    AmethystOptions options) : IServer, IDisposable
+    EventDispatcher eventDispatcher) : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
@@ -37,7 +35,11 @@ internal sealed class Server(
 
     private async Task ListeningAsync()
     {
-        await using var listener = await listenerFactory.BindAsync(options.EndPoint, source!.Token).ConfigureAwait(false);
+        var starting = await eventDispatcher
+            .DispatchAsync(this, new Starting(), source!.Token)
+            .ConfigureAwait(false);
+
+        await using var listener = await listenerFactory.BindAsync(starting.EndPoint, source.Token).ConfigureAwait(false);
         logger.LogInformation("Started listening");
 
         while (true)
@@ -101,15 +103,11 @@ internal sealed class Server(
 
     private async Task TickingAsync()
     {
-        await eventDispatcher
-            .DispatchAsync(this, new Starting(), source!.Token)
-            .ConfigureAwait(false);
-
         while (true)
         {
             try
             {
-                source.Token.ThrowIfCancellationRequested();
+                await Task.Delay(50, source!.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {

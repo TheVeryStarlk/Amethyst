@@ -1,3 +1,8 @@
-﻿namespace Amethyst.Components.Eventing.Sources.Server;
+﻿using System.Net;
 
-public sealed class Starting : Event<IServer>;
+namespace Amethyst.Components.Eventing.Sources.Server;
+
+public sealed class Starting : Event<IServer>
+{
+    public IPEndPoint EndPoint { get; set; } = new(IPAddress.Any, 25565);
+}
