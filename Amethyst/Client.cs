@@ -74,20 +74,15 @@ internal sealed class Client(
 
                         State = (State) handshake.State;
 
-                        if (handshake.Version is not Version)
+                        if (handshake.Version is not Version && State is State.Login)
                         {
                             // Eh, should probably cache this.
                             var reason = Message
                                 .Create()
-                                .Write("Sorry! I'm still rocking ").Red()
-                                .Write("1.8").Red().Bold()
-                                .Write("...").Red()
+                                .Write("I'm still rocking 1.8!").Red()
                                 .Build();
 
-                            if (State is State.Login)
-                            {
-                                Stop(reason);
-                            }
+                            Stop(reason);
                         }
 
                         break;
