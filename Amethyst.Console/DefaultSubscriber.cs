@@ -1,6 +1,7 @@
 ﻿using Amethyst.Components;
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Client;
+using Amethyst.Components.Eventing.Sources.Server;
 using Amethyst.Components.Messages;
 using Microsoft.Extensions.Logging;
 
@@ -23,23 +24,15 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
                     .Write("Amethyst").LightPurple()
                     .Build();
 
-                request.Status = Status.Create("Amethyst", 47, 0, 0, description, string.Empty);
-                return Task.CompletedTask;
-            });
-
-            consumer.On<Joining>((client, joining, _) =>
-            {
-                var message = Message
-                    .Create()
-                    .Write("Sorry, ")
-                    .Write(joining.Username).Yellow().Bold()
-                    .WriteLine("...")
-                    .Write("Come back later!").Gray()
-                    .Build();
-
-                client.Stop(message);
+                request.Status = Status.Create("Amethyst", 47, 1, 0, description, string.Empty);
                 return Task.CompletedTask;
             });
         });
+
+        registry.For<IServer>(consumer => consumer.On<Stopping>((_, stopping, _) =>
+        {
+            stopping.Message = Message.Create("Come back later!");
+            return Task.CompletedTask;
+        }));
     }
 }

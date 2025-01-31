@@ -21,14 +21,13 @@ internal sealed class Client(
 {
     public int Identifier => identifier;
 
-    public State State { get; private set; }
-
     private const int Version = 47;
 
     private readonly (ProtocolReader Input, ProtocolWriter Output) protocol = connection.CreateProtocol();
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
+    private State state;
     private Message message = "No reason provided.";
 
     public Task StartAsync()
@@ -67,14 +66,14 @@ internal sealed class Client(
             {
                 var packet = await protocol.Input.ReadAsync(source.Token).ConfigureAwait(false);
 
-                switch (State)
+                switch (state)
                 {
                     case State.Handshake:
                         packet.Out(out HandshakePacket handshake);
 
-                        State = (State) handshake.State;
+                        state = (State) handshake.State;
 
-                        if (handshake.Version is not Version && State is State.Login)
+                        if (state is State.Login && handshake.Version is not Version)
                         {
                             // Eh, should probably cache this.
                             var reason = Message
@@ -122,8 +121,12 @@ internal sealed class Client(
                             break;
                         }
 
-                        Write(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username));
-                        State = State.Play;
+                        Write(
+                            new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
+                            new JoinGamePacket(Identifier, 1, 0, 0, 1, "default", false),
+                            new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false));
+
+                        state = State.Play;
 
                         break;
 
@@ -147,7 +150,7 @@ internal sealed class Client(
             }
         }
 
-        IOutgoingPacket bye = State is State.Login
+        IOutgoingPacket bye = state is State.Login
             ? new LoginFailurePacket(message.Serialize())
             : new DisconnectPacket(message.Serialize());
 
@@ -174,4 +177,12 @@ internal sealed class Client(
             logger.LogError(exception, "Unexpected exception while writing to client");
         }
     }
+}
+
+public enum State
+{
+    Handshake,
+    Status,
+    Login,
+    Play
 }
