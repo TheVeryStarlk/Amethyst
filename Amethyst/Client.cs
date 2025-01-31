@@ -152,24 +152,26 @@ internal sealed class Client(
             }
         }
 
-        IOutgoingPacket bye = state is State.Login
-            ? new LoginFailurePacket(message.Serialize())
-            : new DisconnectPacket(message.Serialize());
+        // The client has stopped, so the final packet needs to be manually written to the client.
+        if (state is not State.Status)
+        {
+            IOutgoingPacket final = state is State.Login
+                ? new LoginFailurePacket(message.Serialize())
+                : new DisconnectPacket(message.Serialize());
 
-        Write(bye);
+            await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
+        }
 
-        // We're done with the client, write the final packet,
-        // and complete the writer as no more packets will be sent.
-        outgoing.Writer.Complete();
+        connection.Abort();
     }
 
     private async Task WritingAsync()
     {
         try
         {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
+            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token).ConfigureAwait(false))
             {
-                await protocol.Output.WriteAsync(packet).ConfigureAwait(false);
+                await protocol.Output.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
         }
         catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
