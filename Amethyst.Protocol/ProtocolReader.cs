@@ -7,6 +7,7 @@ public sealed class ProtocolReader(PipeReader input)
 {
     private SequencePosition consumed;
     private SequencePosition examined;
+    private bool read;
 
     public async ValueTask<Packet> ReadAsync(CancellationToken cancellationToken)
     {
@@ -29,6 +30,8 @@ public sealed class ProtocolReader(PipeReader input)
                 // Examined is marked the same as consumed here,
                 // so the next call to ReadAsync will process the next packet if there's one.
                 examined = consumed;
+
+                read = true;
 
                 return packet;
             }
@@ -72,6 +75,12 @@ public sealed class ProtocolReader(PipeReader input)
 
     public void Advance()
     {
+        if (!read)
+        {
+            return;
+        }
+
         input.AdvanceTo(consumed, examined);
+        read = false;
     }
 }

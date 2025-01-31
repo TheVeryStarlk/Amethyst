@@ -136,8 +136,6 @@ internal sealed class Client(
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-
-                protocol.Input.Advance();
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
@@ -147,6 +145,10 @@ internal sealed class Client(
             {
                 logger.LogError(exception, "Unexpected exception while reading from client");
                 break;
+            }
+            finally
+            {
+                protocol.Input.Advance();
             }
         }
 
