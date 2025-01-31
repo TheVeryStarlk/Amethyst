@@ -23,9 +23,9 @@ internal sealed class Client(
 
     private const int Version = 47;
 
-    private readonly (ProtocolReader Input, ProtocolWriter Output) protocol = connection.CreateProtocol();
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
+    private readonly ProtocolDuplex protocol = connection.CreateProtocol();
 
     private State state;
     private Message message = "No reason provided.";
@@ -158,6 +158,8 @@ internal sealed class Client(
 
         Write(bye);
 
+        // We're done with the client, write the final packet,
+        // and complete the writer as no more packets will be sent.
         outgoing.Writer.Complete();
     }
 

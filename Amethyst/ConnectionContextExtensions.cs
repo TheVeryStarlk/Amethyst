@@ -5,8 +5,10 @@ namespace Amethyst;
 
 internal static class ConnectionContextExtensions
 {
-    public static (ProtocolReader Input, ProtocolWriter Output) CreateProtocol(this ConnectionContext connectionContext)
+    public static ProtocolDuplex CreateProtocol(this ConnectionContext connectionContext)
     {
-        return (new ProtocolReader(connectionContext.Transport.Input), new ProtocolWriter(connectionContext.Transport.Output));
+        return new ProtocolDuplex(new ProtocolReader(connectionContext.Transport.Input), new ProtocolWriter(connectionContext.Transport.Output));
     }
 }
+
+internal sealed record ProtocolDuplex(ProtocolReader Input, ProtocolWriter Output);
