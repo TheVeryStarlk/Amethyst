@@ -5,7 +5,7 @@ namespace Amethyst.Components;
 
 public interface IClient
 {
-    public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
+    ValueTask WriteAsync(params IOutgoingPacket[] packets);
 
     public void Stop(Message reason);
 }

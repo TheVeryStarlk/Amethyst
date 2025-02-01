@@ -80,10 +80,7 @@ internal sealed class Server(
         }
 
         logger.LogInformation("Waiting for clients to stop");
-
-        await Task
-            .WhenAll(pairs.Values.Select(pair => pair.Task))
-            .TimeoutAfter(stopping.Timeout).ConfigureAwait(false);
+        await Task.WhenAll(pairs.Values.Select(pair => pair.Task)).TimeoutAfter(stopping.Timeout).ConfigureAwait(false);
 
         return;
 

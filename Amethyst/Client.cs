@@ -1,5 +1,4 @@
-﻿using System.Threading.Channels;
-using Amethyst.Components;
+﻿using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Client;
 using Amethyst.Components.Messages;
 using Amethyst.Eventing;
@@ -21,28 +20,51 @@ internal sealed class Client(
 {
     public int Identifier => identifier;
 
-    private const int Version = 47;
-
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
-    private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
     private readonly ProtocolDuplex protocol = connection.CreateProtocol();
+    private readonly SemaphoreSlim semaphore = new(1);
 
     private State state;
     private Message message = "No reason specified.";
 
-    public Task StartAsync()
+    public async Task StartAsync()
     {
-        return Task.WhenAll(ReadingAsync(), WritingAsync());
+        await ReadingAsync().ConfigureAwait(false);
+
+        if (state is State.Status)
+        {
+            return;
+        }
+
+        IOutgoingPacket final = state is State.Login
+            ? new LoginFailurePacket(message.Serialize())
+            : new DisconnectPacket(message.Serialize());
+
+        // Token is cancelled here so the final packet has to be manually sent out.
+        // Probably should wait a single tick before aborting.
+        await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
+
+        connection.Abort();
     }
 
-    public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
+    public async ValueTask WriteAsync(params IOutgoingPacket[] packets)
     {
-        foreach (var packet in packets)
+        await semaphore.WaitAsync(source.Token).ConfigureAwait(false);
+
+        try
         {
-            if (!outgoing.Writer.TryWrite(packet))
+            foreach (var packet in packets)
             {
-                break;
+                await protocol.Output.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unexpected exception while writing to client");
+        }
+        finally
+        {
+            semaphore.Release();
         }
     }
 
@@ -55,6 +77,7 @@ internal sealed class Client(
     public ValueTask DisposeAsync()
     {
         source.Dispose();
+        semaphore.Dispose();
         return connection.DisposeAsync();
     }
 
@@ -73,7 +96,7 @@ internal sealed class Client(
 
                         state = (State) handshake.State;
 
-                        if (state is State.Login && handshake.Version is not Version)
+                        if (state is State.Login && handshake.Version != 47)
                         {
                             // Eh, should probably cache this.
                             var reason = Message
@@ -92,16 +115,14 @@ internal sealed class Client(
                             case 0:
                                 packet.Out(out StatusRequestPacket _);
 
-                                var request = await eventDispatcher
-                                    .DispatchAsync(this, new StatusRequest(), source.Token)
-                                    .ConfigureAwait(false);
+                                var request = await eventDispatcher.DispatchAsync(this, new StatusRequest(), source.Token).ConfigureAwait(false);
+                                await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
 
-                                Write(new StatusResponsePacket(request.Status.Serialize()));
                                 break;
 
                             case 1:
                                 packet.Out(out PingPacket ping);
-                                Write(new PongPacket(ping.Magic));
+                                await WriteAsync(new PongPacket(ping.Magic)).ConfigureAwait(false);
 
                                 break;
                         }
@@ -111,20 +132,12 @@ internal sealed class Client(
                     case State.Login:
                         packet.Out(out LoginStartPacket loginStart);
 
-                        await eventDispatcher
-                            .DispatchAsync(this, new Joining(loginStart.Username), source.Token)
-                            .ConfigureAwait(false);
+                        await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
 
-                        // Stop was called, do not continue execution.
-                        if (source.IsCancellationRequested)
-                        {
-                            break;
-                        }
-
-                        Write(
+                        await WriteAsync(
                             new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
                             new JoinGamePacket(Identifier, 1, 0, 0, 1, "default", false),
-                            new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false));
+                            new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
 
                         state = State.Play;
 
@@ -150,37 +163,6 @@ internal sealed class Client(
             {
                 protocol.Input.Advance();
             }
-        }
-
-        // The client has stopped, so the final packet needs to be manually written to the client.
-        if (state is not State.Status)
-        {
-            IOutgoingPacket final = state is State.Login
-                ? new LoginFailurePacket(message.Serialize())
-                : new DisconnectPacket(message.Serialize());
-
-            await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
-        }
-
-        connection.Abort();
-    }
-
-    private async Task WritingAsync()
-    {
-        try
-        {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token).ConfigureAwait(false))
-            {
-                await protocol.Output.WriteAsync(packet, source.Token).ConfigureAwait(false);
-            }
-        }
-        catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
-        {
-            // Nothing.
-        }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "Unexpected exception while writing to client");
         }
     }
 }
