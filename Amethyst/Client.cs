@@ -120,8 +120,8 @@ internal sealed class Client(
                                 break;
 
                             case 1:
-                                packet.Out(out PingPacket ping);
-                                await WriteAsync(new PongPacket(ping.Magic)).ConfigureAwait(false);
+                                packet.Out(out PingPongPacket pingPong);
+                                await WriteAsync(pingPong).ConfigureAwait(false);
 
                                 break;
                         }
