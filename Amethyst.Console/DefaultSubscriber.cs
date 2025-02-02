@@ -30,6 +30,18 @@ internal sealed class DefaultSubscriber : ISubscriber
 
         registry.For<IClient>(consumer =>
         {
+            consumer.On<Outdated>((client, _, _) =>
+            {
+                // Eh, should probably cache this.
+                var reason = Message
+                    .Create()
+                    .Write("I'm still rocking 1.8!").Red()
+                    .Build();
+
+                client.Stop(reason);
+                return Task.CompletedTask;
+            });
+
             consumer.On<ReceivedPacket>((_, received, _) =>
             {
                 if (received.Packet.Identifier == MessagePacket.Identifier)

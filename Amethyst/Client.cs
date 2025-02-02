@@ -21,7 +21,7 @@ internal sealed class Client(
     public int Identifier => identifier;
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
-    private readonly ProtocolDuplex protocol = connection.CreateProtocol();
+    private readonly ProtocolWriter writer = new(connection.Transport.Output);
     private readonly SemaphoreSlim semaphore = new(1);
 
     private State state;
@@ -39,7 +39,7 @@ internal sealed class Client(
 
             // Token is cancelled here so the final packet has to be manually sent out.
             // And wait a single tick to let the client realize the final packet.
-            await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
+            await writer.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
             await Task.Delay(50).ConfigureAwait(false);
         }
 
@@ -54,7 +54,7 @@ internal sealed class Client(
         {
             foreach (var packet in packets)
             {
-                await protocol.Output.WriteAsync(packet, source.Token).ConfigureAwait(false);
+                await writer.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
         }
         catch (Exception exception)
@@ -82,73 +82,24 @@ internal sealed class Client(
 
     private async Task ReadingAsync()
     {
+        var reader = new ProtocolReader(connection.Transport.Input);
+
         while (true)
         {
             try
             {
-                var packet = await protocol.Input.ReadAsync(source.Token).ConfigureAwait(false);
+                var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
 
-                switch (state)
+                var task = state switch
                 {
-                    case State.Handshake:
-                        packet.Out(out HandshakePacket handshake);
+                    State.Handshake => HandshakeAsync(packet),
+                    State.Status => StatusAsync(packet),
+                    State.Login => LoginAsync(packet),
+                    State.Play => PlayAsync(packet),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
 
-                        state = (State) handshake.State;
-
-                        if (state is State.Login && handshake.Version != 47)
-                        {
-                            // Eh, should probably cache this.
-                            var reason = Message
-                                .Create()
-                                .Write("I'm still rocking 1.8!").Red()
-                                .Build();
-
-                            Stop(reason);
-                        }
-
-                        break;
-
-                    case State.Status:
-                        switch (packet.Identifier)
-                        {
-                            case 0:
-                                packet.Out(out StatusRequestPacket _);
-
-                                var request = await eventDispatcher.DispatchAsync(this, new StatusRequest(), source.Token).ConfigureAwait(false);
-                                await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
-
-                                break;
-
-                            case 1:
-                                packet.Out(out PingPongPacket pingPong);
-                                await WriteAsync(pingPong).ConfigureAwait(false);
-
-                                break;
-                        }
-
-                        break;
-
-                    case State.Login:
-                        packet.Out(out LoginStartPacket loginStart);
-
-                        var joining = await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
-
-                        await WriteAsync(
-                            new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
-                            new JoinGamePacket(Identifier, joining.GameMode, 0, 0, joining.MaximumPlayerCount, "default", joining.ReducedDebugInformation),
-                            new PlayerPositionAndLookPacket(joining.X, joining.Y, joining.Z, joining.Yaw, joining.Pitch, false)).ConfigureAwait(false);
-
-                        state = State.Play;
-
-                        break;
-
-                    case State.Play:
-                        await eventDispatcher.DispatchAsync(this, new ReceivedPacket(packet), source.Token).ConfigureAwait(false);
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                await task.ConfigureAwait(false);
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
@@ -161,9 +112,58 @@ internal sealed class Client(
             }
             finally
             {
-                protocol.Input.Advance();
+                reader.Advance();
             }
         }
+    }
+
+    private async Task HandshakeAsync(Packet packet)
+    {
+        packet.Out(out HandshakePacket handshake);
+
+        state = (State) handshake.State;
+
+        if (state is not State.Login || handshake.Version is 47)
+        {
+            return;
+        }
+
+        await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), source.Token).ConfigureAwait(false);
+    }
+
+    private async Task LoginAsync(Packet packet)
+    {
+        packet.Out(out LoginStartPacket loginStart);
+
+        var joining = await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
+
+        await WriteAsync(
+            new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
+            new JoinGamePacket(Identifier, joining.GameMode, 0, 0, joining.MaximumPlayerCount, "default", joining.ReducedDebugInformation),
+            new PlayerPositionAndLookPacket(joining.X, joining.Y, joining.Z, joining.Yaw, joining.Pitch, false)).ConfigureAwait(false);
+
+        state = State.Play;
+    }
+
+    private async Task StatusAsync(Packet packet)
+    {
+        if (packet.Identifier == StatusRequestPacket.Identifier)
+        {
+            packet.Out(out StatusRequestPacket _);
+
+            var request = await eventDispatcher.DispatchAsync(this, new StatusRequest(), source.Token).ConfigureAwait(false);
+            await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
+
+            return;
+        }
+
+        packet.Out(out PingPongPacket pingPong);
+        await WriteAsync(pingPong).ConfigureAwait(false);
+    }
+
+    private async Task PlayAsync(Packet packet)
+    {
+        await eventDispatcher.DispatchAsync(this, new ReceivedPacket(packet), source.Token).ConfigureAwait(false);
     }
 }
 
