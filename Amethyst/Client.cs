@@ -42,7 +42,7 @@ internal sealed class Client(
                     State.Status => StatusAsync(packet),
                     State.Login => LoginAsync(packet),
                     State.Play => PlayAsync(packet),
-                    _ => throw new ArgumentOutOfRangeException()
+                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Invalid state.")
                 };
 
                 await task.ConfigureAwait(false);
@@ -122,7 +122,8 @@ internal sealed class Client(
             return;
         }
 
-        await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), source.Token).ConfigureAwait(false);
+        var outdated = await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), source.Token).ConfigureAwait(false);
+        Stop(outdated.Message);
     }
 
     private async Task LoginAsync(Packet packet)

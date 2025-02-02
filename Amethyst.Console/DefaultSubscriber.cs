@@ -30,15 +30,15 @@ internal sealed class DefaultSubscriber : ISubscriber
 
         registry.For<IClient>(consumer =>
         {
-            consumer.On<Outdated>((client, _, _) =>
+            consumer.On<Outdated>((_, outdated, _) =>
             {
                 // Eh, should probably cache this.
-                var reason = Message
+                var message = Message
                     .Create()
-                    .Write("I'm still rocking 1.8!").Red()
+                    .Write("You're scaring me!").Red()
                     .Build();
 
-                client.Stop(reason);
+                outdated.Message = message;
                 return Task.CompletedTask;
             });
 
