@@ -31,18 +31,16 @@ internal sealed class Client(
     {
         await ReadingAsync().ConfigureAwait(false);
 
-        if (state is State.Status)
+        if (state is not State.Status)
         {
-            return;
+            IOutgoingPacket final = state is State.Login
+                ? new LoginFailurePacket(message.Serialize())
+                : new DisconnectPacket(message.Serialize());
+
+            // Token is cancelled here so the final packet has to be manually sent out.
+            // Probably should wait a single tick before aborting.
+            await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
         }
-
-        IOutgoingPacket final = state is State.Login
-            ? new LoginFailurePacket(message.Serialize())
-            : new DisconnectPacket(message.Serialize());
-
-        // Token is cancelled here so the final packet has to be manually sent out.
-        // Probably should wait a single tick before aborting.
-        await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
 
         connection.Abort();
     }
