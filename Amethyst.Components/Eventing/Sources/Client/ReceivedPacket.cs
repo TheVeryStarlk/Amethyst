@@ -2,7 +2,7 @@
 
 namespace Amethyst.Components.Eventing.Sources.Client;
 
-public sealed class Received(Packet packet) : Event<IClient>
+public sealed class ReceivedPacket(Packet packet) : Event<IClient>
 {
     public Packet Packet { get; init; } = packet;
 }

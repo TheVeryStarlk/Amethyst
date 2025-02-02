@@ -142,6 +142,7 @@ internal sealed class Client(
                         break;
 
                     case State.Play:
+                        await eventDispatcher.DispatchAsync(this, new ReceivedPacket(packet), source.Token).ConfigureAwait(false);
                         break;
 
                     default:
