@@ -51,8 +51,7 @@ internal sealed class Server(
                 var client = new Client(
                     loggerFactory.CreateLogger<Client>(),
                     connection!,
-                    eventDispatcher,
-                    Random.Shared.Next());
+                    eventDispatcher);
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
                 logger.LogDebug("Started client {Identifier}", client.Identifier);

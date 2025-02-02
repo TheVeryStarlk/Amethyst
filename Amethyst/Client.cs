@@ -15,10 +15,9 @@ namespace Amethyst;
 internal sealed class Client(
     ILogger<Client> logger,
     ConnectionContext connection,
-    EventDispatcher eventDispatcher,
-    int identifier) : IClient, IAsyncDisposable
+    EventDispatcher eventDispatcher) : IClient, IAsyncDisposable
 {
-    public int Identifier => identifier;
+    public int Identifier { get; } = Random.Shared.Next();
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
@@ -29,7 +28,39 @@ internal sealed class Client(
 
     public async Task StartAsync()
     {
-        await ReadingAsync().ConfigureAwait(false);
+        var reader = new ProtocolReader(connection.Transport.Input);
+
+        while (true)
+        {
+            try
+            {
+                var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
+
+                var task = state switch
+                {
+                    State.Handshake => HandshakeAsync(packet),
+                    State.Status => StatusAsync(packet),
+                    State.Login => LoginAsync(packet),
+                    State.Play => PlayAsync(packet),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                await task.ConfigureAwait(false);
+            }
+            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while reading from client");
+                break;
+            }
+            finally
+            {
+                reader.Advance();
+            }
+        }
 
         if (state is not State.Status)
         {
@@ -78,43 +109,6 @@ internal sealed class Client(
         source.Dispose();
         semaphore.Dispose();
         return connection.DisposeAsync();
-    }
-
-    private async Task ReadingAsync()
-    {
-        var reader = new ProtocolReader(connection.Transport.Input);
-
-        while (true)
-        {
-            try
-            {
-                var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
-
-                var task = state switch
-                {
-                    State.Handshake => HandshakeAsync(packet),
-                    State.Status => StatusAsync(packet),
-                    State.Login => LoginAsync(packet),
-                    State.Play => PlayAsync(packet),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
-                await task.ConfigureAwait(false);
-            }
-            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
-            {
-                break;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Unexpected exception while reading from client");
-                break;
-            }
-            finally
-            {
-                reader.Advance();
-            }
-        }
     }
 
     private async Task HandshakeAsync(Packet packet)
