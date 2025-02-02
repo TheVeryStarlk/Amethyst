@@ -5,7 +5,8 @@ using Microsoft.Extensions.Logging;
 
 var builder = Host.CreateApplicationBuilder();
 
-builder.Logging.SetMinimumLevel(LogLevel.Trace);
+// Only show Microsoft.*'s logging warnings and exceptions.
+builder.Logging.AddFilter((_, category, logLevel) => !category!.Contains("Microsoft") || logLevel > LogLevel.Information);
 
 builder.Services.AddAmethyst<DefaultSubscriber>();
 

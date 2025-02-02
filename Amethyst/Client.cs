@@ -38,8 +38,9 @@ internal sealed class Client(
                 : new DisconnectPacket(message.Serialize());
 
             // Token is cancelled here so the final packet has to be manually sent out.
-            // Probably should wait a single tick before aborting.
+            // And wait a single tick to let the client realize the final packet.
             await protocol.Output.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
+            await Task.Delay(50).ConfigureAwait(false);
         }
 
         connection.Abort();

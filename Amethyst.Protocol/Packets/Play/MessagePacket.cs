@@ -2,9 +2,9 @@
 
 public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
 {
-    static int IIngoingPacket<MessagePacket>.Identifier => 1;
+    public static int Identifier => 1;
 
-    public int Identifier => 2;
+    int IOutgoingPacket.Identifier => 2;
 
     int IOutgoingPacket.Length => Variable.GetByteCount(Message) + sizeof(byte);
 

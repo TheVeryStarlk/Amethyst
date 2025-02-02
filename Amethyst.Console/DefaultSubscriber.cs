@@ -3,24 +3,43 @@ using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Client;
 using Amethyst.Components.Eventing.Sources.Server;
 using Amethyst.Components.Messages;
-using Microsoft.Extensions.Logging;
+using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Console;
 
-internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISubscriber
+internal sealed class DefaultSubscriber : ISubscriber
 {
+    private IServer? server;
+
     public void Subscribe(IRegistry registry)
     {
-        logger.LogInformation("Registering events");
-
-        registry.For<IServer>(consumer => consumer.On<Stopping>((_, stopping, _) =>
+        registry.For<IServer>(consumer =>
         {
-            stopping.Message = Message.Create("Come back later!");
-            return Task.CompletedTask;
-        }));
+            consumer.On<Starting>((source, _, _) =>
+            {
+                server = source;
+                return Task.CompletedTask;
+            });
+
+            consumer.On<Stopping>((_, stopping, _) =>
+            {
+                stopping.Message = Message.Create("Come back later!");
+                return Task.CompletedTask;
+            });
+        });
 
         registry.For<IClient>(consumer =>
         {
+            consumer.On<ReceivedPacket>((_, received, _) =>
+            {
+                if (received.Packet.Identifier == MessagePacket.Identifier)
+                {
+                    server?.Stop();
+                }
+
+                return Task.CompletedTask;
+            });
+
             consumer.On<Joining>((_, joining, _) =>
             {
                 joining.GameMode = 0;

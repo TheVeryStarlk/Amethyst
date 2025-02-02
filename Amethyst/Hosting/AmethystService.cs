@@ -11,6 +11,7 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
 
         try
         {
+            logger.LogInformation("Starting server");
             await server.StartAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
@@ -20,6 +21,7 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
         finally
         {
             server.Dispose();
+            logger.LogInformation("Server stopped");
         }
     }
 }

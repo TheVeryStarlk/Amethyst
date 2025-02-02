@@ -40,7 +40,7 @@ internal sealed class Server(
             .ConfigureAwait(false);
 
         await using var listener = await listenerFactory.BindAsync(starting.EndPoint, source.Token).ConfigureAwait(false);
-        logger.LogInformation("Started listening");
+        logger.LogInformation("Listening for new clients...");
 
         while (true)
         {
@@ -55,6 +55,7 @@ internal sealed class Server(
                     Random.Shared.Next());
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
+                logger.LogDebug("Started client {Identifier}", client.Identifier);
             }
             catch (OperationCanceledException)
             {
@@ -68,7 +69,7 @@ internal sealed class Server(
         }
 
         await listener.UnbindAsync().ConfigureAwait(false);
-        logger.LogInformation("Stopped listening");
+        logger.LogDebug("Stopped listening");
 
         var stopping = await eventDispatcher
             .DispatchAsync(this, new Stopping(), source.Token)
@@ -90,6 +91,8 @@ internal sealed class Server(
 
             await client.StartAsync().ConfigureAwait(false);
             await client.DisposeAsync().ConfigureAwait(false);
+
+            logger.LogDebug("Stopped client {Identifier}", client.Identifier);
 
             if (!pairs.TryRemove(client.Identifier, out _))
             {
