@@ -21,6 +21,12 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
 
         registry.For<IClient>(consumer =>
         {
+            consumer.On<Joining>((_, joining, _) =>
+            {
+                joining.GameMode = 0;
+                return Task.CompletedTask;
+            });
+
             consumer.On<StatusRequest>((_, request, _) =>
             {
                 var description = Message

@@ -130,12 +130,12 @@ internal sealed class Client(
                     case State.Login:
                         packet.Out(out LoginStartPacket loginStart);
 
-                        await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
+                        var joining = await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
 
                         await WriteAsync(
                             new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
-                            new JoinGamePacket(Identifier, 1, 0, 0, 1, "default", false),
-                            new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
+                            new JoinGamePacket(Identifier, joining.GameMode, 0, 0, joining.MaximumPlayerCount, "default", joining.ReducedDebugInformation),
+                            new PlayerPositionAndLookPacket(joining.X, joining.Y, joining.Z, joining.Yaw, joining.Pitch, false)).ConfigureAwait(false);
 
                         state = State.Play;
 
