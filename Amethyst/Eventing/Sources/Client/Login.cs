@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Abstractions.Eventing.Sources.Client;
+﻿using Amethyst.Abstractions;
+
+namespace Amethyst.Eventing.Sources.Client;
 
 public sealed class Login(string username) : Event<IClient>
 {

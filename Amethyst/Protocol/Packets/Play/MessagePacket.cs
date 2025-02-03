@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Eventing.Sources.Player;
+﻿using Amethyst.Eventing.Sources.Player;
 
 namespace Amethyst.Protocol.Packets.Play;
 

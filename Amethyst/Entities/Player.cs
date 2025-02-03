@@ -1,6 +1,7 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Messages;
+using Amethyst.Components;
+using Amethyst.Components.Messages;
 using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Entities;

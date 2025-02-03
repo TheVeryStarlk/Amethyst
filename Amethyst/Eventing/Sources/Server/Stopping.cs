@@ -1,6 +1,7 @@
-﻿using Amethyst.Abstractions.Messages;
+﻿using Amethyst.Abstractions;
+using Amethyst.Components.Messages;
 
-namespace Amethyst.Abstractions.Eventing.Sources.Server;
+namespace Amethyst.Eventing.Sources.Server;
 
 public sealed class Stopping : Event<IServer>
 {

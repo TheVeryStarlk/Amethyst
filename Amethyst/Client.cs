@@ -1,10 +1,11 @@
 ﻿using Amethyst.Abstractions;
-using Amethyst.Abstractions.Eventing.Sources.Client;
-using Amethyst.Abstractions.Eventing.Sources.Player;
-using Amethyst.Abstractions.Eventing.Sources.Server;
-using Amethyst.Abstractions.Messages;
+using Amethyst.Components;
+using Amethyst.Components.Messages;
 using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Eventing.Sources.Client;
+using Amethyst.Eventing.Sources.Player;
+using Amethyst.Eventing.Sources.Server;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshake;
 using Amethyst.Protocol.Packets.Login;

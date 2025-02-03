@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Messages;
+﻿namespace Amethyst.Components.Messages;
 
 public sealed class Message
 {

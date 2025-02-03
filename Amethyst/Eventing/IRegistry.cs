@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Eventing;
+﻿namespace Amethyst.Eventing;
 
 public interface IRegistry
 {

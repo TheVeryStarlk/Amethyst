@@ -1,10 +1,11 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing;
-using Amethyst.Abstractions.Eventing.Sources.Client;
-using Amethyst.Abstractions.Eventing.Sources.Player;
-using Amethyst.Abstractions.Eventing.Sources.Server;
-using Amethyst.Abstractions.Messages;
+using Amethyst.Components;
+using Amethyst.Components.Messages;
+using Amethyst.Eventing;
+using Amethyst.Eventing.Sources.Client;
+using Amethyst.Eventing.Sources.Player;
+using Amethyst.Eventing.Sources.Server;
 
 namespace Amethyst.Console;
 

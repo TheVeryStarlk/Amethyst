@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Abstractions.Eventing;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;

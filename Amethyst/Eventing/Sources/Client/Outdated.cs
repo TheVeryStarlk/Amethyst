@@ -1,6 +1,7 @@
-﻿using Amethyst.Abstractions.Messages;
+﻿using Amethyst.Abstractions;
+using Amethyst.Components.Messages;
 
-namespace Amethyst.Abstractions.Eventing.Sources.Client;
+namespace Amethyst.Eventing.Sources.Client;
 
 public sealed class Outdated(int version) : Event<IClient>
 {

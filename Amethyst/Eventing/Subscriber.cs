@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Eventing;
-
-namespace Amethyst.Eventing;
+﻿namespace Amethyst.Eventing;
 
 public sealed class Consumer<TSource>(Dictionary<Type, Delegate> events) : IConsumer<TSource>
 {

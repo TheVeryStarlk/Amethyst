@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Messages;
+﻿using Amethyst.Components.Messages;
 
 namespace Amethyst.Abstractions.Entities;
 

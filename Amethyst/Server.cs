@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing.Sources.Server;
 using Amethyst.Eventing;
+using Amethyst.Eventing.Sources.Server;
 using Amethyst.Protocol.Packets.Play;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
