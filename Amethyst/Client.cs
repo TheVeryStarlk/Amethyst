@@ -170,7 +170,7 @@ internal sealed class Client(
     }
 }
 
-public enum State
+internal enum State
 {
     Handshake,
     Status,

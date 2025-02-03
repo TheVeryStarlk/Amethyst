@@ -106,7 +106,8 @@ internal sealed class Server(
         {
             try
             {
-                await Task.Delay(50, source!.Token).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(5), source!.Token).ConfigureAwait(false);
+                await Task.WhenAll(Players.Select(player => player.KeepAliveAsync().AsTask())).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {

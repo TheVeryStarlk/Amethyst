@@ -10,5 +10,7 @@ public interface IPlayer : IEntity
 
     public ValueTask SendAsync(Message message, byte position);
 
+    public ValueTask KeepAliveAsync();
+
     public void Disconnect(Message reason);
 }

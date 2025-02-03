@@ -20,6 +20,11 @@ internal sealed class Player(Server server, Client client, string username) : IP
         return client.WriteAsync(new MessagePacket(message.Serialize(), position));
     }
 
+    public ValueTask KeepAliveAsync()
+    {
+        return client.WriteAsync(new KeepAlivePacket(Random.Shared.Next()));
+    }
+
     public void Disconnect(Message reason)
     {
         client.Stop(reason);
