@@ -23,7 +23,7 @@ public sealed class Message
         // Probably should parse symbols as well.
         return new Message
         {
-            Text = value,
+            Text = value
         };
     }
 
