@@ -17,7 +17,8 @@ namespace Amethyst;
 internal sealed class Client(
     ILogger<Client> logger,
     ConnectionContext connection,
-    EventDispatcher eventDispatcher) : IClient, IAsyncDisposable
+    EventDispatcher eventDispatcher,
+    Server server) : IClient, IAsyncDisposable
 {
     public int Identifier { get; } = Random.Shared.Next();
 
@@ -138,7 +139,7 @@ internal sealed class Client(
         await WriteAsync(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username)).ConfigureAwait(false);
 
         state = State.Play;
-        Player = new Player(this, loginStart.Username);
+        Player = new Player(server, this, loginStart.Username);
 
         await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
 

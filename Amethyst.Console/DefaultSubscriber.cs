@@ -53,9 +53,8 @@ internal sealed class DefaultSubscriber : ISubscriber
         {
             consumer.On<Joined>(async (player, _, _) =>
             {
-                await player.SendAsync("Welcome.", 0);
-                await player.SendAsync("Hey there.", 1);
-                await player.SendAsync("Why hello!", 2);
+                var tasks = player.Server.Players.Select(static player => player.SendAsync("Hey!", 0).AsTask());
+                await Task.WhenAll(tasks);
             });
         });
     }

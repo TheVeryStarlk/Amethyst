@@ -5,8 +5,10 @@ using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(Client client, string username) : IPlayer
+internal sealed class Player(Server server, Client client, string username) : IPlayer
 {
+    public IServer Server => server;
+
     public int Identifier => client.Identifier;
 
     public IClient Client => client;
