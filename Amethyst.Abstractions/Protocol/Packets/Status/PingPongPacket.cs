@@ -1,10 +1,8 @@
 ﻿namespace Amethyst.Abstractions.Protocol.Packets.Status;
 
-public sealed class PingPongPacket : IIngoingPacket<PingPongPacket>, IOutgoingPacket
+public sealed record PingPongPacket(long Magic) : IIngoingPacket<PingPongPacket>, IOutgoingPacket
 {
     public static int Identifier => 1;
-
-    public required long Magic { get; init; }
 
     int IOutgoingPacket.Identifier => Identifier;
 
@@ -12,10 +10,7 @@ public sealed class PingPongPacket : IIngoingPacket<PingPongPacket>, IOutgoingPa
 
     static PingPongPacket IIngoingPacket<PingPongPacket>.Create(SpanReader reader)
     {
-        return new PingPongPacket
-        {
-            Magic = reader.ReadLong()
-        };
+        return new PingPongPacket(reader.ReadLong());
     }
 
     void IOutgoingPacket.Write(ref SpanWriter writer)

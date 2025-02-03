@@ -42,7 +42,7 @@ internal sealed class DefaultSubscriber : ISubscriber
                 return Task.CompletedTask;
             });
 
-            consumer.On<ReceivedPacket>((_, received, _) =>
+            consumer.On<Received>((_, received, _) =>
             {
                 if (received.Packet.Identifier == MessagePacket.Identifier)
                 {

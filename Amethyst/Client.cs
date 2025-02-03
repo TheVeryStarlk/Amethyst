@@ -158,7 +158,7 @@ internal sealed class Client(
 
     private async Task PlayAsync(Packet packet)
     {
-        await eventDispatcher.DispatchAsync(this, new ReceivedPacket(packet), source.Token).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(this, new Received(packet), source.Token).ConfigureAwait(false);
     }
 }
 
