@@ -57,13 +57,20 @@ internal sealed class DefaultSubscriber : ISubscriber
             {
                 foreach (var item in player.Server.Players)
                 {
-                    await item.SendAsync($"{player.Username}: {sent.Message}", MessagePosition.Box);
+                    var message = Message
+                        .Create()
+                        .Write($"{player.Username}: ").Gray()
+                        .Write(sent.Message)
+                        .Build();
+
+                    await item.SendAsync(message, MessagePosition.Box);
                 }
             });
 
             consumer.On<Joined>(async (player, _, _) =>
             {
-                await player.SendAsync("Welcome!", MessagePosition.Box);
+                var message = Message.Create().Write("Welcome!").Yellow().Build();
+                await player.SendAsync(message, MessagePosition.Box);
             });
         });
     }
