@@ -30,7 +30,7 @@ internal sealed class Client(
     private readonly SemaphoreSlim semaphore = new(1);
 
     private State state;
-    private Message message = "No reason specified.";
+    private Message reason = "No reason specified.";
 
     public async Task StartAsync()
     {
@@ -71,8 +71,8 @@ internal sealed class Client(
         if (state is not State.Status)
         {
             IOutgoingPacket final = state is State.Login
-                ? new LoginFailurePacket(message.Serialize())
-                : new DisconnectPacket(message.Serialize());
+                ? new LoginFailurePacket(reason.Serialize())
+                : new DisconnectPacket(reason.Serialize());
 
             // Token is cancelled here so the final packet has to be manually sent out.
             // And wait a single tick to let the client realize the final packet.
@@ -104,9 +104,9 @@ internal sealed class Client(
         }
     }
 
-    public void Stop(Message reason)
+    public void Stop(Message message)
     {
-        message = reason;
+        reason = message;
         source.Cancel();
     }
 
@@ -165,9 +165,13 @@ internal sealed class Client(
             new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
     }
 
-    private Task PlayAsync(Packet packet)
+    private async Task PlayAsync(Packet packet)
     {
-        return Task.CompletedTask;
+        if (packet.Identifier == MessagePacket.Identifier)
+        {
+            packet.Out(out MessagePacket message);
+            await eventDispatcher.DispatchAsync(Player!, new Sent(message.Message), source.Token).ConfigureAwait(false);
+        }
     }
 }
 

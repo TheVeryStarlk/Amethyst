@@ -53,10 +53,17 @@ internal sealed class DefaultSubscriber : ISubscriber
 
         registry.For<IPlayer>(consumer =>
         {
+            consumer.On<Sent>(async (player, sent, _) =>
+            {
+                foreach (var item in player.Server.Players)
+                {
+                    await item.SendAsync($"{player.Username}: {sent.Message}", MessagePosition.Box);
+                }
+            });
+
             consumer.On<Joined>(async (player, _, _) =>
             {
-                var tasks = player.Server.Players.Select(static player => player.SendAsync("Hey!", 0).AsTask());
-                await Task.WhenAll(tasks);
+                await player.SendAsync("Welcome!", MessagePosition.Box);
             });
         });
     }

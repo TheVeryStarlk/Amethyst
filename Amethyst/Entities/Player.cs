@@ -15,9 +15,9 @@ internal sealed class Player(Server server, Client client, string username) : IP
 
     public string Username => username;
 
-    public ValueTask SendAsync(Message message, byte position)
+    public ValueTask SendAsync(Message message, MessagePosition position)
     {
-        return client.WriteAsync(new MessagePacket(message.Serialize(), position));
+        return client.WriteAsync(new MessagePacket(message.Serialize(), (byte) position));
     }
 
     public ValueTask KeepAliveAsync()

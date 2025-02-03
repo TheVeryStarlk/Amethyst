@@ -8,7 +8,7 @@ public interface IPlayer : IEntity
 
     public string Username { get; }
 
-    public ValueTask SendAsync(Message message, byte position);
+    public ValueTask SendAsync(Message message, MessagePosition position);
 
     public ValueTask KeepAliveAsync();
 

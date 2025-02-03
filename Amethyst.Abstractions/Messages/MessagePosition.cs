@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Abstractions.Messages;
 
-public enum ChatMessagePosition
+public enum MessagePosition
 {
     Box,
     System,

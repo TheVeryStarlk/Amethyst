@@ -4,5 +4,5 @@ namespace Amethyst.Abstractions;
 
 public interface IClient
 {
-    public void Stop(Message reason);
+    public void Stop(Message message);
 }
