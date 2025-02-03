@@ -12,8 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Amethyst.Abstractions\Amethyst.Abstractions.csproj" />
-		<ProjectReference Include="..\Amethyst.Components\Amethyst.Abstractions.csproj"/>
+		<ProjectReference Include="..\Amethyst.Abstractions\Amethyst.Abstractions.csproj"/>
 	</ItemGroup>
 
 </Project>
