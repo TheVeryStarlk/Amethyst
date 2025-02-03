@@ -1,6 +1,8 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Eventing.Sources.Client;
+using Amethyst.Abstractions.Eventing.Sources.Player;
 using Amethyst.Abstractions.Messages;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshake;
@@ -18,6 +20,8 @@ internal sealed class Client(
     EventDispatcher eventDispatcher) : IClient, IAsyncDisposable
 {
     public int Identifier { get; } = Random.Shared.Next();
+
+    public Player? Player { get; private set; }
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
@@ -130,14 +134,17 @@ internal sealed class Client(
     {
         packet.Out(out LoginStartPacket loginStart);
 
-        var joining = await eventDispatcher.DispatchAsync(this, new Joining(loginStart.Username), source.Token).ConfigureAwait(false);
-
-        await WriteAsync(
-            new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
-            new JoinGamePacket(Identifier, joining.GameMode, 0, 0, joining.MaximumPlayerCount, "default", joining.ReducedDebugInformation),
-            new PlayerPositionAndLookPacket(joining.X, joining.Y, joining.Z, joining.Yaw, joining.Pitch, false)).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(this, new Login(loginStart.Username), source.Token).ConfigureAwait(false);
+        await WriteAsync(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username)).ConfigureAwait(false);
 
         state = State.Play;
+        Player = new Player(this, loginStart.Username);
+
+        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
+
+        await WriteAsync(
+            new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
+            new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
     }
 
     private async Task StatusAsync(Packet packet)

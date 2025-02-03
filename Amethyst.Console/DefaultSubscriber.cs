@@ -1,6 +1,8 @@
 ﻿using Amethyst.Abstractions;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Sources.Client;
+using Amethyst.Abstractions.Eventing.Sources.Player;
 using Amethyst.Abstractions.Eventing.Sources.Server;
 using Amethyst.Abstractions.Messages;
 
@@ -8,18 +10,10 @@ namespace Amethyst.Console;
 
 internal sealed class DefaultSubscriber : ISubscriber
 {
-    private IServer? server;
-
     public void Subscribe(IRegistry registry)
     {
         registry.For<IServer>(consumer =>
         {
-            consumer.On<Starting>((source, _, _) =>
-            {
-                server = source;
-                return Task.CompletedTask;
-            });
-
             consumer.On<Stopping>((_, stopping, _) =>
             {
                 stopping.Message = Message.Create("Come back later!");
@@ -41,13 +35,7 @@ internal sealed class DefaultSubscriber : ISubscriber
                 return Task.CompletedTask;
             });
 
-            consumer.On<Joining>((_, joining, _) =>
-            {
-                joining.GameMode = 0;
-                return Task.CompletedTask;
-            });
-
-            consumer.On<StatusRequest>((client, request, _) =>
+            consumer.On<StatusRequest>((_, request, _) =>
             {
                 var description = Message
                     .Create()
@@ -58,6 +46,16 @@ internal sealed class DefaultSubscriber : ISubscriber
 
                 request.Status = Status.Create("Amethyst", 47, 1, 0, description, string.Empty);
                 return Task.CompletedTask;
+            });
+        });
+
+        registry.For<IPlayer>(consumer =>
+        {
+            consumer.On<Joined>(async (player, _, _) =>
+            {
+                await player.SendAsync("Welcome.", 0);
+                await player.SendAsync("Hey there.", 1);
+                await player.SendAsync("Why hello!", 2);
             });
         });
     }
