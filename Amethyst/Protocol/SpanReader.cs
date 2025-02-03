@@ -1,7 +1,7 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
 
-namespace Amethyst.Abstractions.Protocol;
+namespace Amethyst.Protocol;
 
 internal ref struct SpanReader(ReadOnlySpan<byte> span)
 {

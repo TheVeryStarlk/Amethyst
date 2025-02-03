@@ -1,6 +1,6 @@
-﻿namespace Amethyst.Abstractions.Protocol.Packets.Handshake;
+﻿namespace Amethyst.Protocol.Packets.Handshake;
 
-public sealed record HandshakePacket(
+internal sealed record HandshakePacket(
     int Version,
     string Address,
     ushort Port,
@@ -8,7 +8,7 @@ public sealed record HandshakePacket(
 {
     public static int Identifier => 0;
 
-    static HandshakePacket IIngoingPacket<HandshakePacket>.Create(SpanReader reader)
+    public static HandshakePacket Create(SpanReader reader)
     {
         return new HandshakePacket(
             reader.ReadVariableInteger(),

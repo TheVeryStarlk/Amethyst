@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Text;
 
-namespace Amethyst.Abstractions.Protocol;
+namespace Amethyst.Protocol;
 
 internal static class Variable
 {

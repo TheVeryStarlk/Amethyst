@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace Amethyst.Abstractions.Protocol;
+namespace Amethyst.Protocol;
 
 internal static class SequenceReaderExtensions
 {

@@ -3,7 +3,6 @@ using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Sources.Client;
 using Amethyst.Abstractions.Eventing.Sources.Server;
 using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Protocol.Packets.Play;
 
 namespace Amethyst.Console;
 
@@ -42,23 +41,13 @@ internal sealed class DefaultSubscriber : ISubscriber
                 return Task.CompletedTask;
             });
 
-            consumer.On<Received>((_, received, _) =>
-            {
-                if (received.Packet.Identifier == MessagePacket.Identifier)
-                {
-                    server?.Stop();
-                }
-
-                return Task.CompletedTask;
-            });
-
             consumer.On<Joining>((_, joining, _) =>
             {
                 joining.GameMode = 0;
                 return Task.CompletedTask;
             });
 
-            consumer.On<StatusRequest>((_, request, _) =>
+            consumer.On<StatusRequest>((client, request, _) =>
             {
                 var description = Message
                     .Create()

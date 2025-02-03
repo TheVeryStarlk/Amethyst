@@ -1,9 +1,9 @@
 ﻿using System.Buffers;
 using System.IO.Pipelines;
 
-namespace Amethyst.Abstractions.Protocol;
+namespace Amethyst.Protocol;
 
-public sealed class ProtocolReader(PipeReader input)
+internal class ProtocolReader(PipeReader input)
 {
     private SequencePosition consumed;
     private SequencePosition examined;
