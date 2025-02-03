@@ -4,26 +4,37 @@
 
 # Amethyst
 
-A low-level implementation of the Minecraft Java edition server protocol.\
+A light-weight implementation of the Minecraft Java edition server protocol.
 Amethyst is customizable and sacrifices many of the vanilla mechanics in favor of performance and memory usage.
 
 ## Structure
 
-Amethyst by nature has very little built-in logic, the way you implement logic to Amethyst is by subscribing to events.\
-Each part of Amethyst has a collection of events that you can subscribe to.
+Amethyst by nature has very little built-in logic, the way you implement logic to Amethyst is by subscribing to events.
 
-* Amethyst
-    * The main project, where the actual implementation of the server and related parts resides.
-    * Contains important components like worlds, event dispatching and the server itself.
-* Amethyst.Components (Might rename to Amethyst.Abstraction)
-    * Contains small, commonly used components such as the chat messages and server status POCOs.
-* Amethyst.Protocol
-    * The implementation of the protocol and all packets reside in that project.
-    * This might get merged into Amethyst.Components.
-* Amethyst.Console
-    * An example console project of Amethyst's API.
+```csharp
+registry.For<IPlayer>(consumer =>
+{
+    consumer.On<Joined>(async (player, _, _) =>
+    {
+        var message = Message.Create().Write("Welcome!").Yellow().Build();
+        await player.SendAsync(message, MessagePosition.Box);
+    });
+});
+```
 
-This is all subject to change as Amethyst develops, expect big rewrites and refactors.
+The Amethyst.Console projects serves as an extensive example of usage of the event API.\
+Be careful that everything is currently subject to change as Amethyst develops.
+
+## Roadmap
+
+This is not by any means a complete roadmap. There's still a lot to do.
+
+* Server list ping protocol
+    * Implement legacy ping packets.
+* Networking
+    * Implement encryption and compression.
+* Worlds
+    * Design an API for creating, saving and modifying worlds.
 
 ## Credits
 
