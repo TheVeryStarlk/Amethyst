@@ -21,6 +21,10 @@ internal sealed class Client(
     EventDispatcher eventDispatcher,
     Server server) : IClient, IAsyncDisposable
 {
+    public EventDispatcher EventDispatcher => eventDispatcher;
+
+    public CancellationToken CancellationToken => source.Token;
+
     public int Identifier { get; } = Random.Shared.Next();
 
     public Player? Player { get; private set; }
@@ -119,7 +123,7 @@ internal sealed class Client(
 
     private async Task HandshakeAsync(Packet packet)
     {
-        packet.Out(out HandshakePacket handshake);
+        var handshake = packet.Create<HandshakePacket>();
 
         state = (State) handshake.State;
 
@@ -136,21 +140,18 @@ internal sealed class Client(
     {
         if (packet.Identifier == StatusRequestPacket.Identifier)
         {
-            packet.Out(out StatusRequestPacket _);
-
             var request = await eventDispatcher.DispatchAsync(server, new StatusRequest(), source.Token).ConfigureAwait(false);
             await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
 
             return;
         }
 
-        packet.Out(out PingPongPacket pingPong);
-        await WriteAsync(pingPong).ConfigureAwait(false);
+        await WriteAsync(packet.Create<PingPongPacket>()).ConfigureAwait(false);
     }
 
     private async Task LoginAsync(Packet packet)
     {
-        packet.Out(out LoginStartPacket loginStart);
+        var loginStart = packet.Create<LoginStartPacket>();
 
         await eventDispatcher.DispatchAsync(this, new Login(loginStart.Username), source.Token).ConfigureAwait(false);
         await WriteAsync(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username)).ConfigureAwait(false);
@@ -167,11 +168,13 @@ internal sealed class Client(
 
     private async Task PlayAsync(Packet packet)
     {
-        if (packet.Identifier == MessagePacket.Identifier)
+        Func<Client,ValueTask> task = packet.Identifier switch
         {
-            packet.Out(out MessagePacket message);
-            await eventDispatcher.DispatchAsync(Player!, new Sent(message.Message), source.Token).ConfigureAwait(false);
-        }
+            1 => packet.Create<MessagePacket>().Handle,
+            _ => static _ => ValueTask.CompletedTask
+        };
+
+        await task(this).ConfigureAwait(false);
     }
 }
 

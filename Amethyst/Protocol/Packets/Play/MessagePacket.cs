@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Eventing.Sources.Player;
+
+namespace Amethyst.Protocol.Packets.Play;
 
 internal sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
 {
@@ -17,5 +19,10 @@ internal sealed record MessagePacket(string Message, byte Position) : IIngoingPa
     {
         writer.WriteVariableString(Message);
         writer.WriteByte(Position);
+    }
+
+    public async ValueTask Handle(Client client)
+    {
+        await client.EventDispatcher.DispatchAsync(client.Player!, new Sent(Message), client.CancellationToken).ConfigureAwait(false);
     }
 }

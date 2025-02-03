@@ -3,6 +3,7 @@ using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing.Sources.Server;
 using Amethyst.Eventing;
+using Amethyst.Protocol.Packets.Play;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -107,7 +108,13 @@ internal sealed class Server(
             try
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), source!.Token).ConfigureAwait(false);
-                await Task.WhenAll(Players.Select(player => player.KeepAliveAsync().AsTask())).ConfigureAwait(false);
+
+                var keepAlive = new KeepAlivePacket(Random.Shared.Next());
+
+                foreach (var player in Players)
+                {
+                    await player.Client.WriteAsync(keepAlive).ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException)
             {

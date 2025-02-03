@@ -69,7 +69,7 @@ internal sealed class DefaultSubscriber : ISubscriber
 
             consumer.On<Joined>(async (player, _, _) =>
             {
-                var message = Message.Create().Write("Welcome!").Yellow().Build();
+                var message = Message.Create("Welcome!", color: Color.Yellow);
                 await player.SendAsync(message, MessagePosition.Box);
             });
         });

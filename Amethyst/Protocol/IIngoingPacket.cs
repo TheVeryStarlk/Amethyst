@@ -7,13 +7,18 @@ internal interface IIngoingPacket<out T> where T : IIngoingPacket<T>
     public static abstract int Identifier { get; }
 
     public static abstract T Create(SpanReader reader);
+
+    public ValueTask Handle(Client client)
+    {
+        return ValueTask.CompletedTask;
+    }
 }
 
 internal readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
 {
     public int Identifier => identifier;
 
-    public void Out<T>(out T packet) where T : IIngoingPacket<T>
+    public T Create<T>() where T : IIngoingPacket<T>
     {
         if (T.Identifier != identifier)
         {
@@ -21,6 +26,6 @@ internal readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
         }
 
         var reader = new SpanReader(sequence.IsSingleSegment ? sequence.FirstSpan : sequence.ToArray());
-        packet = T.Create(reader);
+        return T.Create(reader);
     }
 }
