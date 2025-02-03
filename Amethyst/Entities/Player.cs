@@ -25,8 +25,8 @@ internal sealed class Player(Server server, Client client, string username) : IP
         return client.WriteAsync(new KeepAlivePacket(Random.Shared.Next()));
     }
 
-    public void Disconnect(Message reason)
+    public void Disconnect(Message message)
     {
-        client.Stop(reason);
+        client.Stop(message);
     }
 }
