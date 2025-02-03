@@ -1,12 +1,12 @@
-﻿using Amethyst.Components;
-using Amethyst.Components.Eventing.Sources.Client;
-using Amethyst.Components.Messages;
+﻿using Amethyst.Abstractions;
+using Amethyst.Abstractions.Eventing.Sources.Client;
+using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Protocol;
+using Amethyst.Abstractions.Protocol.Packets.Handshake;
+using Amethyst.Abstractions.Protocol.Packets.Login;
+using Amethyst.Abstractions.Protocol.Packets.Play;
+using Amethyst.Abstractions.Protocol.Packets.Status;
 using Amethyst.Eventing;
-using Amethyst.Protocol;
-using Amethyst.Protocol.Packets.Handshake;
-using Amethyst.Protocol.Packets.Login;
-using Amethyst.Protocol.Packets.Play;
-using Amethyst.Protocol.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 

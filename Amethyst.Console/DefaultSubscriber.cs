@@ -1,9 +1,9 @@
-﻿using Amethyst.Components;
-using Amethyst.Components.Eventing;
-using Amethyst.Components.Eventing.Sources.Client;
-using Amethyst.Components.Eventing.Sources.Server;
-using Amethyst.Components.Messages;
-using Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions;
+using Amethyst.Abstractions.Eventing;
+using Amethyst.Abstractions.Eventing.Sources.Client;
+using Amethyst.Abstractions.Eventing.Sources.Server;
+using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Protocol.Packets.Play;
 
 namespace Amethyst.Console;
 

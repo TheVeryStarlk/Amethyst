@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using Amethyst.Components;
-using Amethyst.Components.Eventing.Sources.Server;
+using Amethyst.Abstractions;
+using Amethyst.Abstractions.Eventing.Sources.Server;
 using Amethyst.Eventing;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -35,11 +35,9 @@ internal sealed class Server(
 
     private async Task ListeningAsync()
     {
-        var starting = await eventDispatcher
-            .DispatchAsync(this, new Starting(), source!.Token)
-            .ConfigureAwait(false);
-
+        var starting = await eventDispatcher.DispatchAsync(this, new Starting(), source!.Token).ConfigureAwait(false);
         await using var listener = await listenerFactory.BindAsync(starting.EndPoint, source.Token).ConfigureAwait(false);
+
         logger.LogInformation("Listening for new clients...");
 
         while (true)
@@ -70,9 +68,7 @@ internal sealed class Server(
         await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogDebug("Stopped listening");
 
-        var stopping = await eventDispatcher
-            .DispatchAsync(this, new Stopping(), source.Token)
-            .ConfigureAwait(false);
+        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token).ConfigureAwait(false);
 
         foreach (var pair in pairs.Values)
         {

@@ -1,4 +1,4 @@
-﻿using Amethyst.Components.Eventing;
+﻿using Amethyst.Abstractions.Eventing;
 
 namespace Amethyst.Eventing;
 

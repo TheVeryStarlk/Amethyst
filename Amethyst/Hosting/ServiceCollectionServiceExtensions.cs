@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Amethyst.Components.Eventing;
+using Amethyst.Abstractions.Eventing;
 using Amethyst.Eventing;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
