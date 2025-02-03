@@ -7,11 +7,6 @@ internal interface IIngoingPacket<out T> where T : IIngoingPacket<T>
     public static abstract int Identifier { get; }
 
     public static abstract T Create(SpanReader reader);
-
-    public ValueTask Handle(Client client)
-    {
-        return ValueTask.CompletedTask;
-    }
 }
 
 internal readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)

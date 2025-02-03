@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
+internal sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket, IHandler
 {
     public static int Identifier => 1;
 
@@ -21,7 +21,7 @@ internal sealed record MessagePacket(string Message, byte Position) : IIngoingPa
         writer.WriteByte(Position);
     }
 
-    public async ValueTask Handle(Client client)
+    public async Task HandleAsync(Client client)
     {
         await client.EventDispatcher.DispatchAsync(client.Player!, new Sent(Message), client.CancellationToken).ConfigureAwait(false);
     }
