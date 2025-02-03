@@ -1,6 +1,7 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Eventing.Sources.Client;
 using Amethyst.Abstractions.Eventing.Sources.Player;
+using Amethyst.Abstractions.Eventing.Sources.Server;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Entities;
 using Amethyst.Eventing;
@@ -131,6 +132,22 @@ internal sealed class Client(
         Stop(outdated.Message);
     }
 
+    private async Task StatusAsync(Packet packet)
+    {
+        if (packet.Identifier == StatusRequestPacket.Identifier)
+        {
+            packet.Out(out StatusRequestPacket _);
+
+            var request = await eventDispatcher.DispatchAsync(server, new StatusRequest(), source.Token).ConfigureAwait(false);
+            await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
+
+            return;
+        }
+
+        packet.Out(out PingPongPacket pingPong);
+        await WriteAsync(pingPong).ConfigureAwait(false);
+    }
+
     private async Task LoginAsync(Packet packet)
     {
         packet.Out(out LoginStartPacket loginStart);
@@ -146,22 +163,6 @@ internal sealed class Client(
         await WriteAsync(
             new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
             new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
-    }
-
-    private async Task StatusAsync(Packet packet)
-    {
-        if (packet.Identifier == StatusRequestPacket.Identifier)
-        {
-            packet.Out(out StatusRequestPacket _);
-
-            var request = await eventDispatcher.DispatchAsync(this, new StatusRequest(), source.Token).ConfigureAwait(false);
-            await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
-
-            return;
-        }
-
-        packet.Out(out PingPongPacket pingPong);
-        await WriteAsync(pingPong).ConfigureAwait(false);
     }
 
     private Task PlayAsync(Packet packet)

@@ -5,7 +5,7 @@ internal sealed record JoinGamePacket(
     byte GameMode,
     sbyte Dimension,
     byte Difficulty,
-    byte MaximumPlayerCount,
+    byte Players,
     string LevelType,
     bool ReducedDebugInformation) : IOutgoingPacket
 {
@@ -25,7 +25,7 @@ internal sealed record JoinGamePacket(
         writer.WriteByte(GameMode);
         writer.WriteByte((byte) Dimension);
         writer.WriteByte(Difficulty);
-        writer.WriteByte(MaximumPlayerCount);
+        writer.WriteByte(Players);
         writer.WriteVariableString(LevelType);
         writer.WriteBoolean(ReducedDebugInformation);
     }

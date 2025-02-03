@@ -19,6 +19,21 @@ internal sealed class DefaultSubscriber : ISubscriber
                 stopping.Message = Message.Create("Come back later!");
                 return Task.CompletedTask;
             });
+
+            consumer.On<StatusRequest>((server, request, _) =>
+            {
+                var description = Message
+                    .Create()
+                    .WriteLine("Hello, world!").Bold()
+                    .Write("Powered by ").Gray()
+                    .Write("Amethyst").LightPurple()
+                    .Build();
+
+                var players = server.Players.Count();
+                request.Status = Status.Create("Amethyst", 47, players + 1, players, description, string.Empty);
+
+                return Task.CompletedTask;
+            });
         });
 
         registry.For<IClient>(consumer =>
@@ -32,19 +47,6 @@ internal sealed class DefaultSubscriber : ISubscriber
                     .Build();
 
                 outdated.Message = message;
-                return Task.CompletedTask;
-            });
-
-            consumer.On<StatusRequest>((_, request, _) =>
-            {
-                var description = Message
-                    .Create()
-                    .WriteLine("Hello, world!").Bold()
-                    .Write("Powered by ").Gray()
-                    .Write("Amethyst").LightPurple()
-                    .Build();
-
-                request.Status = Status.Create("Amethyst", 47, 1, 0, description, string.Empty);
                 return Task.CompletedTask;
             });
         });
