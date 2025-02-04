@@ -12,14 +12,11 @@ Amethyst is customizable and sacrifices many of the vanilla mechanics in favor o
 Amethyst by nature has very little built-in logic, the way you implement logic is by subscribing to events.
 
 ```csharp
-registry.For<IPlayer>(consumer =>
+registry.For<Player>(consumer => consumer.On<Joined>(async (player, _, _) =>
 {
-    consumer.On<Joined>(async (player, _, _) =>
-    {
-        var message = Message.Create("Welcome!", color: Color.Yellow);
-        await player.SendAsync(message, MessagePosition.Box);
-    });
-});
+    var message = Message.Create("Welcome!", color: Color.Yellow);
+    await player.SendAsync(message, MessagePosition.Box);
+}));
 ```
 
 ## Credits
