@@ -22,10 +22,6 @@ internal sealed class Client(
     EventDispatcher eventDispatcher,
     Server server) : IClient, IAsyncDisposable
 {
-    public EventDispatcher EventDispatcher => eventDispatcher;
-
-    public CancellationToken CancellationToken => source.Token;
-
     public int Identifier { get; } = Random.Shared.Next();
 
     public Player? Player { get; private set; }
@@ -45,7 +41,7 @@ internal sealed class Client(
         {
             try
             {
-                var packet = await reader.ReadAsync(CancellationToken).ConfigureAwait(false);
+                var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
 
                 Func<Packet, Task> task = state switch
                 {
@@ -90,13 +86,13 @@ internal sealed class Client(
 
     public async ValueTask WriteAsync(params IOutgoingPacket[] packets)
     {
-        await semaphore.WaitAsync(CancellationToken).ConfigureAwait(false);
+        await semaphore.WaitAsync(source.Token).ConfigureAwait(false);
 
         try
         {
             foreach (var packet in packets)
             {
-                await writer.WriteAsync(packet, CancellationToken).ConfigureAwait(false);
+                await writer.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
         }
         catch (Exception exception)
@@ -133,7 +129,7 @@ internal sealed class Client(
             return;
         }
 
-        var outdated = await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), CancellationToken).ConfigureAwait(false);
+        var outdated = await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), source.Token).ConfigureAwait(false);
         Stop(outdated.Message);
     }
 
@@ -141,7 +137,7 @@ internal sealed class Client(
     {
         if (packet.Identifier == StatusRequestPacket.Identifier)
         {
-            var request = await eventDispatcher.DispatchAsync(server, new StatusRequest(), CancellationToken).ConfigureAwait(false);
+            var request = await eventDispatcher.DispatchAsync(server, new StatusRequest(), source.Token).ConfigureAwait(false);
             await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
 
             return;
@@ -154,28 +150,22 @@ internal sealed class Client(
     {
         var loginStart = packet.Create<LoginStartPacket>();
 
-        await eventDispatcher.DispatchAsync(this, new Login(loginStart.Username), CancellationToken).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(this, new Login(loginStart.Username), source.Token).ConfigureAwait(false);
         await WriteAsync(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username)).ConfigureAwait(false);
 
         state = State.Play;
         Player = new Player(server, this, loginStart.Username);
 
-        await eventDispatcher.DispatchAsync(Player, new Joined(), CancellationToken).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
 
         await WriteAsync(
             new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
             new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
     }
 
-    private async Task PlayAsync(Packet packet)
+    private Task PlayAsync(Packet packet)
     {
-        Func<Client, Task> task = packet.Identifier switch
-        {
-            1 => packet.Create<MessagePacket>().HandleAsync,
-            _ => _ => Task.CompletedTask
-        };
-
-        await task(this).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 }
 

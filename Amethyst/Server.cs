@@ -1,9 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Amethyst.Abstractions;
-using Amethyst.Abstractions.Entities;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Sources.Server;
-using Amethyst.Protocol.Packets.Play;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -14,8 +12,6 @@ internal sealed class Server(
     IConnectionListenerFactory listenerFactory,
     EventDispatcher eventDispatcher) : IServer, IDisposable
 {
-    public IEnumerable<IPlayer> Players => pairs.Values.Select(pair => pair.Client.Player).OfType<IPlayer>();
-
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
 
@@ -108,13 +104,6 @@ internal sealed class Server(
             try
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), source!.Token).ConfigureAwait(false);
-
-                var keepAlive = new KeepAlivePacket(Random.Shared.Next());
-
-                foreach (var player in Players)
-                {
-                    await player.Client.WriteAsync(keepAlive).ConfigureAwait(false);
-                }
             }
             catch (OperationCanceledException)
             {

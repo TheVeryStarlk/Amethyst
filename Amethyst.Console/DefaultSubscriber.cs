@@ -21,7 +21,7 @@ internal sealed class DefaultSubscriber : ISubscriber
                 return Task.CompletedTask;
             });
 
-            consumer.On<StatusRequest>((server, request, _) =>
+            consumer.On<StatusRequest>((_, request, _) =>
             {
                 var description = Message
                     .Create()
@@ -30,9 +30,7 @@ internal sealed class DefaultSubscriber : ISubscriber
                     .Write("Amethyst").LightPurple()
                     .Build();
 
-                var players = server.Players.Count();
-                request.Status = Status.Create("Amethyst", 47, players + 1, players, description, string.Empty);
-
+                request.Status = Status.Create("Amethyst", 47, 0, 0, description, string.Empty);
                 return Task.CompletedTask;
             });
         });
@@ -54,20 +52,6 @@ internal sealed class DefaultSubscriber : ISubscriber
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Sent>(async (player, sent, _) =>
-            {
-                foreach (var item in player.Server.Players)
-                {
-                    var message = Message
-                        .Create()
-                        .Write($"{player.Username}: ").Gray()
-                        .Write(sent.Message)
-                        .Build();
-
-                    await item.SendAsync(message, MessagePosition.Box);
-                }
-            });
-
             consumer.On<Joined>(async (player, _, _) =>
             {
                 var message = Message.Create("Welcome!", color: Color.Yellow);
