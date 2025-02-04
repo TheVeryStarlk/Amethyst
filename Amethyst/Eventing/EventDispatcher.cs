@@ -3,20 +3,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
+public sealed class EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
 {
     private readonly FrozenDictionary<Type, Delegate> events = Registry.Create(subscriber);
 
-    public async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
+    internal async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
     {
-        if (!events.TryGetValue(typeof(TEvent), out var value) || value is not TaskDelegate<TSource, TEvent> callback)
+        if (!events.TryGetValue(typeof(TEvent), out var value))
         {
             return original;
         }
 
         try
         {
+            var callback = (TaskDelegate<TSource, TEvent>) value;
             await callback(source, original, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Nothing.
         }
         catch (Exception exception)
         {

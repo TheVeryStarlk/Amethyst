@@ -1,10 +1,10 @@
 ﻿namespace Amethyst.Protocol.Packets.Status;
 
-internal sealed record StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
+public sealed record StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {
     public static int Identifier => 0;
 
-    public static StatusRequestPacket Create(SpanReader reader)
+    static StatusRequestPacket IIngoingPacket<StatusRequestPacket>.Create(SpanReader reader)
     {
         return new StatusRequestPacket();
     }

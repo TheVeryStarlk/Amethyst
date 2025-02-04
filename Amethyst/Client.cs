@@ -1,11 +1,10 @@
-﻿using Amethyst.Abstractions;
-using Amethyst.Components;
+﻿using Amethyst.Components;
 using Amethyst.Components.Messages;
 using Amethyst.Entities;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Sources.Client;
-using Amethyst.Eventing.Sources.Player;
-using Amethyst.Eventing.Sources.Server;
+using Amethyst.Eventing.Sources.Clients;
+using Amethyst.Eventing.Sources.Players;
+using Amethyst.Eventing.Sources.Servers;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshake;
 using Amethyst.Protocol.Packets.Login;
@@ -16,15 +15,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(
+public sealed class Client(
     ILogger<Client> logger,
     ConnectionContext connection,
     EventDispatcher eventDispatcher,
-    Server server) : IClient, IAsyncDisposable
+    Server server) : IAsyncDisposable
 {
     public int Identifier { get; } = Random.Shared.Next();
 
-    public Player? Player { get; private set; }
+    private Player? player;
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
@@ -33,7 +32,7 @@ internal sealed class Client(
     private State state;
     private Message reason = "No reason specified.";
 
-    public async Task StartAsync()
+    internal async Task StartAsync()
     {
         var reader = new ProtocolReader(connection.Transport.Input);
 
@@ -95,6 +94,10 @@ internal sealed class Client(
                 await writer.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Nothing.
+        }
         catch (Exception exception)
         {
             logger.LogError(exception, "Unexpected exception while writing to client");
@@ -154,18 +157,18 @@ internal sealed class Client(
         await WriteAsync(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username)).ConfigureAwait(false);
 
         state = State.Play;
-        Player = new Player(server, this, loginStart.Username);
+        player = new Player(server, this, loginStart.Username);
 
-        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(player, new Joined(), source.Token).ConfigureAwait(false);
 
         await WriteAsync(
             new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
             new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
     }
 
-    private Task PlayAsync(Packet packet)
+    private async Task PlayAsync(Packet packet)
     {
-        return Task.CompletedTask;
+        await eventDispatcher.DispatchAsync(this, new Received(packet), source.Token).ConfigureAwait(false);
     }
 }
 

@@ -1,23 +1,22 @@
 ﻿using System.Collections.Concurrent;
-using Amethyst.Abstractions;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Sources.Server;
+using Amethyst.Eventing.Sources.Servers;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(
+public sealed class Server(
     ILoggerFactory loggerFactory,
     IConnectionListenerFactory listenerFactory,
-    EventDispatcher eventDispatcher) : IServer, IDisposable
+    EventDispatcher eventDispatcher) : IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
 
     private CancellationTokenSource? source;
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    internal Task StartAsync(CancellationToken cancellationToken)
     {
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         return Task.WhenAll(ListeningAsync(), TickingAsync());

@@ -1,11 +1,11 @@
-﻿using Amethyst.Abstractions;
-using Amethyst.Abstractions.Entities;
-using Amethyst.Components;
+﻿using Amethyst.Components;
 using Amethyst.Components.Messages;
+using Amethyst.Entities;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Sources.Client;
-using Amethyst.Eventing.Sources.Player;
-using Amethyst.Eventing.Sources.Server;
+using Amethyst.Eventing.Sources.Clients;
+using Amethyst.Eventing.Sources.Players;
+using Amethyst.Eventing.Sources.Servers;
+using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Console;
 
@@ -13,7 +13,7 @@ internal sealed class DefaultSubscriber : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
-        registry.For<IServer>(consumer =>
+        registry.For<Server>(consumer =>
         {
             consumer.On<Stopping>((_, stopping, _) =>
             {
@@ -35,7 +35,7 @@ internal sealed class DefaultSubscriber : ISubscriber
             });
         });
 
-        registry.For<IClient>(consumer =>
+        registry.For<Client>(consumer =>
         {
             consumer.On<Outdated>((_, outdated, _) =>
             {
@@ -50,10 +50,11 @@ internal sealed class DefaultSubscriber : ISubscriber
             });
         });
 
-        registry.For<IPlayer>(consumer =>
+        registry.For<Player>(consumer =>
         {
             consumer.On<Joined>(async (player, _, _) =>
             {
+                await player.Client.WriteAsync(new DisconnectPacket("aaa"));
                 var message = Message.Create("Welcome!", color: Color.Yellow);
                 await player.SendAsync(message, MessagePosition.Box);
             });

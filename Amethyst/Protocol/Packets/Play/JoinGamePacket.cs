@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record JoinGamePacket(
+public sealed record JoinGamePacket(
     int Entity,
     byte GameMode,
     sbyte Dimension,
@@ -19,7 +19,7 @@ internal sealed record JoinGamePacket(
                          + Variable.GetByteCount(LevelType)
                          + sizeof(bool);
 
-    public void Write(ref SpanWriter writer)
+    void IOutgoingPacket.Write(ref SpanWriter writer)
     {
         writer.WriteInteger(Entity);
         writer.WriteByte(GameMode);

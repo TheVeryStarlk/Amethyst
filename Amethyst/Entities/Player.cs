@@ -1,18 +1,16 @@
-﻿using Amethyst.Abstractions;
-using Amethyst.Abstractions.Entities;
-using Amethyst.Components;
+﻿using Amethyst.Components;
 using Amethyst.Components.Messages;
 using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(Server server, Client client, string username) : IPlayer
+public sealed class Player(Server server, Client client, string username)
 {
-    public IServer Server => server;
+    public Server Server => server;
 
     public int Identifier => client.Identifier;
 
-    public IClient Client => client;
+    public Client Client => client;
 
     public string Username => username;
 

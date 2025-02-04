@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record PlayerPositionAndLookPacket(
+public sealed record PlayerPositionAndLookPacket(
     double X,
     double Y,
     double Z,
@@ -17,7 +17,7 @@ internal sealed record PlayerPositionAndLookPacket(
                          + sizeof(float)
                          + sizeof(bool);
 
-    public void Write(ref SpanWriter writer)
+    void IOutgoingPacket.Write(ref SpanWriter writer)
     {
         writer.WriteDouble(X);
         writer.WriteDouble(Y);

@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
+public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
 {
     public static int Identifier => 1;
 
@@ -8,12 +8,12 @@ internal sealed record MessagePacket(string Message, byte Position) : IIngoingPa
 
     public int Length => Variable.GetByteCount(Message) + sizeof(byte);
 
-    public static MessagePacket Create(SpanReader reader)
+    static MessagePacket IIngoingPacket<MessagePacket>.Create(SpanReader reader)
     {
         return new MessagePacket(reader.ReadVariableString(), 0);
     }
 
-    public void Write(ref SpanWriter writer)
+    void IOutgoingPacket.Write(ref SpanWriter writer)
     {
         writer.WriteVariableString(Message);
         writer.WriteByte(Position);
