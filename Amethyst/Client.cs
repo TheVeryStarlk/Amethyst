@@ -78,6 +78,11 @@ public sealed class Client(
             // And wait a single tick to let the client realize the final packet.
             await writer.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
             await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
+
+            if (state is State.Play)
+            {
+                await eventDispatcher.DispatchAsync(player!, new Left(), CancellationToken.None).ConfigureAwait(false);
+            }
         }
 
         connection.Abort();
@@ -168,7 +173,7 @@ public sealed class Client(
 
     private async Task PlayAsync(Packet packet)
     {
-        await eventDispatcher.DispatchAsync(this, new Received(packet), source.Token).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(player!, new Received(packet), source.Token).ConfigureAwait(false);
     }
 }
 
