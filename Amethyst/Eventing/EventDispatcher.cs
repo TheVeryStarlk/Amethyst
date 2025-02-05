@@ -1,23 +1,40 @@
 ﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-public sealed class EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
+public sealed class EventDispatcher
 {
-    private readonly FrozenDictionary<Type, Delegate> events = Registry.Create(subscriber);
+    private readonly ILogger<EventDispatcher> logger;
+    private readonly FrozenDictionary<Type, ImmutableArray<Delegate>> events;
+
+    public EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
+    {
+        this.logger = logger;
+
+        var registry = new Registry();
+
+        // Register the internal subscriber first so that callbacks get to run before other subscribers.
+        InternalSubscriber.Register(registry);
+        subscriber.Subscribe(registry);
+
+        events = registry.Build();
+    }
 
     internal async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
     {
-        if (!events.TryGetValue(typeof(TEvent), out var value))
+        if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
             return original;
         }
 
         try
         {
-            var callback = (TaskDelegate<TSource, TEvent>) value;
-            await callback(source, original, cancellationToken).ConfigureAwait(false);
+            foreach (var task in callbacks.Cast<TaskDelegate<TSource, TEvent>>())
+            {
+                await task(source, original, cancellationToken).ConfigureAwait(false);
+            }
         }
         catch (OperationCanceledException)
         {

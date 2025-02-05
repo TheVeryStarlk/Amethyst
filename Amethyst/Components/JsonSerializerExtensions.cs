@@ -18,10 +18,7 @@ public static class JsonSerializerExtensions
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             TypeInfoResolver = AmethystJsonSerializerContext.Default,
-            Converters =
-            {
-                new JsonStringEnumConverter<Color>(JsonNamingPolicy.SnakeCaseLower)
-            }
+            Converters = { new JsonStringEnumConverter<Color>(JsonNamingPolicy.SnakeCaseLower) }
         };
 
     [UnconditionalSuppressMessage(
