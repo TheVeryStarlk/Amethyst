@@ -14,6 +14,18 @@ public sealed class Player(Server server, Client client, string username)
 
     public string Username => username;
 
+    public double X { get; internal set; }
+
+    public double Y { get; internal set; }
+
+    public double Z { get; internal set; }
+
+    public float Yaw { get; internal set; }
+
+    public float Pitch { get; internal set; }
+
+    public bool OnGround { get; internal set; }
+
     public ValueTask SendAsync(Message message, MessagePosition position)
     {
         return client.WriteAsync(new MessagePacket(message.Serialize(), (byte) position));

@@ -5,11 +5,10 @@ using Amethyst.Eventing;
 using Amethyst.Eventing.Sources.Clients;
 using Amethyst.Eventing.Sources.Players;
 using Amethyst.Eventing.Sources.Servers;
-using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Console;
 
-internal sealed class DefaultSubscriber(AuthenticationService authenticationService) : ISubscriber
+internal sealed class DefaultSubscriber : ISubscriber
 {
     private readonly Dictionary<string, Player> players = [];
     private readonly Message bye = Message.Create().Write("You're scaring me!").Red().Build();
@@ -43,25 +42,6 @@ internal sealed class DefaultSubscriber(AuthenticationService authenticationServ
 
                 var message = Message.Create("Enter your password.", color: Color.Red);
                 await player.SendAsync(message, MessagePosition.Box);
-            });
-
-            consumer.On<Received>(async (player, received, _) =>
-            {
-                if (received.Packet.Identifier != MessagePacket.Identifier)
-                {
-                    return;
-                }
-
-                var packet = received.Packet.Create<MessagePacket>();
-
-                if (authenticationService.TryAuthenticate(packet.Message))
-                {
-                    await player.SendAsync(packet.Message, MessagePosition.Box);
-                    return;
-                }
-
-                var message = Message.Create("Incorrect password.", color: Color.Red);
-                player.Disconnect(message);
             });
 
             consumer.On<Left>((player, _, _) =>

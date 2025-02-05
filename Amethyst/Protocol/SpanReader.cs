@@ -1,4 +1,5 @@
 ﻿using System.Buffers.Binary;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Amethyst.Protocol;
@@ -9,9 +10,24 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
 
     private readonly ReadOnlySpan<byte> span = span;
 
+    public bool ReadBoolean()
+    {
+        return Unsafe.BitCast<byte, bool>(span[position++]);
+    }
+
     public ushort ReadUnsignedShort()
     {
         return BinaryPrimitives.ReadUInt16BigEndian(span[position..(position += sizeof(ushort))]);
+    }
+
+    public double ReadDouble()
+    {
+        return BinaryPrimitives.ReadDoubleBigEndian(span[position..(position += sizeof(double))]);
+    }
+
+    public float ReadFloat()
+    {
+        return BinaryPrimitives.ReadSingleBigEndian(span[position..(position += sizeof(float))]);
     }
 
     public long ReadLong()

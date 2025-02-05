@@ -16,7 +16,7 @@ public sealed class EventDispatcher
         var registry = new Registry();
 
         // Register the internal subscriber first so that callbacks get to run before other subscribers.
-        InternalSubscriber.Register(registry);
+        InternalSubscriber.Create(this, registry);
         subscriber.Subscribe(registry);
 
         events = registry.Build();

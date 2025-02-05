@@ -168,7 +168,7 @@ public sealed class Client(
 
         await WriteAsync(
             new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
-            new PlayerPositionAndLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
+            new PositionLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
     }
 
     private async Task PlayAsync(Packet packet)

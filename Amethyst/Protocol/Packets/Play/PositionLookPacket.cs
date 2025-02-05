@@ -1,14 +1,16 @@
 ﻿namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record PlayerPositionAndLookPacket(
+public sealed record PositionLookPacket(
     double X,
     double Y,
     double Z,
     float Yaw,
     float Pitch,
-    bool OnGround) : IOutgoingPacket
+    bool OnGround) : IIngoingPacket<PositionLookPacket>, IOutgoingPacket
 {
-    public int Identifier => 8;
+    public static int Identifier => 6;
+
+    int IOutgoingPacket.Identifier => 8;
 
     public int Length => sizeof(double)
                          + sizeof(double)
@@ -16,6 +18,17 @@ public sealed record PlayerPositionAndLookPacket(
                          + sizeof(float)
                          + sizeof(float)
                          + sizeof(bool);
+
+    static PositionLookPacket IIngoingPacket<PositionLookPacket>.Create(SpanReader reader)
+    {
+        return new PositionLookPacket(
+            reader.ReadDouble(),
+            reader.ReadDouble(),
+            reader.ReadDouble(),
+            reader.ReadFloat(),
+            reader.ReadFloat(),
+            reader.ReadBoolean());
+    }
 
     void IOutgoingPacket.Write(ref SpanWriter writer)
     {
