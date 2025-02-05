@@ -10,6 +10,6 @@ public sealed class Consumer<TSource>(Dictionary<Type, List<Delegate>> events) :
             return;
         }
 
-        events[typeof(TEvent)] = [ callback ];
+        events[typeof(TEvent)] = [callback];
     }
 }

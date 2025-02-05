@@ -2,7 +2,6 @@
 using Amethyst.Components.Messages;
 using Amethyst.Entities;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Sources.Clients;
 using Amethyst.Eventing.Sources.Players;
 using Amethyst.Eventing.Sources.Servers;
 
@@ -11,7 +10,6 @@ namespace Amethyst.Console;
 internal sealed class DefaultSubscriber : ISubscriber
 {
     private readonly Dictionary<string, Player> players = [];
-    private readonly Message bye = Message.Create().Write("You're scaring me!").Red().Build();
 
     public void Subscribe(IRegistry registry)
     {
@@ -24,24 +22,23 @@ internal sealed class DefaultSubscriber : ISubscriber
                 .Write("Amethyst").LightPurple()
                 .Build();
 
-            request.Status = Status.Create("Amethyst", 47, players.Count + 1, players.Count, description, string.Empty);
-            return Task.CompletedTask;
-        }));
-
-        registry.For<Client>(consumer => consumer.On<Outdated>((_, outdated, _) =>
-        {
-            outdated.Message = bye;
+            request.Status = Status.Create("Amethyst", 47, players.Count, players.Count, description, string.Empty);
             return Task.CompletedTask;
         }));
 
         registry.For<Player>(consumer =>
         {
+            consumer.On<Moved>(async (player, _, _) =>
+            {
+                await player.MoveAsync(0, 0, 0, 0, 0);
+            });
+
             consumer.On<Joined>(async (player, _, _) =>
             {
                 players[player.Username] = player;
 
-                var message = Message.Create("Enter your password.", color: Color.Red);
-                await player.SendAsync(message, MessagePosition.Box);
+                var message = Message.Create($"Welcome {player.Username}!", color: Color.Green);
+                await player.SendAsync(message);
             });
 
             consumer.On<Left>((player, _, _) =>

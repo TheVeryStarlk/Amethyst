@@ -14,7 +14,7 @@ public sealed class Moved(
 
     public double Y => y;
 
-    public double Z  => z;
+    public double Z => z;
 
     public float Yaw => yaw;
 

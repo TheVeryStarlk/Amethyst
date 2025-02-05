@@ -26,14 +26,14 @@ public sealed class Player(Server server, Client client, string username)
 
     public bool OnGround { get; internal set; }
 
-    public ValueTask SendAsync(Message message, MessagePosition position)
+    public ValueTask MoveAsync(double x, double y, double z, float yaw, float pitch)
     {
-        return client.WriteAsync(new MessagePacket(message.Serialize(), (byte) position));
+        return client.WriteAsync(new PositionLookPacket(x, y, z, yaw, pitch, false));
     }
 
-    public ValueTask KeepAliveAsync()
+    public ValueTask SendAsync(Message message, MessagePosition position = MessagePosition.Box)
     {
-        return client.WriteAsync(new KeepAlivePacket(Random.Shared.Next()));
+        return client.WriteAsync(new MessagePacket(message.Serialize(), (byte) position));
     }
 
     public void Disconnect(Message message)
