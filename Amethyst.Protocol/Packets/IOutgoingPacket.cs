@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Protocol;
+﻿namespace Amethyst.Protocol.Packets;
 
 public interface IOutgoingPacket
 {

@@ -1,8 +1,9 @@
 ﻿using System.IO.Pipelines;
+using Amethyst.Protocol.Packets;
 
 namespace Amethyst.Protocol;
 
-internal class ProtocolWriter(PipeWriter output)
+public class ProtocolWriter(PipeWriter output)
 {
     public async ValueTask WriteAsync(IOutgoingPacket packet, CancellationToken cancellationToken)
     {

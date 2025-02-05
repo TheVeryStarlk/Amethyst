@@ -1,13 +1,14 @@
 ﻿using System.Buffers;
 using System.IO.Pipelines;
+using Amethyst.Protocol.Packets;
 
 namespace Amethyst.Protocol;
 
-internal class ProtocolReader(PipeReader input)
+public class ProtocolReader(PipeReader input)
 {
     private SequencePosition consumed;
     private SequencePosition examined;
-    private bool read;
+    private bool hasFinished;
 
     public async ValueTask<Packet> ReadAsync(CancellationToken cancellationToken)
     {
@@ -31,7 +32,7 @@ internal class ProtocolReader(PipeReader input)
                 // so the next call to ReadAsync will process the next packet if there's one.
                 examined = consumed;
 
-                read = true;
+                hasFinished = true;
 
                 return packet;
             }
@@ -75,12 +76,13 @@ internal class ProtocolReader(PipeReader input)
 
     public void Advance()
     {
-        if (!read)
+        if (!hasFinished)
         {
             return;
         }
 
+        hasFinished = false;
+
         input.AdvanceTo(consumed, examined);
-        read = false;
     }
 }

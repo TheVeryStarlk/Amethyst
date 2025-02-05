@@ -63,8 +63,6 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
     public string ReadVariableString()
     {
         var length = ReadVariableInteger();
-        var buffer = span[position..(position += length)];
-
-        return Encoding.UTF8.GetString(buffer);
+        return Encoding.UTF8.GetString(span[position..(position += length)]);
     }
 }

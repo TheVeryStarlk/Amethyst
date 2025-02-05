@@ -6,6 +6,7 @@ using Amethyst.Eventing.Sources.Clients;
 using Amethyst.Eventing.Sources.Players;
 using Amethyst.Eventing.Sources.Servers;
 using Amethyst.Protocol;
+using Amethyst.Protocol.Packets;
 using Amethyst.Protocol.Packets.Handshake;
 using Amethyst.Protocol.Packets.Login;
 using Amethyst.Protocol.Packets.Play;

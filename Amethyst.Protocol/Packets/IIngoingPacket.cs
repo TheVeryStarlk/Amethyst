@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace Amethyst.Protocol;
+namespace Amethyst.Protocol.Packets;
 
 public interface IIngoingPacket<out T> where T : IIngoingPacket<T>
 {
