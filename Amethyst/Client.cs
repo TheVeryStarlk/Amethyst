@@ -70,6 +70,8 @@ public sealed class Client(
 
         if (state is not State.Status)
         {
+            await eventDispatcher.DispatchAsync(player!, new Left(), CancellationToken.None).ConfigureAwait(false);
+
             IOutgoingPacket final = state is State.Login
                 ? new LoginFailurePacket(reason.Serialize())
                 : new DisconnectPacket(reason.Serialize());
@@ -78,11 +80,6 @@ public sealed class Client(
             // And wait a single tick to let the client realize the final packet.
             await writer.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
             await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
-
-            if (state is State.Play)
-            {
-                await eventDispatcher.DispatchAsync(player!, new Left(), CancellationToken.None).ConfigureAwait(false);
-            }
         }
 
         connection.Abort();
@@ -152,6 +149,7 @@ public sealed class Client(
         }
 
         await WriteAsync(packet.Create<PingPongPacket>()).ConfigureAwait(false);
+        Stop("Finished ping.");
     }
 
     private async Task LoginAsync(Packet packet)
