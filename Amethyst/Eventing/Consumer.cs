@@ -1,6 +1,8 @@
-﻿namespace Amethyst.Eventing;
+﻿using Amethyst.Abstractions.Eventing;
 
-public sealed class Consumer<TSource>(Dictionary<Type, List<Delegate>> events) : IConsumer<TSource>
+namespace Amethyst.Eventing;
+
+internal sealed class Consumer<TSource>(Dictionary<Type, List<Delegate>> events) : IConsumer<TSource>
 {
     public void On<TEvent>(TaskDelegate<TSource, TEvent> callback) where TEvent : Event<TSource>
     {

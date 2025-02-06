@@ -1,20 +1,26 @@
 ﻿using System.Collections.Frozen;
-using System.Collections.Immutable;
+using Amethyst.Abstractions.Eventing;
 
 namespace Amethyst.Eventing;
 
-public sealed class Registry : IRegistry
+internal sealed class Registry(Dictionary<Type, List<Delegate>> events) : IRegistry
 {
-    private readonly Dictionary<Type, List<Delegate>> events = [];
+    public static FrozenDictionary<Type, IEnumerable<Delegate>> Register(params ISubscriber[] subscribers)
+    {
+        var events = new Dictionary<Type, List<Delegate>>();
+        var registry = new Registry(events);
+
+        foreach (var subscriber in subscribers)
+        {
+            subscriber.Subscribe(registry);
+        }
+
+        return events.ToFrozenDictionary(pair => pair.Key, pair => pair.Value.AsEnumerable());
+    }
 
     public void For<T>(Action<IConsumer<T>> configure)
     {
         var consumer = new Consumer<T>(events);
         configure(consumer);
-    }
-
-    internal FrozenDictionary<Type, ImmutableArray<Delegate>> Build()
-    {
-        return events.ToFrozenDictionary(pair => pair.Key, pair => pair.Value.ToImmutableArray());
     }
 }
