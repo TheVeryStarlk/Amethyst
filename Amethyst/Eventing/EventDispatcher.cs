@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
+internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
 {
-    private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events = Registry.Register(subscriber);
+    private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events = Registry.Create(subscribers);
 
     public async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
     {

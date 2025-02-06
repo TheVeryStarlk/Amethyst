@@ -5,7 +5,7 @@ namespace Amethyst.Eventing;
 
 internal sealed class Registry(Dictionary<Type, List<Delegate>> events) : IRegistry
 {
-    public static FrozenDictionary<Type, IEnumerable<Delegate>> Register(params ISubscriber[] subscribers)
+    public static FrozenDictionary<Type, IEnumerable<Delegate>> Create(IEnumerable<ISubscriber> subscribers)
     {
         var events = new Dictionary<Type, List<Delegate>>();
         var registry = new Registry(events);

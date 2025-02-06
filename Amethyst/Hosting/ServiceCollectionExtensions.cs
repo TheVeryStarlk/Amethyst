@@ -1,14 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Amethyst.Abstractions.Eventing;
+﻿using Amethyst.Abstractions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Amethyst.Hosting;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
+    public static IServiceCollection AddAmethyst(this IServiceCollection services, Action<IAmethystBuilder> configure)
     {
-        services.AddTransient<ISubscriber, T>();
+        configure(new AmethystBuilder(services));
         return services;
     }
 }
