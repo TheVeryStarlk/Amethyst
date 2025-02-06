@@ -9,7 +9,7 @@ internal sealed class AmethystBuilder(IServiceCollection services) : IAmethystBu
 {
     public IAmethystBuilder AddSubscriber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber
     {
-        services.AddTransient<T>();
+        services.AddSingleton<ISubscriber, T>();
         return this;
     }
 }
