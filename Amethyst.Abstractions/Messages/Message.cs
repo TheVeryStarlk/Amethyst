@@ -18,10 +18,10 @@ public sealed class Message
 
     public IEnumerable<Message>? Extra { get; set; }
 
-    public static implicit operator Message(string value)
+    public static implicit operator Message(string text)
     {
         // Should parse symbols as well.
-        return new Message { Text = value };
+        return new Message { Text = text };
     }
 
     public static Message Create(

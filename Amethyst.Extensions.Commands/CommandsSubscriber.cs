@@ -6,6 +6,6 @@ internal sealed class CommandsSubscriber : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
-        // Not now for the moment...
+        // Not now...
     }
 }
