@@ -4,8 +4,9 @@ namespace Amethyst.Extensions.Commands;
 
 public static class AmethystBuilderExtensions
 {
-    public static IAmethystBuilder AddCommands(this IAmethystBuilder builder)
+    public static IAmethystBuilder AddCommandsSubscriber(this IAmethystBuilder builder)
     {
+        builder.AddSubscriber<CommandsSubscriber>();
         return builder;
     }
 }
