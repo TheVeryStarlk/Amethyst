@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Handshake;
 
-internal sealed record HandshakePacket(int Version, string Address, ushort Port, int State) : IIngoingPacket<HandshakePacket>
+public sealed record HandshakePacket(int Version, string Address, ushort Port, int State) : IIngoingPacket<HandshakePacket>
 {
     public static int Identifier => 0;
 

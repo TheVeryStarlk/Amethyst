@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
+public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
 {
     public static int Identifier => 1;
 

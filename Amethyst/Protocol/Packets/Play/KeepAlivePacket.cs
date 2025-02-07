@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record KeepAlivePacket(int Magic) : IIngoingPacket<KeepAlivePacket>, IOutgoingPacket
+public sealed record KeepAlivePacket(int Magic) : IIngoingPacket<KeepAlivePacket>, IOutgoingPacket
 {
     public static int Identifier => 0;
 

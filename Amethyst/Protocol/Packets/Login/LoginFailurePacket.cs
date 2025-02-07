@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Login;
 
-internal sealed record LoginFailurePacket(string Reason) : IOutgoingPacket
+public sealed record LoginFailurePacket(string Reason) : IOutgoingPacket
 {
     public int Identifier => 0;
 

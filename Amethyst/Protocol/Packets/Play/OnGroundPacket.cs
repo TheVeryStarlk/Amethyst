@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>
+public sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>
 {
     public static int Identifier => 3;
 

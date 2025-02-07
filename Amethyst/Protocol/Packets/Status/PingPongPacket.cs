@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Status;
 
-internal sealed record PingPongPacket(long Magic) : IIngoingPacket<PingPongPacket>, IOutgoingPacket
+public sealed record PingPongPacket(long Magic) : IIngoingPacket<PingPongPacket>, IOutgoingPacket
 {
     public int Length => sizeof(long);
 

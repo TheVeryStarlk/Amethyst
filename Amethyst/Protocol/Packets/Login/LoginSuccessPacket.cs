@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Login;
 
-internal sealed record LoginSuccessPacket(string Guid, string Username) : IOutgoingPacket
+public sealed record LoginSuccessPacket(string Guid, string Username) : IOutgoingPacket
 {
     public int Identifier => 2;
 

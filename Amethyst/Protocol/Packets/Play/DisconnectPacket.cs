@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record DisconnectPacket(string Reason) : IOutgoingPacket
+public sealed record DisconnectPacket(string Reason) : IOutgoingPacket
 {
     public int Identifier => 64;
 

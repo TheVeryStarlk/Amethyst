@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed record PositionLookPacket(double X, double Y, double Z, float Yaw, float Pitch, bool OnGround) : IIngoingPacket<PositionLookPacket>, IOutgoingPacket
+public sealed record PositionLookPacket(double X, double Y, double Z, float Yaw, float Pitch, bool OnGround) : IIngoingPacket<PositionLookPacket>, IOutgoingPacket
 {
     public static int Identifier => 6;
 

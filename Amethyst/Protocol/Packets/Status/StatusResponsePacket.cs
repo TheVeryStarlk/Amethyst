@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Status;
 
-internal sealed record StatusResponsePacket(string Message) : IOutgoingPacket
+public sealed record StatusResponsePacket(string Message) : IOutgoingPacket
 {
     public int Identifier => 0;
 
