@@ -1,5 +1,5 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Abstractions.Eventing;
+using Amethyst.Components.Eventing;
 
 namespace Amethyst.Eventing;
 

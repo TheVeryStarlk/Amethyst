@@ -1,7 +1,7 @@
-﻿using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Protocol;
+﻿using Amethyst.Components.Messages;
+using Amethyst.Components.Protocol;
 
-namespace Amethyst.Abstractions;
+namespace Amethyst.Components;
 
 public interface IClient
 {

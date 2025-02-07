@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Hosting;
+﻿using Amethyst.Components.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Amethyst.Hosting;

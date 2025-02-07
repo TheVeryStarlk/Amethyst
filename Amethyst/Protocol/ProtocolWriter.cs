@@ -1,5 +1,5 @@
 ﻿using System.IO.Pipelines;
-using Amethyst.Abstractions.Protocol;
+using Amethyst.Components.Protocol;
 
 namespace Amethyst.Protocol;
 

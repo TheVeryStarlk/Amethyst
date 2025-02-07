@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Hosting;
+﻿using Amethyst.Components.Hosting;
 
 namespace Amethyst.Extensions.Commands;
 

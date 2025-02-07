@@ -1,6 +1,6 @@
-﻿using Amethyst.Abstractions.Eventing;
+﻿using Amethyst.Components.Eventing;
 
-namespace Amethyst.Abstractions.Hosting;
+namespace Amethyst.Components.Hosting;
 
 public interface IAmethystBuilder
 {

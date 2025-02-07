@@ -1,6 +1,6 @@
-﻿using Amethyst.Abstractions;
-using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Protocol;
+﻿using Amethyst.Components;
+using Amethyst.Components.Messages;
+using Amethyst.Components.Protocol;
 using Amethyst.Protocol;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;

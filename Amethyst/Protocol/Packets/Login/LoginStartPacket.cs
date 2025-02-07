@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Protocol;
+﻿using Amethyst.Components.Protocol;
 
 namespace Amethyst.Protocol.Packets.Login;
 

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Amethyst.Abstractions.Eventing;
-using Amethyst.Abstractions.Hosting;
+using Amethyst.Components.Eventing;
+using Amethyst.Components.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Amethyst.Hosting;

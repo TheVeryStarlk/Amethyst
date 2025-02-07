@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Amethyst.Abstractions.Messages;
+using Amethyst.Components.Messages;
 
-namespace Amethyst.Abstractions;
+namespace Amethyst.Components;
 
 public sealed record Status(
     Version Version,
