@@ -1,18 +1,41 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Protocol;
+using Amethyst.Protocol;
 using Microsoft.AspNetCore.Connections;
+using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ConnectionContext connection) : IClient, IDisposable
+internal sealed class Client(ILogger<Client> logger, ConnectionContext connection) : IClient, IDisposable
 {
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
+    private readonly ProtocolWriter writer = new(connection.Transport.Output);
     private readonly SemaphoreSlim semaphore = new(1);
 
-    public ValueTask WriteAsync(params IOutgoingPacket[] packets)
+    public async ValueTask WriteAsync(params IOutgoingPacket[] packets)
     {
-        return ValueTask.CompletedTask;
+        await semaphore.WaitAsync(source.Token).ConfigureAwait(false);
+
+        try
+        {
+            foreach (var packet in packets)
+            {
+                await writer.WriteAsync(packet, source.Token).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Nothing.
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unexpected exception while writing to client");
+        }
+        finally
+        {
+            semaphore.Release();
+        }
     }
 
     public void Stop(Message message)
