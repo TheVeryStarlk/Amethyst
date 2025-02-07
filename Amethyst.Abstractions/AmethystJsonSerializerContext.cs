@@ -7,4 +7,4 @@ namespace Amethyst.Abstractions;
 [JsonSerializable(typeof(Status))]
 [JsonSerializable(typeof(Version))]
 [JsonSerializable(typeof(Information))]
-internal partial class AmethystJsonSerializerContext : JsonSerializerContext;
+internal sealed partial class AmethystJsonSerializerContext : JsonSerializerContext;
