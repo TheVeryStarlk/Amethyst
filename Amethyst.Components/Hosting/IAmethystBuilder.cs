@@ -1,8 +1,9 @@
-﻿using Amethyst.Components.Eventing;
+﻿using System.Diagnostics.CodeAnalysis;
+using Amethyst.Components.Eventing;
 
 namespace Amethyst.Components.Hosting;
 
 public interface IAmethystBuilder
 {
-    public IAmethystBuilder AddSubscriber<T>() where T : class, ISubscriber;
+    public IAmethystBuilder AddSubscriber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber;
 }
