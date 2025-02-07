@@ -12,7 +12,8 @@ public interface IClient
     /// This is intended to be internally used in Amethyst.
     /// </remarks>
     /// <param name="packets">The packet(s) to write.</param>
-    public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
+    /// <returns>A <see cref="ValueTask"/> representing the asynchronous write operation.</returns>
+    public ValueTask WriteAsync(params IOutgoingPacket[] packets);
 
     public void Stop(Message message);
 }
