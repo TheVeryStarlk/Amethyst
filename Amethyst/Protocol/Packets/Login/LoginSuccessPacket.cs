@@ -1,7 +1,11 @@
-﻿namespace Amethyst.Protocol.Packets.Login;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record LoginSuccessPacket(string Guid, string Username) : LoginSuccessPacketBase(Guid, Username), IWriteable
+namespace Amethyst.Protocol.Packets.Login;
+
+internal sealed record LoginSuccessPacket(string Guid, string Username) : IOutgoingPacket
 {
+    public int Identifier => 2;
+
     public int Length => Variable.GetByteCount(Guid) + Variable.GetByteCount(Username);
 
     public void Write(Span<byte> span)

@@ -1,8 +1,12 @@
-﻿namespace Amethyst.Protocol.Packets.Login;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record LoginStartPacket(string Username) : LoginStartPacketBase(Username), ICreatable<LoginStartPacketBase>
+namespace Amethyst.Protocol.Packets.Login;
+
+internal sealed record LoginStartPacket(string Username) : IIngoingPacket<LoginStartPacket>
 {
-    public static LoginStartPacketBase Create(ReadOnlySpan<byte> span)
+    public static int Identifier => 0;
+
+    public static LoginStartPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new LoginStartPacket(reader.ReadVariableString());

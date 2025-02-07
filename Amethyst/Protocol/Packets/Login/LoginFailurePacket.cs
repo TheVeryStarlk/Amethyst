@@ -1,7 +1,11 @@
-﻿namespace Amethyst.Protocol.Packets.Login;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record LoginFailurePacket(string Reason) : LoginFailurePacketBase(Reason), IWriteable
+namespace Amethyst.Protocol.Packets.Login;
+
+internal sealed record LoginFailurePacket(string Reason) : IOutgoingPacket
 {
+    public int Identifier => 0;
+
     public int Length => Variable.GetByteCount(Reason);
 
     public void Write(Span<byte> span)

@@ -1,8 +1,12 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record OnGroundPacket(bool Value) : OnGroundPacketBase(Value), ICreatable<OnGroundPacketBase>
+namespace Amethyst.Protocol.Packets.Play;
+
+internal sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>
 {
-    public static OnGroundPacketBase Create(ReadOnlySpan<byte> span)
+    public static int Identifier => 3;
+
+    public static OnGroundPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new OnGroundPacket(reader.ReadBoolean());

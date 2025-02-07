@@ -1,5 +1,5 @@
 ﻿using Amethyst.Abstractions.Messages;
-using Amethyst.Protocol;
+using Amethyst.Abstractions.Protocol;
 
 namespace Amethyst.Abstractions;
 

@@ -1,10 +1,16 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record KeepAlivePacket(int Magic) : KeepAlivePacketBase(Magic), ICreatable<KeepAlivePacketBase>, IWriteable
+namespace Amethyst.Protocol.Packets.Play;
+
+internal sealed record KeepAlivePacket(int Magic) : IIngoingPacket<KeepAlivePacket>, IOutgoingPacket
 {
+    public static int Identifier => 0;
+
+    int IOutgoingPacket.Identifier => 0;
+
     public int Length => Variable.GetByteCount(Magic);
 
-    public static KeepAlivePacketBase Create(ReadOnlySpan<byte> span)
+    public static KeepAlivePacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new KeepAlivePacket(reader.ReadVariableInteger());

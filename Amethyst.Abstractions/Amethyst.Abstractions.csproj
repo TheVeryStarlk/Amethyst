@@ -7,8 +7,4 @@
 		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Amethyst.Protocol\Amethyst.Protocol.csproj"/>
-	</ItemGroup>
-
 </Project>

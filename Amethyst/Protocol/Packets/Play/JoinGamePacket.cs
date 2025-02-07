@@ -1,8 +1,11 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, byte Difficulty, byte Players, string LevelType, bool ReducedDebugInformation)
-    : JoinGamePacketBase(Entity, GameMode, Dimension, Difficulty, Players, LevelType, ReducedDebugInformation), IWriteable
+namespace Amethyst.Protocol.Packets.Play;
+
+internal sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, byte Difficulty, byte Players, string LevelType, bool ReducedDebugInformation) : IOutgoingPacket
 {
+    public int Identifier => 1;
+
     public int Length => sizeof(int)
                          + sizeof(byte)
                          + sizeof(sbyte)

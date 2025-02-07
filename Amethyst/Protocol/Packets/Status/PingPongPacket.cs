@@ -1,10 +1,16 @@
-﻿namespace Amethyst.Protocol.Packets.Status;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record PingPongPacket(long Magic) : PingPongPacketBase(Magic), ICreatable<PingPongPacketBase>, IWriteable
+namespace Amethyst.Protocol.Packets.Status;
+
+internal sealed record PingPongPacket(long Magic) : IIngoingPacket<PingPongPacket>, IOutgoingPacket
 {
     public int Length => sizeof(long);
 
-    public static PingPongPacketBase Create(ReadOnlySpan<byte> span)
+    public static int Identifier => 1;
+
+    int IOutgoingPacket.Identifier => 1;
+
+    public static PingPongPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new PingPongPacket(reader.ReadLong());

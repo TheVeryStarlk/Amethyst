@@ -1,8 +1,11 @@
-﻿namespace Amethyst.Protocol.Packets.Handshake;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record HandshakePacket(int Version, string Address, ushort Port, int State)
-    : HandshakePacketBase(Version, Address, Port, State), ICreatable<HandshakePacket>
+namespace Amethyst.Protocol.Packets.Handshake;
+
+internal sealed record HandshakePacket(int Version, string Address, ushort Port, int State) : IIngoingPacket<HandshakePacket>
 {
+    public static int Identifier => 0;
+
     public static HandshakePacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);

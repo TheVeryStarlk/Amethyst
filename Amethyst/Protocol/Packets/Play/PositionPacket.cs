@@ -1,9 +1,12 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record PositionPacket(double X, double Y, double Z, bool OnGround)
-    : PositionPacketBase(X, Y, Z, OnGround), ICreatable<PositionPacketBase>
+namespace Amethyst.Protocol.Packets.Play;
+
+internal sealed record PositionPacket(double X, double Y, double Z, bool OnGround) : IIngoingPacket<PositionPacket>
 {
-    public static PositionPacketBase Create(ReadOnlySpan<byte> span)
+    public static int Identifier => 4;
+
+    public static PositionPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new PositionPacket(reader.ReadDouble(), reader.ReadDouble(), reader.ReadDouble(), reader.ReadBoolean());

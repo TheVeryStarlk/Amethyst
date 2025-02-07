@@ -1,11 +1,16 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record MessagePacket(string Message, byte Position)
-    : MessagePacketBase(Message, Position), ICreatable<MessagePacketBase>, IWriteable
+namespace Amethyst.Protocol.Packets.Play;
+
+internal sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
 {
+    public static int Identifier => 1;
+
+    int IOutgoingPacket.Identifier => 2;
+
     public int Length => Variable.GetByteCount(Message) + sizeof(byte);
 
-    public static MessagePacketBase Create(ReadOnlySpan<byte> span)
+    public static MessagePacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new MessagePacket(reader.ReadVariableString(), 0);

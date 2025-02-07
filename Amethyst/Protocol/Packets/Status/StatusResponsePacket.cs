@@ -1,7 +1,11 @@
-﻿namespace Amethyst.Protocol.Packets.Status;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record StatusResponsePacket(string Message) : StatusResponsePacketBase(Message), IWriteable
+namespace Amethyst.Protocol.Packets.Status;
+
+internal sealed record StatusResponsePacket(string Message) : IOutgoingPacket
 {
+    public int Identifier => 0;
+
     public int Length => Variable.GetByteCount(Message);
 
     public void Write(Span<byte> span)

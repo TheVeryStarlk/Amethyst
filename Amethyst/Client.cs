@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Messages;
-using Amethyst.Protocol;
+using Amethyst.Abstractions.Protocol;
 using Microsoft.AspNetCore.Connections;
 
 namespace Amethyst;

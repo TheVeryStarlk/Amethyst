@@ -1,8 +1,12 @@
-﻿namespace Amethyst.Protocol.Packets.Status;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record StatusRequestPacket : StatusRequestPacketBase, ICreatable<StatusRequestPacketBase>
+namespace Amethyst.Protocol.Packets.Status;
+
+internal sealed record StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {
-    public static StatusRequestPacketBase Create(ReadOnlySpan<byte> span)
+    public static int Identifier => 0;
+
+    public static StatusRequestPacket Create(ReadOnlySpan<byte> span)
     {
         return new StatusRequestPacket();
     }

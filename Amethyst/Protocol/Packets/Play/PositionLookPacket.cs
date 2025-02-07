@@ -1,8 +1,13 @@
-﻿namespace Amethyst.Protocol.Packets.Play;
+﻿using Amethyst.Abstractions.Protocol;
 
-internal sealed record PositionLookPacket(double X, double Y, double Z, float Yaw, float Pitch, bool OnGround)
-    : PositionLookPacketBase(X, Y, Z, Yaw, Pitch, OnGround), ICreatable<PositionLookPacketBase>, IWriteable
+namespace Amethyst.Protocol.Packets.Play;
+
+internal sealed record PositionLookPacket(double X, double Y, double Z, float Yaw, float Pitch, bool OnGround) : IIngoingPacket<PositionLookPacket>, IOutgoingPacket
 {
+    public static int Identifier => 6;
+
+    int IOutgoingPacket.Identifier => 8;
+
     public int Length => sizeof(double)
                          + sizeof(double)
                          + sizeof(double)
@@ -10,7 +15,7 @@ internal sealed record PositionLookPacket(double X, double Y, double Z, float Ya
                          + sizeof(float)
                          + sizeof(bool);
 
-    public static PositionLookPacketBase Create(ReadOnlySpan<byte> span)
+    public static PositionLookPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
 
