@@ -2,10 +2,13 @@
 
 namespace Amethyst.Protocol;
 
-public interface IIngoingPacket<out T> where T : IIngoingPacket<T>
+public interface IIngoingPacket
 {
     public static abstract int Identifier { get; }
+}
 
+public interface ICreatable<out T> where T : IIngoingPacket
+{
     public static abstract T Create(ReadOnlySpan<byte> span);
 }
 
@@ -13,7 +16,7 @@ public readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
 {
     public int Identifier => identifier;
 
-    public T Create<T>() where T : IIngoingPacket<T>
+    public T Create<T>() where T : IIngoingPacket, ICreatable<T>
     {
         if (T.Identifier != identifier)
         {

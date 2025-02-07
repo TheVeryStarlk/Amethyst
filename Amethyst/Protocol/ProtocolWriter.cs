@@ -2,9 +2,9 @@
 
 namespace Amethyst.Protocol;
 
-public sealed class ProtocolWriter(PipeWriter output)
+internal sealed class ProtocolWriter(PipeWriter output)
 {
-    public async ValueTask WriteAsync(IOutgoingPacket packet, CancellationToken cancellationToken)
+    public async ValueTask WriteAsync<T>(T packet, CancellationToken cancellationToken) where T : IOutgoingPacket, IWriteable
     {
         // Length is used to denote the packet's length including the identifier,
         // total includes the byte count of length and the value of length itself.

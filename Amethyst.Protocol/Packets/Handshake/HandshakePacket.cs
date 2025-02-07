@@ -1,21 +1,10 @@
 ﻿namespace Amethyst.Protocol.Packets.Handshake;
 
-public sealed record HandshakePacket(
+public abstract record HandshakePacketBase(
     int Version,
     string Address,
     ushort Port,
-    int State) : IIngoingPacket<HandshakePacket>
+    int State) : IIngoingPacket
 {
     public static int Identifier => 0;
-
-    public static HandshakePacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-
-        return new HandshakePacket(
-            reader.ReadVariableInteger(),
-            reader.ReadVariableString(),
-            reader.ReadUnsignedShort(),
-            reader.ReadVariableInteger());
-    }
 }

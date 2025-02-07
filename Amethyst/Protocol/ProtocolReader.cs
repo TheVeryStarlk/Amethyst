@@ -3,7 +3,7 @@ using System.IO.Pipelines;
 
 namespace Amethyst.Protocol;
 
-public sealed class ProtocolReader(PipeReader input)
+internal sealed class ProtocolReader(PipeReader input)
 {
     private SequencePosition consumed;
     private SequencePosition examined;
