@@ -38,16 +38,14 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
 
         logger.LogInformation("Listening for new clients...");
 
+        var identifier = 0;
+
         while (true)
         {
             try
             {
                 var connection = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
-
-                var client = new Client(
-                    loggerFactory.CreateLogger<Client>(),
-                    connection!,
-                    eventDispatcher);
+                var client = new Client(loggerFactory.CreateLogger<Client>(), connection!, eventDispatcher, identifier++);
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
                 logger.LogDebug("Started client {Identifier}", client.Identifier);

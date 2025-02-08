@@ -14,10 +14,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher)
+internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher, int identifier)
     : IClient, IAsyncDisposable
 {
-    public int Identifier { get; } = Random.Shared.Next();
+    public int Identifier => identifier;
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
