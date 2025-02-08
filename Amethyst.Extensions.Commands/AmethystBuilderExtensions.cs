@@ -1,12 +1,12 @@
-﻿using Amethyst.Components.Hosting;
+﻿using Amethyst.Hosting;
 
 namespace Amethyst.Extensions.Commands;
 
 public static class AmethystBuilderExtensions
 {
-    public static IAmethystBuilder AddCommandsSubscriber(this IAmethystBuilder builder)
+    public static AmethystOptions AddCommandsSubscriber(this AmethystOptions options)
     {
-        builder.AddSubscriber<CommandsSubscriber>();
-        return builder;
+        options.AddSubscriber<CommandsSubscriber>();
+        return options;
     }
 }

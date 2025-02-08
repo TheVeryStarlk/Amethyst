@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Extensions.Command
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Components", "Amethyst.Components\Amethyst.Components.csproj", "{12772BBF-7410-4AF2-ABA0-8B502B994984}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Example", "Amethyst.Example\Amethyst.Example.csproj", "{7AE48A79-9D17-4595-83AD-95CBA50076B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{12772BBF-7410-4AF2-ABA0-8B502B994984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12772BBF-7410-4AF2-ABA0-8B502B994984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12772BBF-7410-4AF2-ABA0-8B502B994984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AE48A79-9D17-4595-83AD-95CBA50076B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AE48A79-9D17-4595-83AD-95CBA50076B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AE48A79-9D17-4595-83AD-95CBA50076B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AE48A79-9D17-4595-83AD-95CBA50076B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

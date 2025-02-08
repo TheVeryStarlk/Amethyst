@@ -7,10 +7,12 @@ internal sealed class ProtocolWriter(PipeWriter output)
 {
     public async ValueTask WriteAsync(IOutgoingPacket packet, CancellationToken cancellationToken)
     {
-        // Length is used to denote the packet's length including the identifier,
-        // total includes the byte count of length and the value of length itself.
-        var length = Variable.GetByteCount(packet.Identifier) + packet.Length;
-        var total = Variable.GetByteCount(length) + length;
+        var identifier = Variable.GetByteCount(packet.Identifier);
+
+        var length = identifier + packet.Length;
+        var body = Variable.GetByteCount(length);
+
+        var total = body + length;
 
         var span = output.GetSpan(total);
         var writer = new SpanWriter(span);
@@ -18,7 +20,8 @@ internal sealed class ProtocolWriter(PipeWriter output)
         writer.WriteVariableInteger(length);
         writer.WriteVariableInteger(packet.Identifier);
 
-        packet.Write(span[length..]);
+        var index = body + identifier;
+        packet.Write(span[index..]);
 
         output.Advance(total);
 

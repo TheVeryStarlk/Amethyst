@@ -146,7 +146,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     private async Task LoginAsync(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
-        await WriteAsync(new LoginFailurePacket("Come back later!")).ConfigureAwait(false);
+        await WriteAsync(new LoginFailurePacket(reason.Serialize())).ConfigureAwait(false);
     }
 
     private Task PlayAsync(Packet packet)
