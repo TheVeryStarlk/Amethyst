@@ -21,7 +21,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
-    private readonly ProtocolWriter writer = new(connection.Transport.Output);
 
     private State state;
     private Message reason = "No reason specified.";
@@ -45,8 +44,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     public void Stop(Message message)
     {
         reason = message;
-
-        outgoing.Writer.Complete();
         source.Cancel();
     }
 
@@ -98,17 +95,21 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
                 ? new LoginFailurePacket(reason.Serialize())
                 : new DisconnectPacket(reason.Serialize());
 
-            // Token is cancelled here so the final packet has to be manually sent out.
-            // And wait a single tick to let the client realize the final packet.
-            await writer.WriteAsync(final).ConfigureAwait(false);
-            await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
+            Write(final);
+
         }
 
+        // Give client some time to realize the packets.
+        await Task.Delay(50).ConfigureAwait(false);
+
+        outgoing.Writer.Complete();
         connection.Abort();
     }
 
     private async Task WritingAsync()
     {
+        var writer = new ProtocolWriter(connection.Transport.Output);
+
         try
         {
             await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
