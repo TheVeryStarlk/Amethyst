@@ -45,6 +45,8 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     public void Stop(Message message)
     {
         reason = message;
+
+        outgoing.Writer.Complete();
         source.Cancel();
     }
 
@@ -98,7 +100,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
             // Token is cancelled here so the final packet has to be manually sent out.
             // And wait a single tick to let the client realize the final packet.
-            await writer.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
+            await writer.WriteAsync(final).ConfigureAwait(false);
             await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
         }
 
@@ -109,9 +111,9 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     {
         try
         {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token).ConfigureAwait(false))
+            await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
             {
-                await writer.WriteAsync(packet, source.Token).ConfigureAwait(false);
+                await writer.WriteAsync(packet).ConfigureAwait(false);
             }
         }
         catch (OperationCanceledException)

@@ -5,7 +5,7 @@ namespace Amethyst.Protocol;
 
 internal sealed class ProtocolWriter(PipeWriter output)
 {
-    public async ValueTask WriteAsync(IOutgoingPacket packet, CancellationToken cancellationToken)
+    public async ValueTask WriteAsync(IOutgoingPacket packet)
     {
         var identifier = Variable.GetByteCount(packet.Identifier);
 
@@ -25,6 +25,6 @@ internal sealed class ProtocolWriter(PipeWriter output)
 
         output.Advance(total);
 
-        await output.FlushAsync(cancellationToken).ConfigureAwait(false);
+        await output.FlushAsync().ConfigureAwait(false);
     }
 }
