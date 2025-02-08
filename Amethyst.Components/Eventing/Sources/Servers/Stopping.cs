@@ -1,6 +1,6 @@
 ﻿using Amethyst.Components.Messages;
 
-namespace Amethyst.Components.Eventing.Sources.Server;
+namespace Amethyst.Components.Eventing.Sources.Servers;
 
 public sealed class Stopping : Event<Stopping>
 {

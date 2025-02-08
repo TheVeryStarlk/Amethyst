@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Amethyst.Components.Eventing.Sources.Server;
+namespace Amethyst.Components.Eventing.Sources.Servers;
 
 public sealed class Starting : Event<IServer>
 {

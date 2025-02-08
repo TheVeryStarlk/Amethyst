@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Amethyst.Components;
-using Amethyst.Components.Eventing.Sources.Server;
+using Amethyst.Components.Eventing.Sources.Servers;
 using Amethyst.Eventing;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;

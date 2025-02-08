@@ -1,6 +1,6 @@
 ﻿using Amethyst.Components.Messages;
 
-namespace Amethyst.Components.Eventing.Sources.Client;
+namespace Amethyst.Components.Eventing.Sources.Clients;
 
 public sealed class Outdated(int version) : Event<IClient>
 {

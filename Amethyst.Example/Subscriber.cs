@@ -1,6 +1,6 @@
 ﻿using Amethyst.Components;
 using Amethyst.Components.Eventing;
-using Amethyst.Components.Eventing.Sources.Client;
+using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Messages;
 
 namespace Amethyst.Example;

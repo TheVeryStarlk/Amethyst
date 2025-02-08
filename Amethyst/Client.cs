@@ -1,8 +1,9 @@
 ﻿using System.Threading.Channels;
 using Amethyst.Components;
-using Amethyst.Components.Eventing.Sources.Client;
+using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol;
 using Amethyst.Protocol.Packets.Handshake;
@@ -18,6 +19,8 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     : IClient, IAsyncDisposable
 {
     public int Identifier => identifier;
+
+    public Player? Player { get; private set; }
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
@@ -164,6 +167,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
             new PositionLookPacket(0, 0, 0, 0, 0, false));
 
+        Player = new Player(this);
         state = State.Play;
 
         return Task.CompletedTask;
