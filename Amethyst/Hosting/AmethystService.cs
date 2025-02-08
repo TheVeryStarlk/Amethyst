@@ -5,11 +5,11 @@ namespace Amethyst.Hosting;
 
 internal sealed class AmethystService(Server server, ILogger<AmethystService> logger) : BackgroundService
 {
-    protected override Task ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         try
         {
-            server.Start();
+            await server.StartAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -19,7 +19,5 @@ internal sealed class AmethystService(Server server, ILogger<AmethystService> lo
         {
             server.Dispose();
         }
-
-        return Task.CompletedTask;
     }
 }

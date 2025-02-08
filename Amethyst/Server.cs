@@ -6,20 +6,21 @@ namespace Amethyst;
 
 internal sealed class Server(ILogger<Server> logger, EventDispatcher eventDispatcher) : IServer, IDisposable
 {
-    private readonly CancellationTokenSource source = new();
+    private CancellationTokenSource? source;
 
-    public void Start()
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-
+        source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        return Task.CompletedTask;
     }
 
     public void Stop()
     {
-        source.Cancel();
+        source!.Cancel();
     }
 
     public void Dispose()
     {
-        source.Dispose();
+        source!.Dispose();
     }
 }
