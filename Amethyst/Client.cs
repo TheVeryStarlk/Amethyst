@@ -1,10 +1,13 @@
 ﻿using Amethyst.Components;
+using Amethyst.Components.Eventing.Sources.Client;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
 using Amethyst.Eventing;
 using Amethyst.Protocol;
+using Amethyst.Protocol.Packets.Handshake;
 using Amethyst.Protocol.Packets.Login;
 using Amethyst.Protocol.Packets.Play;
+using Amethyst.Protocol.Packets.Status;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -31,6 +34,17 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             try
             {
                 var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
+
+                var task = state switch
+                {
+                    State.Handshake => HandshakeAsync(packet),
+                    State.Status => StatusAsync(packet),
+                    State.Login => LoginAsync(packet),
+                    State.Play => PlayAsync(packet),
+                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Invalid state.")
+                };
+
+                await task.ConfigureAwait(false);
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
@@ -98,6 +112,46 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         source.Dispose();
         semaphore.Dispose();
         return connection.DisposeAsync();
+    }
+
+    private async Task HandshakeAsync(Packet packet)
+    {
+        var handshake = packet.Create<HandshakePacket>();
+
+        state = (State) handshake.State;
+
+        if (state is not State.Login || handshake.Version is 47)
+        {
+            return;
+        }
+
+        var outdated = await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), source.Token).ConfigureAwait(false);
+        Stop(outdated.Message);
+    }
+
+    private async Task StatusAsync(Packet packet)
+    {
+        if (packet.Identifier == StatusRequestPacket.Identifier)
+        {
+            var request = await eventDispatcher.DispatchAsync(this, new Request(), source.Token).ConfigureAwait(false);
+            await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
+
+            return;
+        }
+
+        await WriteAsync(packet.Create<PingPongPacket>()).ConfigureAwait(false);
+        Stop("Finished ping.");
+    }
+
+    private async Task LoginAsync(Packet packet)
+    {
+        var loginStart = packet.Create<LoginStartPacket>();
+        await WriteAsync(new LoginFailurePacket("Come back later!")).ConfigureAwait(false);
+    }
+
+    private Task PlayAsync(Packet packet)
+    {
+        return Task.CompletedTask;
     }
 }
 

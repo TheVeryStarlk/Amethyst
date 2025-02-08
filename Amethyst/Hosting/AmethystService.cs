@@ -7,6 +7,8 @@ internal sealed class AmethystService(Server server, ILogger<AmethystService> lo
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+        logger.LogInformation("Starting server");
+
         try
         {
             await server.StartAsync(cancellationToken).ConfigureAwait(false);
@@ -19,5 +21,7 @@ internal sealed class AmethystService(Server server, ILogger<AmethystService> lo
         {
             server.Dispose();
         }
+
+        logger.LogInformation("Server stopped");
     }
 }
