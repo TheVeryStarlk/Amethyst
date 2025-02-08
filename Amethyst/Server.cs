@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Servers;
+using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Protocol.Packets.Play;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -99,6 +101,13 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
             try
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), source!.Token).ConfigureAwait(false);
+
+                var packet = new KeepAlivePacket(Random.Shared.Next());
+
+                foreach (var pair in pairs.Select(pair => pair.Value.Client.Player).OfType<Player>())
+                {
+                    pair.Client.Write(packet);
+                }
             }
             catch (OperationCanceledException)
             {
