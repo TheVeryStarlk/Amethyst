@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Amethyst;
 
 internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher)
-    : IClient, IDisposable
+    : IClient, IAsyncDisposable
 {
     public int Identifier { get; } = Random.Shared.Next();
 
@@ -52,9 +52,10 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         source.Cancel();
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
         source.Dispose();
         semaphore.Dispose();
+        return connection.DisposeAsync();
     }
 }

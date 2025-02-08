@@ -1,17 +1,24 @@
-﻿using Amethyst.Components;
+﻿using System.Collections.Concurrent;
+using System.Net;
+using Amethyst.Components;
 using Amethyst.Eventing;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILogger<Server> logger, EventDispatcher eventDispatcher) : IServer, IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFactory listenerFactory, EventDispatcher eventDispatcher)
+    : IServer, IDisposable
 {
+    private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
+    private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
+
     private CancellationTokenSource? source;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        return Task.CompletedTask;
+        return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
     public void Stop()
@@ -22,5 +29,85 @@ internal sealed class Server(ILogger<Server> logger, EventDispatcher eventDispat
     public void Dispose()
     {
         source!.Dispose();
+    }
+
+    private async Task ListeningAsync()
+    {
+        await using var listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, 25565), source!.Token).ConfigureAwait(false);
+
+        logger.LogInformation("Listening for new clients...");
+
+        while (true)
+        {
+            try
+            {
+                var connection = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
+
+                var client = new Client(
+                    loggerFactory.CreateLogger<Client>(),
+                    connection!,
+                    eventDispatcher);
+
+                pairs[client.Identifier] = (client, ExecuteAsync(client));
+                logger.LogDebug("Started client {Identifier}", client.Identifier);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while listening");
+                break;
+            }
+        }
+
+        await listener.UnbindAsync().ConfigureAwait(false);
+        logger.LogDebug("Stopped listening");
+
+        foreach (var pair in pairs.Values)
+        {
+            pair.Client.Stop("No reason.");
+        }
+
+        logger.LogInformation("Waiting for clients to stop");
+        await Task.WhenAll(pairs.Values.Select(pair => pair.Task)).TimeoutAfter(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+
+        return;
+
+        async Task ExecuteAsync(Client client)
+        {
+            await Task.Yield();
+
+            await client.StartAsync().ConfigureAwait(false);
+            await client.DisposeAsync().ConfigureAwait(false);
+
+            logger.LogDebug("Stopped client {Identifier}", client.Identifier);
+
+            if (!pairs.TryRemove(client.Identifier, out _))
+            {
+                logger.LogWarning("Failed to remove client");
+            }
+        }
+    }
+
+    private async Task TickingAsync()
+    {
+        while (true)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(5), source!.Token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while ticking");
+                break;
+            }
+        }
     }
 }
