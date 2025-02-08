@@ -96,7 +96,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
                 : new DisconnectPacket(reason.Serialize());
 
             Write(final);
-
         }
 
         // Give client some time to realize the packets.
@@ -159,7 +158,13 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     private Task LoginAsync(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
-        Write(new LoginFailurePacket(reason.Serialize()));
+
+        Write(
+            new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
+            new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
+            new PositionLookPacket(0, 0, 0, 0, 0, false));
+
+        state = State.Play;
 
         return Task.CompletedTask;
     }
