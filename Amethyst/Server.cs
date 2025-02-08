@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using System.Net;
 using Amethyst.Components;
+using Amethyst.Components.Eventing.Sources.Server;
 using Amethyst.Eventing;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
@@ -33,7 +33,8 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
 
     private async Task ListeningAsync()
     {
-        await using var listener = await listenerFactory.BindAsync(new IPEndPoint(IPAddress.Any, 25565), source!.Token).ConfigureAwait(false);
+        var starting = await eventDispatcher.DispatchAsync(this, new Starting(), source!.Token).ConfigureAwait(false);
+        await using var listener = await listenerFactory.BindAsync(starting.EndPoint, source.Token).ConfigureAwait(false);
 
         logger.LogInformation("Listening for new clients...");
 
@@ -65,9 +66,11 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
         await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogDebug("Stopped listening");
 
+        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source!.Token).ConfigureAwait(false);
+
         foreach (var pair in pairs.Values)
         {
-            pair.Client.Stop("No reason.");
+            pair.Client.Stop(stopping.Message);
         }
 
         logger.LogInformation("Waiting for clients to stop");

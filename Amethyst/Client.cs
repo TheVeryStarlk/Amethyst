@@ -3,6 +3,8 @@ using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
 using Amethyst.Eventing;
 using Amethyst.Protocol;
+using Amethyst.Protocol.Packets.Login;
+using Amethyst.Protocol.Packets.Play;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -17,9 +19,47 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
     private readonly SemaphoreSlim semaphore = new(1);
 
-    public Task StartAsync()
+    private State state;
+    private Message reason = "No reason specified.";
+
+    public async Task StartAsync()
     {
-        return Task.CompletedTask;
+        var reader = new ProtocolReader(connection.Transport.Input);
+
+        while (true)
+        {
+            try
+            {
+                var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
+            }
+            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while reading from client");
+                break;
+            }
+            finally
+            {
+                reader.Advance();
+            }
+        }
+
+        if (state is not State.Status)
+        {
+            IOutgoingPacket final = state is State.Login
+                ? new LoginFailurePacket(reason.Serialize())
+                : new DisconnectPacket(reason.Serialize());
+
+            // Token is cancelled here so the final packet has to be manually sent out.
+            // And wait a single tick to let the client realize the final packet.
+            await writer.WriteAsync(final, CancellationToken.None).ConfigureAwait(false);
+            await Task.Delay(50, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        connection.Abort();
     }
 
     public async ValueTask WriteAsync(params IOutgoingPacket[] packets)
@@ -49,6 +89,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     public void Stop(Message message)
     {
+        reason = message;
         source.Cancel();
     }
 
@@ -58,4 +99,12 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         semaphore.Dispose();
         return connection.DisposeAsync();
     }
+}
+
+internal enum State
+{
+    Handshake,
+    Status,
+    Login,
+    Play
 }
