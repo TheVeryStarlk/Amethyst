@@ -13,9 +13,9 @@ internal sealed class AmethystBuilder(IServiceCollection services) : IAmethystBu
     public IAmethystBuilder AddSubscriber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber
     {
         services.AddSingleton<ISubscriber, T>();
+        services.AddSingleton<EventDispatcher>();
 
         services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
-        services.AddTransient<EventDispatcher>();
         services.AddTransient<Server>();
 
         services.AddHostedService<AmethystService>();

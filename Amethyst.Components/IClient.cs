@@ -5,6 +5,8 @@ namespace Amethyst.Components;
 
 public interface IClient
 {
+    public int Identifier { get; }
+
     /// <summary>
     /// Writes packet(s) to the client.
     /// </summary>

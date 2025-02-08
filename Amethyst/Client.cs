@@ -1,14 +1,17 @@
 ﻿using Amethyst.Components;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
+using Amethyst.Eventing;
 using Amethyst.Protocol;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, ConnectionContext connection) : IClient, IDisposable
+internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher) : IClient, IDisposable
 {
+    public int Identifier { get; } = Random.Shared.Next();
+
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
     private readonly SemaphoreSlim semaphore = new(1);
