@@ -1,4 +1,5 @@
-﻿using Amethyst.Components;
+﻿using System.Threading.Channels;
+using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Client;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
@@ -19,13 +20,41 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     public int Identifier { get; } = Random.Shared.Next();
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
+    private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
-    private readonly SemaphoreSlim semaphore = new(1);
 
     private State state;
     private Message reason = "No reason specified.";
 
-    public async Task StartAsync()
+    public Task StartAsync()
+    {
+        return Task.WhenAll(ReadingAsync(), WritingAsync());
+    }
+
+    public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
+    {
+        foreach (var packet in packets)
+        {
+            if (!outgoing.Writer.TryWrite(packet))
+            {
+                break;
+            }
+        }
+    }
+
+    public void Stop(Message message)
+    {
+        reason = message;
+        source.Cancel();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        source.Dispose();
+        return connection.DisposeAsync();
+    }
+
+    private async Task ReadingAsync()
     {
         var reader = new ProtocolReader(connection.Transport.Input);
 
@@ -76,13 +105,11 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         connection.Abort();
     }
 
-    public async ValueTask WriteAsync(params IOutgoingPacket[] packets)
+    private async Task WritingAsync()
     {
-        await semaphore.WaitAsync(source.Token).ConfigureAwait(false);
-
         try
         {
-            foreach (var packet in packets)
+            await foreach (var packet in outgoing.Reader.ReadAllAsync(source.Token).ConfigureAwait(false))
             {
                 await writer.WriteAsync(packet, source.Token).ConfigureAwait(false);
             }
@@ -95,23 +122,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         {
             logger.LogError(exception, "Unexpected exception while writing to client");
         }
-        finally
-        {
-            semaphore.Release();
-        }
-    }
-
-    public void Stop(Message message)
-    {
-        reason = message;
-        source.Cancel();
-    }
-
-    public ValueTask DisposeAsync()
-    {
-        source.Dispose();
-        semaphore.Dispose();
-        return connection.DisposeAsync();
     }
 
     private async Task HandshakeAsync(Packet packet)
@@ -134,19 +144,21 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         if (packet.Identifier == StatusRequestPacket.Identifier)
         {
             var request = await eventDispatcher.DispatchAsync(this, new Request(), source.Token).ConfigureAwait(false);
-            await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
+            Write(new StatusResponsePacket(request.Status.Serialize()));
 
             return;
         }
 
-        await WriteAsync(packet.Create<PingPongPacket>()).ConfigureAwait(false);
-        Stop("Finished ping.");
+        Write(packet.Create<PingPongPacket>());
+        Stop(string.Empty);
     }
 
-    private async Task LoginAsync(Packet packet)
+    private Task LoginAsync(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
-        await WriteAsync(new LoginFailurePacket(reason.Serialize())).ConfigureAwait(false);
+        Write(new LoginFailurePacket(reason.Serialize()));
+
+        return Task.CompletedTask;
     }
 
     private Task PlayAsync(Packet packet)

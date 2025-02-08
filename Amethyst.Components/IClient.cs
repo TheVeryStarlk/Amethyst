@@ -14,8 +14,7 @@ public interface IClient
     /// Misusing this method might result in crashes or weird behaviors.
     /// </remarks>
     /// <param name="packets">The packet(s) to write.</param>
-    /// <returns>A <see cref="ValueTask"/> representing the asynchronous write operation.</returns>
-    public ValueTask WriteAsync(params IOutgoingPacket[] packets);
+    public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
 
     public void Stop(Message message);
 }
