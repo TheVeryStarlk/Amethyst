@@ -1,34 +1,21 @@
 ﻿using System.Collections.Frozen;
-using System.Collections.Immutable;
+using Amethyst.Components.Eventing;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-public sealed class EventDispatcher
+internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
 {
-    private readonly ILogger<EventDispatcher> logger;
-    private readonly FrozenDictionary<Type, ImmutableArray<Delegate>> events;
+    private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events = Registry.Create(subscribers);
 
-    public EventDispatcher(ILogger<EventDispatcher> logger, ISubscriber subscriber)
-    {
-        this.logger = logger;
-
-        var registry = new Registry();
-
-        // Register the internal subscriber first so that callbacks get to run before other subscribers.
-        InternalSubscriber.Create(this, registry);
-        subscriber.Subscribe(registry);
-
-        events = registry.Build();
-    }
-
-    internal async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
+    public async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
     {
         if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
             return original;
         }
 
+        // Maybe catch exceptions inside the loop?
         try
         {
             foreach (var task in callbacks.Cast<TaskDelegate<TSource, TEvent>>())

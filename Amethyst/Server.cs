@@ -1,22 +1,21 @@
 ﻿using System.Collections.Concurrent;
+using Amethyst.Components;
+using Amethyst.Components.Eventing.Sources.Server;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Sources.Servers;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-public sealed class Server(
-    ILoggerFactory loggerFactory,
-    IConnectionListenerFactory listenerFactory,
-    EventDispatcher eventDispatcher) : IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFactory listenerFactory, EventDispatcher eventDispatcher)
+    : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
 
     private CancellationTokenSource? source;
 
-    internal Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         return Task.WhenAll(ListeningAsync(), TickingAsync());
@@ -24,12 +23,12 @@ public sealed class Server(
 
     public void Stop()
     {
-        source?.Cancel();
+        source!.Cancel();
     }
 
     public void Dispose()
     {
-        source?.Dispose();
+        source!.Dispose();
     }
 
     private async Task ListeningAsync()
@@ -48,8 +47,7 @@ public sealed class Server(
                 var client = new Client(
                     loggerFactory.CreateLogger<Client>(),
                     connection!,
-                    eventDispatcher,
-                    this);
+                    eventDispatcher);
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
                 logger.LogDebug("Started client {Identifier}", client.Identifier);
@@ -68,7 +66,7 @@ public sealed class Server(
         await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogDebug("Stopped listening");
 
-        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source.Token).ConfigureAwait(false);
+        var stopping = await eventDispatcher.DispatchAsync(this, new Stopping(), source!.Token).ConfigureAwait(false);
 
         foreach (var pair in pairs.Values)
         {
@@ -76,7 +74,7 @@ public sealed class Server(
         }
 
         logger.LogInformation("Waiting for clients to stop");
-        await Task.WhenAll(pairs.Values.Select(pair => pair.Task)).TimeoutAfter(stopping.Timeout).ConfigureAwait(false);
+        await Task.WhenAll(pairs.Values.Select(pair => pair.Task)).TimeoutAfter(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
         return;
 

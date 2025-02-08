@@ -1,12 +1,9 @@
 ﻿using Amethyst.Components;
+using Amethyst.Components.Eventing.Sources.Client;
 using Amethyst.Components.Messages;
-using Amethyst.Entities;
+using Amethyst.Components.Protocol;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Sources.Clients;
-using Amethyst.Eventing.Sources.Players;
-using Amethyst.Eventing.Sources.Servers;
 using Amethyst.Protocol;
-using Amethyst.Protocol.Packets;
 using Amethyst.Protocol.Packets.Handshake;
 using Amethyst.Protocol.Packets.Login;
 using Amethyst.Protocol.Packets.Play;
@@ -16,15 +13,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-public sealed class Client(
-    ILogger<Client> logger,
-    ConnectionContext connection,
-    EventDispatcher eventDispatcher,
-    Server server) : IAsyncDisposable
+internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher)
+    : IClient, IAsyncDisposable
 {
     public int Identifier { get; } = Random.Shared.Next();
-
-    private Player? player;
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly ProtocolWriter writer = new(connection.Transport.Output);
@@ -33,7 +25,7 @@ public sealed class Client(
     private State state;
     private Message reason = "No reason specified.";
 
-    internal async Task StartAsync()
+    public async Task StartAsync()
     {
         var reader = new ProtocolReader(connection.Transport.Input);
 
@@ -43,16 +35,16 @@ public sealed class Client(
             {
                 var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
 
-                Func<Packet, Task> task = state switch
+                var task = state switch
                 {
-                    State.Handshake => HandshakeAsync,
-                    State.Status => StatusAsync,
-                    State.Login => LoginAsync,
-                    State.Play => PlayAsync,
+                    State.Handshake => HandshakeAsync(packet),
+                    State.Status => StatusAsync(packet),
+                    State.Login => LoginAsync(packet),
+                    State.Play => PlayAsync(packet),
                     _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Invalid state.")
                 };
 
-                await task(packet).ConfigureAwait(false);
+                await task.ConfigureAwait(false);
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
@@ -71,8 +63,6 @@ public sealed class Client(
 
         if (state is not State.Status)
         {
-            await eventDispatcher.DispatchAsync(player!, new Left(), CancellationToken.None).ConfigureAwait(false);
-
             IOutgoingPacket final = state is State.Login
                 ? new LoginFailurePacket(reason.Serialize())
                 : new DisconnectPacket(reason.Serialize());
@@ -143,7 +133,7 @@ public sealed class Client(
     {
         if (packet.Identifier == StatusRequestPacket.Identifier)
         {
-            var request = await eventDispatcher.DispatchAsync(server, new StatusRequest(), source.Token).ConfigureAwait(false);
+            var request = await eventDispatcher.DispatchAsync(this, new Request(), source.Token).ConfigureAwait(false);
             await WriteAsync(new StatusResponsePacket(request.Status.Serialize())).ConfigureAwait(false);
 
             return;
@@ -156,23 +146,12 @@ public sealed class Client(
     private async Task LoginAsync(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
-
-        await eventDispatcher.DispatchAsync(this, new Login(loginStart.Username), source.Token).ConfigureAwait(false);
-        await WriteAsync(new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username)).ConfigureAwait(false);
-
-        state = State.Play;
-        player = new Player(server, this, loginStart.Username);
-
-        await eventDispatcher.DispatchAsync(player, new Joined(), source.Token).ConfigureAwait(false);
-
-        await WriteAsync(
-            new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
-            new PositionLookPacket(0, 0, 0, 0, 0, false)).ConfigureAwait(false);
+        await WriteAsync(new LoginFailurePacket(reason.Serialize())).ConfigureAwait(false);
     }
 
-    private async Task PlayAsync(Packet packet)
+    private Task PlayAsync(Packet packet)
     {
-        await eventDispatcher.DispatchAsync(player!, new Received(packet), source.Token).ConfigureAwait(false);
+        return Task.CompletedTask;
     }
 }
 

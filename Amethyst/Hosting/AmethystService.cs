@@ -3,25 +3,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystService(ILogger<AmethystService> logger, Server server) : BackgroundService
+internal sealed class AmethystService(Server server, ILogger<AmethystService> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await Task.Yield();
+        logger.LogInformation("Starting server");
 
         try
         {
-            logger.LogInformation("Starting server");
             await server.StartAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "Unexpected exception");
+            logger.LogError(exception, "An unhandled exception occurred.");
         }
         finally
         {
             server.Dispose();
-            logger.LogInformation("Server stopped");
         }
+
+        logger.LogInformation("Server stopped");
     }
 }

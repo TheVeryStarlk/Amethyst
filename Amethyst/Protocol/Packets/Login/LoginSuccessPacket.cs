@@ -1,0 +1,15 @@
+﻿using Amethyst.Components.Protocol;
+
+namespace Amethyst.Protocol.Packets.Login;
+
+public sealed record LoginSuccessPacket(string Guid, string Username) : IOutgoingPacket
+{
+    public int Identifier => 2;
+
+    public int Length => Variable.GetByteCount(Guid) + Variable.GetByteCount(Username);
+
+    public void Write(Span<byte> span)
+    {
+        SpanWriter.Create(span).WriteVariableString(Guid).WriteVariableString(Username);
+    }
+}
