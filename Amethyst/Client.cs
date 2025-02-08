@@ -1,6 +1,7 @@
 ﻿using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Clients;
+using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
 using Amethyst.Entities;
@@ -99,6 +100,11 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
                 : new DisconnectPacket(reason.Serialize());
 
             Write(final);
+
+            if (state is State.Play)
+            {
+                await eventDispatcher.DispatchAsync(Player!, new Left(), source.Token).ConfigureAwait(false);
+            }
         }
 
         // Give client some time to realize the packets.
@@ -158,24 +164,28 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         Stop(string.Empty);
     }
 
-    private Task LoginAsync(Packet packet)
+    private async Task LoginAsync(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
+
+        Player = new Player(this, loginStart.Username);
+
+        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
+
+        // Quit before switching to play state if token was cancelled.
+        source.Token.ThrowIfCancellationRequested();
 
         Write(
             new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
             new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
             new PositionLookPacket(0, 0, 0, 0, 0, false));
 
-        Player = new Player(this);
         state = State.Play;
-
-        return Task.CompletedTask;
     }
 
-    private Task PlayAsync(Packet packet)
+    private async Task PlayAsync(Packet packet)
     {
-        return Task.CompletedTask;
+        await eventDispatcher.DispatchAsync(this, new Received(packet), source.Token).ConfigureAwait(false);
     }
 }
 

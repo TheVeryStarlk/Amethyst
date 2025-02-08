@@ -4,9 +4,11 @@ using Amethyst.Components.Messages;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(Client client) : IPlayer
+internal sealed class Player(Client client, string username) : IPlayer
 {
     public IClient Client => client;
+
+    public string Username => username;
 
     public double X { get; set; }
 

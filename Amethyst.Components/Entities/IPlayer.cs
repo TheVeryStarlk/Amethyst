@@ -6,6 +6,8 @@ public interface IPlayer : IEntity
 {
     public IClient Client { get; }
 
+    public string Username { get; }
+
     public float Yaw { get; }
 
     public float Pitch { get; }
