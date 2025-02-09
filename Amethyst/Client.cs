@@ -184,14 +184,11 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         state = State.Play;
     }
 
-    private async Task PlayAsync(Packet packet)
+    private Task PlayAsync(Packet packet)
     {
-        if (!Dispatchable.Registered.TryGetValue(packet.Identifier, out var factory))
-        {
-            return;
-        }
-
-        await factory(packet).DispatchAsync(Player!, eventDispatcher, source.Token).ConfigureAwait(false);
+        return Dispatchable.Registered.TryGetValue(packet.Identifier, out var factory)
+            ? factory(packet).DispatchAsync(Player!, eventDispatcher, source.Token)
+            : Task.CompletedTask;
     }
 }
 
