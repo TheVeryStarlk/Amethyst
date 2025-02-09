@@ -172,14 +172,14 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         Player = new Player(this, loginStart.Username);
 
-        await eventDispatcher.DispatchAsync(Player, new Joining(), source.Token).ConfigureAwait(false);
+        var joining = await eventDispatcher.DispatchAsync(Player, new Joining(), source.Token).ConfigureAwait(false);
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();
 
         Write(
             new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
-            new JoinGamePacket(Identifier, 1, 0, 0, 1, "flat", false),
+            new JoinGamePacket(Identifier, joining.GameMode, 1, 0, 1, "flat", false),
             new PositionLookPacket(0, 0, 0, 0, 0, false));
 
         state = State.Play;
