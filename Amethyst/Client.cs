@@ -201,7 +201,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             return;
         }
 
-        await publisher.PublishAsync(Player!, eventDispatcher, source.Token).ConfigureAwait(false);
+        await publisher.PublishAsync(packet, Player!, eventDispatcher, source.Token).ConfigureAwait(false);
     }
 }
 

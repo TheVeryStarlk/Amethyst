@@ -1,5 +1,4 @@
 ﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Protocol;
 using Amethyst.Eventing;
@@ -16,8 +15,11 @@ public sealed record PositionPacket(double X, double Y, double Z, bool OnGround)
         return new PositionPacket(reader.ReadDouble(), reader.ReadDouble(), reader.ReadDouble(), reader.ReadBoolean());
     }
 
-    async Task IPublisher.PublishAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IPublisher.PublishAsync(Packet packet, IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        await eventDispatcher.DispatchAsync(player, new Moved(X, Y, Z, player.Yaw, player.Pitch, OnGround), cancellationToken).ConfigureAwait(false);
+        var instance = packet.Create<PositionPacket>();
+        var moved = new Moved(instance.X, instance.Y, instance.Z, player.Yaw, player.Pitch, instance.OnGround);
+
+        await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }
 }

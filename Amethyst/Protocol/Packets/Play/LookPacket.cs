@@ -1,5 +1,4 @@
 ﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Protocol;
 using Amethyst.Eventing;
@@ -16,8 +15,11 @@ public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoin
         return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
     }
 
-    async Task IPublisher.PublishAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IPublisher.PublishAsync(Packet packet, IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        await eventDispatcher.DispatchAsync(player, new Moved(player.X, player.Y, player.Z, Yaw, Pitch, OnGround), cancellationToken);
+        var instance = packet.Create<LookPacket>();
+        var moved = new Moved(player.X, player.Y, player.Z, instance.Yaw, instance.Pitch, instance.OnGround);
+
+        await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }
 }
