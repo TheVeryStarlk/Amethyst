@@ -1,0 +1,27 @@
+﻿using Amethyst.Components.Protocol;
+
+namespace Amethyst.Protocol.Packets.Play;
+
+public sealed record ChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmask) : IOutgoingPacket
+{
+    public int Identifier => 33;
+
+    public int Length => sizeof(int)
+                         + sizeof(int)
+                         + sizeof(bool)
+                         + sizeof(ushort)
+                         + Variable.GetByteCount(Chunk.Length)
+                         + Chunk.Length;
+
+    public void Write(Span<byte> span)
+    {
+        SpanWriter
+            .Create(span)
+            .WriteInteger(X)
+            .WriteInteger(Z)
+            .WriteBoolean(true)
+            .WriteUnsignedShort(Bitmask)
+            .WriteVariableInteger(Chunk.Length)
+            .Write(Chunk);
+    }
+}

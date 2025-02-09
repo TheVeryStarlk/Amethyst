@@ -33,6 +33,12 @@ internal ref struct SpanWriter(Span<byte> span)
         return this;
     }
 
+    public SpanWriter WriteUnsignedShort(ushort value)
+    {
+        BinaryPrimitives.WriteUInt16BigEndian(span[position..(position += sizeof(ushort))], value);
+        return this;
+    }
+
     public SpanWriter WriteInteger(int value)
     {
         BinaryPrimitives.WriteInt32BigEndian(span[position..(position += sizeof(int))], value);

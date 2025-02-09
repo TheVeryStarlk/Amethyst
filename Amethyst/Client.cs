@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Collections.Frozen;
+using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Clients;
@@ -142,7 +143,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         state = (State) handshake.State;
 
-        if (state is not State.Login || handshake.Version is 47)
+        if (state is State.Login or State.Play || handshake.Version is 47)
         {
             return;
         }
@@ -178,7 +179,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         Write(
             new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
-            new JoinGamePacket(Identifier, 0, 0, 0, 1, "default", false),
+            new JoinGamePacket(Identifier, 1, 0, 0, 1, "flat", false),
             new PositionLookPacket(0, 0, 0, 0, 0, false));
 
         state = State.Play;
@@ -186,7 +187,16 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private Task PlayAsync(Packet packet)
     {
-        return Dispatchable.Registered.TryGetValue(packet.Identifier, out var factory)
+        var dictionary = new Dictionary<int, Func<Packet, IDispatchable>>
+        {
+            { MessagePacket.Identifier, static packet => packet.Create<MessagePacket>() },
+            { OnGroundPacket.Identifier, static packet => packet.Create<OnGroundPacket>() },
+            { PositionPacket.Identifier, static packet => packet.Create<PositionPacket>() },
+            { LookPacket.Identifier, static packet => packet.Create<LookPacket>() },
+            { PositionLookPacket.Identifier, static packet => packet.Create<PositionLookPacket>() }
+        }.ToFrozenDictionary();
+
+        return dictionary.TryGetValue(packet.Identifier, out var factory)
             ? factory(packet).DispatchAsync(Player!, eventDispatcher, source.Token)
             : Task.CompletedTask;
     }
