@@ -1,65 +1,71 @@
-﻿namespace Amethyst.Worlds;
+﻿using Amethyst.Components.Worlds;
 
-internal sealed record Chunk(int X, int Z)
+namespace Amethyst.Worlds;
+
+internal sealed class Chunk(int x, int z) : IChunk
 {
+    public int X { get; } = x;
+
+    public int Z { get; } = z;
+
     private readonly Section?[] sections = new Section[16];
 
     public Block GetBlock(long x, long y, long z)
     {
-        var section = GetSection(x, y, z);
+        var section = GetSection(y);
         return section.GetBlock(x % 16, y % 16, z % 16);
     }
 
     public void SetBlock(Block block, long x, long y, long z)
     {
-        var section = GetSection(x, y, z);
+        var section = GetSection(y);
         section.SetBlock(block, x % 16, y % 16, z % 16);
     }
 
     public byte GetSkyLight(long x, long y, long z)
     {
-        var section = GetSection(x, y, z);
+        var section = GetSection(y);
         return section.GetSkyLight(x % 16, y % 16, z % 16);
     }
 
     public void SetSkyLight(byte value, long x, long y, long z)
     {
-        var section = GetSection(x, y, z);
+        var section = GetSection(y);
         section.SetSkyLight(value, x % 16, y % 16, z % 16);
     }
 
     public (byte[] Buffer, ushort Bitmask) Build()
     {
         var serializedSections = sections
-            .Where(section => section is not null)
-            .Select(section => section!.Build())
+            .OfType<Section>()
+            .Select(section => section.Build())
             .ToArray();
 
-        var payload = new List<byte>( /*12288 * serializedSections.Length + 256 */);
+        var list = new List<byte>(12288 * serializedSections.Length + 256);
 
         // Each of blocks, blocks light and skylight must be added separately.
         foreach (var section in serializedSections)
         {
-            payload.AddRange(section.Blocks);
+            list.AddRange(section.Blocks);
         }
 
         foreach (var section in serializedSections)
         {
-            payload.AddRange(section.BlocksLight);
+            list.AddRange(section.BlocksLight);
         }
 
         foreach (var section in serializedSections)
         {
-            payload.AddRange(section.SkyLight);
+            list.AddRange(section.SkyLight);
         }
 
         // Biomes.
-        payload.AddRange(new byte[256]);
+        list.AddRange(new byte[256]);
 
-        return (payload.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
+        return (list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
     }
 
-    private Section GetSection(long x, long y, long z)
+    private Section GetSection(long y)
     {
         var index = y >> 4;
         return sections[index] ?? (sections[index] = new Section());

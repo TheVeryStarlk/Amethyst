@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Worlds;
+﻿using Amethyst.Components.Worlds;
+
+namespace Amethyst.Worlds;
 
 internal sealed class Section
 {
@@ -50,8 +52,6 @@ internal sealed class Section
 
     private static long AsIndex(long x, long y, long z)
     {
-        return (x & 0xF) << 8 | (z & 0xF) << 4 | x & 0xF;
+        return (y & 0xF) << 8 | (z & 0xF) << 4 | x & 0xF;
     }
 }
-
-internal readonly record struct Block(int Type, int Metadata = 0);

@@ -1,6 +1,7 @@
 ﻿using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
+using Amethyst.Components.Worlds;
 using Amethyst.Entities;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
@@ -15,15 +16,27 @@ internal sealed class InternalSubscriber : ISubscriber
         {
             consumer.On<Sent>((source, _, _) =>
             {
-                var chunk = new Chunk(0, 0);
+                var chunks = new Chunk[]
+                {
+                    new(0, 0),
+                    new(-1, 0),
+                    new(-1, -1),
+                    new(0, -1),
+                };
 
-                chunk.SetBlock(new Block(1), 4, 4, 4);
+                foreach (var chunk in chunks)
+                {
+                    for (var x = 0; x < 16; x++)
+                    {
+                        for (var z = 0; z < 16; z++)
+                        {
+                            chunk.SetBlock(new Block(1), x, 4, z);
+                        }
+                    }
 
-                var build = chunk.Build();
-
-                var packet = new ChunkPacket(0, 0, build.Buffer, build.Bitmask);
-
-                source.Client.Write(packet);
+                    var build = chunk.Build();
+                    source.Client.Write(new ChunkPacket(chunk.X, chunk.Z, build.Buffer, build.Bitmask));
+                }
 
                 return Task.CompletedTask;
             });
