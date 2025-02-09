@@ -24,9 +24,15 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((player, _, _) =>
+            consumer.On<Joining>((player, _, _) =>
             {
                 players[player.Username] = player;
+                return Task.CompletedTask;
+            });
+
+            consumer.On<Sent>((player, _, _) =>
+            {
+                player.Move(1, 2, 3, 4, 5);
                 return Task.CompletedTask;
             });
 

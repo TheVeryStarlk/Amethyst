@@ -2,4 +2,4 @@
 
 namespace Amethyst.Components.Eventing.Sources.Players;
 
-public sealed class Joined : Event<IPlayer>;
+public sealed class Joining : Event<IPlayer>;

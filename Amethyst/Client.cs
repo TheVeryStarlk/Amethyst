@@ -171,7 +171,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         Player = new Player(this, loginStart.Username);
 
-        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(Player, new Joining(), source.Token).ConfigureAwait(false);
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();

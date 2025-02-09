@@ -23,6 +23,17 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
+    public void Move(double x, double y, double z, float pitch, float yaw)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+        Yaw = yaw;
+        Pitch = pitch;
+
+        client.Write(new PositionLookPacket(x, y, z, yaw, pitch, OnGround));
+    }
+
     public void Send(Message message, MessagePosition position = MessagePosition.Box)
     {
         client.Write(new MessagePacket(message.Serialize(), (byte) position));

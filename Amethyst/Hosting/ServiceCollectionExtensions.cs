@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAmethyst(this IServiceCollection services, Action<AmethystOptions> configure)
     {
-        configure(new AmethystOptions(services));
+        configure(new AmethystOptions(services).AddSubscriber<AmethystSubscriber>());
 
         services.AddSingleton<EventDispatcher>();
 
