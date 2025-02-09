@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Collections.Frozen;
+using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Clients;
@@ -186,31 +187,18 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private async Task PlayAsync(Packet packet)
     {
-        IPublisher publisher;
+        var dictionary = new Dictionary<int, IPublisher>
+        {
+            { MessagePacket.Identifier, new MessagePacket(string.Empty, 0) },
+            { OnGroundPacket.Identifier, new OnGroundPacket(false) },
+            { PositionPacket.Identifier, new PositionPacket(0, 0, 0, false) },
+            { LookPacket.Identifier, new LookPacket(0, 0, false) },
+            { PositionLookPacket.Identifier, new PositionLookPacket(0, 0, 0, 0, 0, false) }
+        }.ToFrozenDictionary();
 
-        if (packet.Identifier == MessagePacket.Identifier)
+        if (!dictionary.TryGetValue(packet.Identifier, out var publisher))
         {
-            publisher = packet.Create<MessagePacket>();
-        }
-        else if (packet.Identifier == OnGroundPacket.Identifier)
-        {
-            publisher = packet.Create<OnGroundPacket>();
-        }
-        else if (packet.Identifier == PositionPacket.Identifier)
-        {
-            publisher = packet.Create<PositionPacket>();
-        }
-        else if (packet.Identifier == LookPacket.Identifier)
-        {
-            publisher = packet.Create<LookPacket>();
-        }
-        else if (packet.Identifier == PositionLookPacket.Identifier)
-        {
-            publisher = packet.Create<PositionLookPacket>();
-        }
-        else
-        {
-            publisher = new DefaultPublisher(packet);
+            return;
         }
 
         await publisher.PublishAsync(Player!, eventDispatcher, source.Token).ConfigureAwait(false);
