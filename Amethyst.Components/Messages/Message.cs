@@ -20,8 +20,67 @@ public sealed class Message
 
     public static implicit operator Message(string text)
     {
-        // Should parse symbols as well.
-        return new Message { Text = text };
+        var extra = new List<Message>();
+        var index = 0;
+
+        while (index < text.Length)
+        {
+            if (text[index] is not '&')
+            {
+                index++;
+                continue;
+            }
+
+            var start = index++;
+
+            while (index < text.Length)
+            {
+                if (text[index] is '&')
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            var part = text[start..index];
+
+            if (part.Length < 2)
+            {
+                extra.Add(new Message { Text = part });
+                continue;
+            }
+
+            var prefix = char.ToLower(part[1]);
+            var previous = extra.Count > 0 ? extra.Last() : new Message();
+
+            var kind = prefix switch
+            {
+                >= '0' and <= '9' => (Color) int.Parse(prefix.ToString()),
+                'a' => Color.Green,
+                'b' => Color.Aqua,
+                'c' => Color.Red,
+                'd' => Color.LightPurple,
+                'e' => Color.Yellow,
+                'f' => Color.White,
+                _ => previous.Color
+            };
+
+            var current = new Message
+            {
+                Text = text[(start + 2)..index],
+                Obfuscated = prefix is 'k' || previous.Obfuscated,
+                Bold = prefix is 'l'|| previous.Bold,
+                StrikeThrough = prefix is 'm'|| previous.StrikeThrough,
+                Underlined = prefix is 'n'|| previous.Underlined,
+                Italic = prefix is 'o'|| previous.Italic,
+                Color = kind
+            };
+
+            extra.Add(current);
+        }
+
+        return new Message { Extra = extra };
     }
 
     public static Message Create(
