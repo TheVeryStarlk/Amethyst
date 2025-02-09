@@ -14,5 +14,7 @@ public interface IPlayer : IEntity
 
     public bool OnGround { get; }
 
+    public void Send(Message message, MessagePosition position = MessagePosition.Box);
+
     public void Disconnect(Message message);
 }

@@ -1,4 +1,5 @@
-﻿using Amethyst.Components.Messages;
+﻿using Amethyst.Components.Entities;
+using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
 
 namespace Amethyst.Components;
@@ -6,6 +7,8 @@ namespace Amethyst.Components;
 public interface IClient
 {
     public int Identifier { get; }
+
+    public IPlayer? Player { get; }
 
     /// <summary>
     /// Writes packet(s) to the client.

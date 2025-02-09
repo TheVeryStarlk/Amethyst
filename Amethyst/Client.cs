@@ -1,5 +1,6 @@
 ﻿using System.Threading.Channels;
 using Amethyst.Components;
+using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Messages;
@@ -21,7 +22,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 {
     public int Identifier => identifier;
 
-    public Player? Player { get; private set; }
+    public IPlayer? Player { get; private set; }
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
@@ -185,7 +186,10 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private async Task PlayAsync(Packet packet)
     {
-        await eventDispatcher.DispatchAsync(this, new Received(packet), source.Token).ConfigureAwait(false);
+        if (packet.Identifier == MessagePacket.Identifier)
+        {
+            await eventDispatcher.DispatchAsync(Player, new Sent(packet.Create<MessagePacket>().Message), source.Token).ConfigureAwait(false);
+        }
     }
 }
 
