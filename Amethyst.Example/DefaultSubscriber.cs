@@ -30,9 +30,15 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
                 return Task.CompletedTask;
             });
 
-            consumer.On<Sent>((player, _, _) =>
+            consumer.On<Sent>((player, sent, _) =>
             {
-                player.Move(1, 2, 3, 4, 5);
+                player.Send(sent.Message);
+                return Task.CompletedTask;
+            });
+
+            consumer.On<Moved>((player, _, _) =>
+            {
+                player.Send($"{player.Yaw}, {player.Pitch}");
                 return Task.CompletedTask;
             });
 

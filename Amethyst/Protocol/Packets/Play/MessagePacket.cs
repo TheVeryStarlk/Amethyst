@@ -1,8 +1,12 @@
-﻿using Amethyst.Components.Protocol;
+﻿using Amethyst.Components.Entities;
+using Amethyst.Components.Eventing;
+using Amethyst.Components.Eventing.Sources.Players;
+using Amethyst.Components.Protocol;
+using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket
+public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket, IPublisher
 {
     public static int Identifier => 1;
 
@@ -19,5 +23,10 @@ public sealed record MessagePacket(string Message, byte Position) : IIngoingPack
     public void Write(Span<byte> span)
     {
         SpanWriter.Create(span).WriteVariableString(Message).WriteByte(Position);
+    }
+
+    async Task IPublisher.PublishAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    {
+        await eventDispatcher.DispatchAsync(player, new Sent(Message), cancellationToken).ConfigureAwait(false);
     }
 }

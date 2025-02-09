@@ -1,7 +1,7 @@
 ﻿using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
-using Amethyst.Components.Messages;
+using Amethyst.Entities;
 
 namespace Amethyst.Hosting;
 
@@ -9,15 +9,16 @@ internal sealed class AmethystSubscriber : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
-        registry.For<IPlayer>(consumer => consumer.On<Sent>((player, sent, _) =>
+        registry.For<IPlayer>(consumer => consumer.On<Moved>((source, moved, _) =>
         {
-            var message = Message
-                .Create()
-                .Write($"{player.Username}: ").Gray()
-                .Write(sent.Message)
-                .Build();
+            var player = (Player) source;
+            player.X = moved.X;
+            player.Y = moved.Y;
+            player.Z = moved.Z;
+            player.Yaw = moved.Yaw;
+            player.Pitch = moved.Pitch;
+            player.OnGround = moved.OnGround;
 
-            player.Send(message);
             return Task.CompletedTask;
         }));
     }

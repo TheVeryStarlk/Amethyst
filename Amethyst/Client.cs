@@ -186,10 +186,34 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private async Task PlayAsync(Packet packet)
     {
+        IPublisher publisher;
+
         if (packet.Identifier == MessagePacket.Identifier)
         {
-            await eventDispatcher.DispatchAsync(Player, new Sent(packet.Create<MessagePacket>().Message), source.Token).ConfigureAwait(false);
+            publisher = packet.Create<MessagePacket>();
         }
+        else if (packet.Identifier == OnGroundPacket.Identifier)
+        {
+            publisher = packet.Create<OnGroundPacket>();
+        }
+        else if (packet.Identifier == PositionPacket.Identifier)
+        {
+            publisher = packet.Create<PositionPacket>();
+        }
+        else if (packet.Identifier == LookPacket.Identifier)
+        {
+            publisher = packet.Create<LookPacket>();
+        }
+        else if (packet.Identifier == PositionLookPacket.Identifier)
+        {
+            publisher = packet.Create<PositionLookPacket>();
+        }
+        else
+        {
+            publisher = new DefaultPublisher(packet);
+        }
+
+        await publisher.PublishAsync(Player!, eventDispatcher, source.Token).ConfigureAwait(false);
     }
 }
 
