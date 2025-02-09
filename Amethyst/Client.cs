@@ -1,5 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Threading.Channels;
+﻿using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Clients;
@@ -187,21 +186,12 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private async Task PlayAsync(Packet packet)
     {
-        var dictionary = new Dictionary<int, IPublisher>
-        {
-            { MessagePacket.Identifier, new MessagePacket(string.Empty, 0) },
-            { OnGroundPacket.Identifier, new OnGroundPacket(false) },
-            { PositionPacket.Identifier, new PositionPacket(0, 0, 0, false) },
-            { LookPacket.Identifier, new LookPacket(0, 0, false) },
-            { PositionLookPacket.Identifier, new PositionLookPacket(0, 0, 0, 0, 0, false) }
-        }.ToFrozenDictionary();
-
-        if (!dictionary.TryGetValue(packet.Identifier, out var publisher))
+        if (!Dispatchable.Registered.TryGetValue(packet.Identifier, out var factory))
         {
             return;
         }
 
-        await publisher.PublishAsync(packet, Player!, eventDispatcher, source.Token).ConfigureAwait(false);
+        await factory(packet).DispatchAsync(Player!, eventDispatcher, source.Token).ConfigureAwait(false);
     }
 }
 

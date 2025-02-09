@@ -5,7 +5,7 @@ using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket, IPublisher
+public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket, IDispatchable
 {
     public static int Identifier => 1;
 
@@ -24,11 +24,9 @@ public sealed record MessagePacket(string Message, byte Position) : IIngoingPack
         SpanWriter.Create(span).WriteVariableString(Message).WriteByte(Position);
     }
 
-    async Task IPublisher.PublishAsync(Packet packet, IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        var instance = packet.Create<MessagePacket>();
-        var sent = new Sent(instance.Message);
-
+        var sent = new Sent(Message);
         await eventDispatcher.DispatchAsync(player, sent, cancellationToken).ConfigureAwait(false);
     }
 }

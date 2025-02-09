@@ -5,7 +5,7 @@ using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoingPacket<LookPacket>, IPublisher
+public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoingPacket<LookPacket>, IDispatchable
 {
     public static int Identifier => 5;
 
@@ -15,11 +15,9 @@ public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoin
         return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
     }
 
-    async Task IPublisher.PublishAsync(Packet packet, IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        var instance = packet.Create<LookPacket>();
-        var moved = new Moved(player.X, player.Y, player.Z, instance.Yaw, instance.Pitch, instance.OnGround);
-
+        var moved = new Moved(player.X, player.Y, player.Z, Yaw, Pitch, OnGround);
         await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }
 }
