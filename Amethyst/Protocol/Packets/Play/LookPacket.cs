@@ -17,7 +17,7 @@ public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoin
 
     async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        var moved = new Moved(player.X, player.Y, player.Z, Yaw, Pitch, OnGround);
+        var moved = new Moved(player.Location, Yaw, Pitch, OnGround);
         await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }
 }

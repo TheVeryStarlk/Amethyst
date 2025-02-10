@@ -1,4 +1,5 @@
 ﻿using Amethyst.Components.Worlds;
+using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Worlds;
 
@@ -10,31 +11,31 @@ internal sealed class Chunk(int x, int z) : IChunk
 
     private readonly Section?[] sections = new Section[16];
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(Position position)
     {
-        var section = GetSection(y);
-        return section.GetBlock(x % 16, y % 16, z % 16);
+        var section = GetSection(position.Y);
+        return section.GetBlock(position % 16);
     }
 
-    public void SetBlock(Block block, int x, int y, int z)
+    public void SetBlock(Block block, Position position)
     {
-        var section = GetSection(y);
-        section.SetBlock(block, x % 16, y % 16, z % 16);
+        var section = GetSection(position.Y);
+        section.SetBlock(block, position % 16);
     }
 
-    public byte GetSkyLight(int x, int y, int z)
+    public byte GetSkyLight(Position position)
     {
-        var section = GetSection(y);
-        return section.GetSkyLight(x % 16, y % 16, z % 16);
+        var section = GetSection(position.Y);
+        return section.GetSkyLight(position % 16);
     }
 
-    public void SetSkyLight(byte value, int x, int y, int z)
+    public void SetSkyLight(byte value, Position position)
     {
-        var section = GetSection(y);
-        section.SetSkyLight(value, x % 16, y % 16, z % 16);
+        var section = GetSection(position.Y);
+        section.SetSkyLight(value, position % 16);
     }
 
-    public (byte[] Buffer, ushort Bitmask) Build()
+    public ChunkPacket Build()
     {
         var serializedSections = sections
             .OfType<Section>()
@@ -62,7 +63,7 @@ internal sealed class Chunk(int x, int z) : IChunk
         // Biomes.
         list.AddRange(new byte[256]);
 
-        return (list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
+        return new ChunkPacket(X, Z, list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
     }
 
     private Section GetSection(int y)

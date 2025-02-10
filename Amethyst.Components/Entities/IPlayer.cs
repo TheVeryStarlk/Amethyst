@@ -14,7 +14,7 @@ public interface IPlayer : IEntity
 
     public bool OnGround { get; }
 
-    public void Move(double x, double y, double z, float pitch, float yaw);
+    public void Move(Location location, float pitch, float yaw);
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box);
 

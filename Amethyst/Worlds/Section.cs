@@ -8,9 +8,9 @@ internal sealed class Section
     private readonly byte[] blocksLight = new byte[2048];
     private readonly byte[] skyLight = new byte[2048];
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(Position position)
     {
-        var index = AsIndex(x, y, z) * 2;
+        var index = AsIndex(position) * 2;
 
         var type = blocks[index] >> 4 | blocks[index + 1] << 4;
         var metadata = blocks[index] & 0x0F;
@@ -18,24 +18,24 @@ internal sealed class Section
         return new Block(type, metadata);
     }
 
-    public void SetBlock(Block block, int x, int y, int z)
+    public void SetBlock(Block block, Position position)
     {
-        var index = AsIndex(x, y, z) * 2;
+        var index = AsIndex(position) * 2;
         var type = block.Type;
 
         blocks[index] = (byte) (type << 4 | block.Metadata);
         blocks[index + 1] = (byte) (type >> 4);
     }
 
-    public byte GetSkyLight(int x, int y, int z)
+    public byte GetSkyLight(Position position)
     {
-        var index = AsIndex(x, y, z);
+        var index = AsIndex(position);
         return skyLight[index];
     }
 
-    public void SetSkyLight(byte value, int x, int y, int z)
+    public void SetSkyLight(byte value, Position position)
     {
-        var index = AsIndex(x, y, z);
+        var index = AsIndex(position);
         skyLight[index] = value;
     }
 
@@ -50,8 +50,8 @@ internal sealed class Section
         return (blocks, blocksLight, skyLight);
     }
 
-    private static int AsIndex(int x, int y, int z)
+    private static int AsIndex(Position position)
     {
-        return (y & 0xF) << 8 | (z & 0xF) << 4 | x & 0xF;
+        return (position.Y & 0xF) << 8 | (position.Z & 0xF) << 4 | position.X & 0xF;
     }
 }

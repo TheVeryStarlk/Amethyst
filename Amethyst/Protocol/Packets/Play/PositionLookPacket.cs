@@ -5,7 +5,7 @@ using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record PositionLookPacket(double X, double Y, double Z, float Yaw, float Pitch, bool OnGround)
+public sealed record PositionLookPacket(Location Location, float Yaw, float Pitch, bool OnGround)
     : IIngoingPacket<PositionLookPacket>, IOutgoingPacket, IDispatchable
 {
     public static int Identifier => 6;
@@ -24,9 +24,10 @@ public sealed record PositionLookPacket(double X, double Y, double Z, float Yaw,
         var reader = new SpanReader(span);
 
         return new PositionLookPacket(
-            reader.ReadDouble(),
-            reader.ReadDouble(),
-            reader.ReadDouble(),
+            new Location(
+                reader.ReadDouble(),
+                reader.ReadDouble(),
+                reader.ReadDouble()),
             reader.ReadFloat(),
             reader.ReadFloat(),
             reader.ReadBoolean());
@@ -36,9 +37,9 @@ public sealed record PositionLookPacket(double X, double Y, double Z, float Yaw,
     {
         SpanWriter
             .Create(span)
-            .WriteDouble(X)
-            .WriteDouble(Y)
-            .WriteDouble(Z)
+            .WriteDouble(Location.X)
+            .WriteDouble(Location.Y)
+            .WriteDouble(Location.Z)
             .WriteFloat(Yaw)
             .WriteFloat(Pitch)
             .WriteBoolean(OnGround);
@@ -46,7 +47,7 @@ public sealed record PositionLookPacket(double X, double Y, double Z, float Yaw,
 
     async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        var moved = new Moved(X, Y, Z, Yaw, Pitch, OnGround);
+        var moved = new Moved(Location, Yaw, Pitch, OnGround);
         await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }
 }

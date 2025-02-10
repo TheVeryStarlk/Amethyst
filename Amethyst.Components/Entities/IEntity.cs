@@ -2,9 +2,5 @@
 
 public interface IEntity
 {
-    public double X { get; }
-
-    public double Y { get; }
-
-    public double Z { get; }
+    public Location Location { get; }
 }

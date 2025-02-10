@@ -2,7 +2,7 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name)
+internal sealed class World(string name) : IWorld
 {
     public string Name { get; } = name;
 
@@ -10,14 +10,14 @@ internal sealed class World(string name)
 
     private readonly List<Region> regions = [];
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(Position position)
     {
-        return GetRegion(x, z).GetBlock(x, y, z);
+        return GetRegion(position.X, position.Z).GetBlock(position);
     }
 
-    public void SetBlock(Block block, int x, int y, int z)
+    public void SetBlock(Block block, Position position)
     {
-        GetRegion(x, z).SetBlock(block, x, y, z);
+        GetRegion(position.X, position.Z).SetBlock(block, position);
     }
 
     private Region GetRegion(int x, int z)
@@ -32,7 +32,12 @@ internal sealed class World(string name)
             return region;
         }
 
-        region = new Region(x, z);
+        region = new Region
+        {
+            X = x,
+            Z = z
+        };
+
         regions.Add(region);
 
         return region;

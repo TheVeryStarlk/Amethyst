@@ -11,11 +11,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public string Username => username;
 
-    public double X { get; set; }
-
-    public double Y { get; set; }
-
-    public double Z { get; set; }
+    public Location Location { get; set; }
 
     public float Yaw { get; set; }
 
@@ -23,15 +19,13 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public void Move(double x, double y, double z, float pitch, float yaw)
+    public void Move(Location location, float pitch, float yaw)
     {
-        X = x;
-        Y = y;
-        Z = z;
+        Location = location;
         Yaw = yaw;
         Pitch = pitch;
 
-        client.Write(new PositionLookPacket(x, y, z, yaw, pitch, OnGround));
+        client.Write(new PositionLookPacket(location, yaw, pitch, OnGround));
     }
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box)

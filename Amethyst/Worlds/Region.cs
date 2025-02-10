@@ -2,11 +2,11 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class Region(int x, int z) : IRegion
+internal sealed class Region : IRegion
 {
-    public int X { get; } = x;
+    public required int X { get; init; }
 
-    public int Z { get; } = z;
+    public required int Z { get; init; }
 
     public IEnumerable<IChunk> Chunks => chunks;
 
@@ -35,27 +35,27 @@ internal sealed class Region(int x, int z) : IRegion
         chunks.Add(chunk);
     }
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(Position position)
     {
-        var chunk = GetChunk(x, z);
-        return chunk.GetBlock(x, y, z);
+        var chunk = GetChunk(position.X, position.Z);
+        return chunk.GetBlock(position);
     }
 
-    public void SetBlock(Block block, int x, int y, int z)
+    public void SetBlock(Block block, Position position)
     {
-        var chunk = GetChunk(x, z);
-        chunk.SetBlock(block, x, y, z);
+        var chunk = GetChunk(position.X, position.Z);
+        chunk.SetBlock(block, position);
     }
 
-    public byte GetSkyLight(int x, int y, int z)
+    public byte GetSkyLight(Position position)
     {
-        var chunk = GetChunk(x, z);
-        return chunk.GetSkyLight(x, y, z);
+        var chunk = GetChunk(position.X, position.Z);
+        return chunk.GetSkyLight(position);
     }
 
-    public void SetSkyLight(byte value, int x, int y, int z)
+    public void SetSkyLight(byte value, Position position)
     {
-        var chunk = GetChunk(x, z);
-        chunk.SetSkyLight(value, x, y, z);
+        var chunk = GetChunk(position.X, position.Z);
+        chunk.SetSkyLight(value,position);
     }
 }

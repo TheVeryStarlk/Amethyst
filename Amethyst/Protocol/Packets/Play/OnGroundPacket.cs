@@ -17,7 +17,7 @@ public sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>
 
     async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
-        var moved = new Moved(player.X, player.Y, player.Z, player.Yaw, player.Pitch, Value);
+        var moved = new Moved(player.Location, player.Yaw, player.Pitch, Value);
         await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }
 }

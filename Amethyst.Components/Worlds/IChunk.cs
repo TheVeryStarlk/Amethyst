@@ -6,7 +6,7 @@ public interface IChunk
 
     public int Z { get; }
 
-    public Block GetBlock(int x, int y, int z);
+    public Block GetBlock(Position position);
 
-    public void SetBlock(Block block, int x, int y, int z);
+    public void SetBlock(Block block, Position position);
 }

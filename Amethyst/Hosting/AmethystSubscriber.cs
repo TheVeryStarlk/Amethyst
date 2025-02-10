@@ -22,7 +22,7 @@ internal sealed class AmethystSubscriber : ISubscriber
                 {
                     for (var z = -64; z < 64; z++)
                     {
-                        world.SetBlock(new Block(1), x, 2, z);
+                        world.SetBlock(new Block(1), new Position(x, 2, z));
                     }
                 }
 
@@ -30,8 +30,7 @@ internal sealed class AmethystSubscriber : ISubscriber
                 {
                     foreach (var chunk in region.Chunks.OfType<Chunk>())
                     {
-                        var build = chunk.Build();
-                        source.Client.Write(new ChunkPacket(chunk.X, chunk.Z, build.Buffer, build.Bitmask));
+                        source.Client.Write(chunk.Build());
                     }
                 }
 
@@ -43,9 +42,7 @@ internal sealed class AmethystSubscriber : ISubscriber
                 // We need to access the internal class to update the player's properties.
                 var player = (Player) source;
 
-                player.X = moved.X;
-                player.Y = moved.Y;
-                player.Z = moved.Z;
+                player.Location = moved.Location;
                 player.Yaw = moved.Yaw;
                 player.Pitch = moved.Pitch;
                 player.OnGround = moved.OnGround;

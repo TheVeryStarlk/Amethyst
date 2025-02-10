@@ -2,13 +2,9 @@
 
 namespace Amethyst.Components.Eventing.Sources.Players;
 
-public sealed class Moved(double x, double y, double z, float yaw, float pitch, bool onGround) : Event<IPlayer>
+public sealed class Moved(Location location, float yaw, float pitch, bool onGround) : Event<IPlayer>
 {
-    public double X => x;
-
-    public double Y  => y;
-
-    public double Z  => z;
+    public Location Location => location;
 
     public float Yaw  => yaw;
 

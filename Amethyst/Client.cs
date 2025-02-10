@@ -180,7 +180,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         Write(
             new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
             new JoinGamePacket(Identifier, joining.GameMode, 0, 0, 1, "flat", false),
-            new PositionLookPacket(0, 0, 0, 0, 0, false));
+            new PositionLookPacket(new Location(), 0, 0, false));
 
         state = State.Play;
 
