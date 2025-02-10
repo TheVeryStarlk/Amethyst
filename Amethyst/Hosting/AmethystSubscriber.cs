@@ -3,13 +3,16 @@ using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
 using Amethyst.Entities;
-using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystSubscriber : ISubscriber
+using Vector = (int X, int Z);
+
+internal sealed class AmethystSubscriber() : ISubscriber
 {
+    private readonly List<Vector> chunks = [];
+
     public void Subscribe(IRegistry registry)
     {
         registry.For<IPlayer>(consumer =>
@@ -46,6 +49,27 @@ internal sealed class AmethystSubscriber : ISubscriber
                 player.Yaw = moved.Yaw;
                 player.Pitch = moved.Pitch;
                 player.OnGround = moved.OnGround;
+
+                var vector = new Vector((int) player.Location.X >> 4, (int) player.Location.Z >> 4);
+
+                if (chunks.Contains(vector) || chunks.Count >= 32)
+                {
+                    return Task.CompletedTask;
+                }
+
+                var chunk = new Chunk(vector.X, vector.Z);
+
+                for (var x = 0; x < 16; x++)
+                {
+                    for (var z = 0; z < 16; z++)
+                    {
+                        chunk.SetBlock(new Block(35, Random.Shared.Next(15)), new Position(x, 2, z));
+                    }
+                }
+
+                chunks.Add(vector);
+
+                player.Client.Write(chunk.Build());
 
                 return Task.CompletedTask;
             });
