@@ -13,12 +13,12 @@ internal sealed class ProtocolWriter(PipeWriter output)
         var body = Variable.GetByteCount(length);
 
         var total = body + length;
-
         var span = output.GetSpan(total);
-        var writer = new SpanWriter(span);
 
-        writer.WriteVariableInteger(length);
-        writer.WriteVariableInteger(packet.Identifier);
+        SpanWriter
+            .Create(span)
+            .WriteVariableInteger(length)
+            .WriteVariableInteger(packet.Identifier);
 
         var index = body + identifier;
         packet.Write(span[index..]);
