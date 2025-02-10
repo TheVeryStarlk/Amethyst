@@ -16,7 +16,7 @@ internal sealed class InternalSubscriber : ISubscriber
         {
             consumer.On<Sent>((source, _, _) =>
             {
-                var world = new World();
+                var world = new World("Funny");
 
                 for (var x = -16; x < 16; x++)
                 {
