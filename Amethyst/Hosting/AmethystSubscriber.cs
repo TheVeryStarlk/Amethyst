@@ -9,7 +9,7 @@ namespace Amethyst.Hosting;
 
 using Vector = (int X, int Z);
 
-internal sealed class AmethystSubscriber() : ISubscriber
+internal sealed class AmethystSubscriber : ISubscriber
 {
     private readonly List<Vector> chunks = [];
 
@@ -17,26 +17,15 @@ internal sealed class AmethystSubscriber() : ISubscriber
     {
         registry.For<IPlayer>(consumer =>
         {
+            consumer.On<Joined>((source, _, _) =>
+            {
+                source.Spawn(new World("Funny"));
+                return Task.CompletedTask;
+            });
+
             consumer.On<Sent>((source, _, _) =>
             {
-                var world = new World("Funny");
-
-                for (var x = -64; x < 64; x++)
-                {
-                    for (var z = -64; z < 64; z++)
-                    {
-                        world.SetBlock(new Block(1), new Position(x, 2, z));
-                    }
-                }
-
-                foreach (var region in world.Regions)
-                {
-                    foreach (var chunk in region.Chunks.OfType<Chunk>())
-                    {
-                        source.Client.Write(chunk.Build());
-                    }
-                }
-
+                source.Spawn(new World("Funny"));
                 return Task.CompletedTask;
             });
 

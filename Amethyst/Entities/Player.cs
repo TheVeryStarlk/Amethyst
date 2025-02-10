@@ -1,6 +1,8 @@
 ﻿using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Messages;
+using Amethyst.Components.Protocol;
+using Amethyst.Components.Worlds;
 using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Entities;
@@ -19,13 +21,22 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public void Move(Location location, float pitch, float yaw)
-    {
-        Location = location;
-        Yaw = yaw;
-        Pitch = pitch;
+    public IWorld? World { get; set; }
 
-        client.Write(new PositionLookPacket(location, yaw, pitch, OnGround));
+    public void Spawn(IWorld world)
+    {
+        if (World == world)
+        {
+            return;
+        }
+
+        IOutgoingPacket packet = World is null
+            ? new JoinGamePacket(client.Identifier, 1, 0, 0, 1, "flat", false)
+            : new RespawnPacket(0, 0, 1, "flat");
+
+        client.Write(packet, new PositionLookPacket(Location, Yaw, Pitch, OnGround));
+
+        World = world;
     }
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box)

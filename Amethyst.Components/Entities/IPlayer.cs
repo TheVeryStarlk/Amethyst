@@ -1,4 +1,5 @@
 ﻿using Amethyst.Components.Messages;
+using Amethyst.Components.Worlds;
 
 namespace Amethyst.Components.Entities;
 
@@ -14,7 +15,9 @@ public interface IPlayer : IEntity
 
     public bool OnGround { get; }
 
-    public void Move(Location location, float pitch, float yaw);
+    public IWorld? World { get; }
+
+    public void Spawn(IWorld world);
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box);
 

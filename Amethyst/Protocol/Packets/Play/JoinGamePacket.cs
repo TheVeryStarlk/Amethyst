@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, byte Difficulty, byte Players, string LevelType, bool ReducedDebugInformation) : IOutgoingPacket
+public sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, byte Difficulty, byte Players, string Type, bool ReducedDebugInformation) : IOutgoingPacket
 {
     public int Identifier => 1;
 
@@ -11,7 +11,7 @@ public sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, 
                          + sizeof(sbyte)
                          + sizeof(byte)
                          + sizeof(byte)
-                         + Variable.GetByteCount(LevelType)
+                         + Variable.GetByteCount(Type)
                          + sizeof(bool);
 
     public void Write(Span<byte> span)
@@ -23,7 +23,7 @@ public sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, 
             .WriteByte((byte) Dimension)
             .WriteByte(Difficulty)
             .WriteByte(Players)
-            .WriteVariableString(LevelType)
+            .WriteVariableString(Type)
             .WriteBoolean(ReducedDebugInformation);
     }
 }
