@@ -8,7 +8,7 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-internal sealed class InternalSubscriber : ISubscriber
+internal sealed class AmethystSubscriber : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
