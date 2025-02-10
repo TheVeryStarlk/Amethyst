@@ -183,6 +183,8 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             new PositionLookPacket(0, 0, 0, 0, 0, false));
 
         state = State.Play;
+
+        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
     }
 
     private Task PlayAsync(Packet packet)
