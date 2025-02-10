@@ -18,9 +18,9 @@ internal sealed class InternalSubscriber : ISubscriber
             {
                 var world = new World("Funny");
 
-                for (var x = -16; x < 16; x++)
+                for (var x = -64; x < 64; x++)
                 {
-                    for (var z = -16; z < 16; z++)
+                    for (var z = -64; z < 64; z++)
                     {
                         world.SetBlock(new Block(1), x, 2, z);
                     }
@@ -31,7 +31,7 @@ internal sealed class InternalSubscriber : ISubscriber
                     foreach (var chunk in region.Chunks.OfType<Chunk>())
                     {
                         var build = chunk.Build();
-                        source.Client.Write(new ChunkPacket(region.X, region.Z, build.Buffer, build.Bitmask));
+                        source.Client.Write(new ChunkPacket(chunk.X, chunk.Z, build.Buffer, build.Bitmask));
                     }
                 }
 
