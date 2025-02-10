@@ -42,7 +42,7 @@ public sealed record PositionLookPacket(Location Location, float Yaw, float Pitc
             .WriteDouble(Location.Z)
             .WriteFloat(Yaw)
             .WriteFloat(Pitch)
-            .WriteBoolean(OnGround);
+            .WriteBoolean(false);
     }
 
     async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
