@@ -1,5 +1,4 @@
 ﻿using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Amethyst.Protocol;
@@ -12,7 +11,7 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
 
     public bool ReadBoolean()
     {
-        return Unsafe.BitCast<byte, bool>(span[position++]);
+        return span[position++] > 0;
     }
 
     public ushort ReadUnsignedShort()
