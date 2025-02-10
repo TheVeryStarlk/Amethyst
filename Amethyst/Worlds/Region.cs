@@ -56,6 +56,6 @@ internal sealed class Region : IRegion
     public void SetSkyLight(byte value, Position position)
     {
         var chunk = GetChunk(position.X, position.Z);
-        chunk.SetSkyLight(value,position);
+        chunk.SetSkyLight(value, position);
     }
 }

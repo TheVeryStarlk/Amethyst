@@ -6,9 +6,9 @@ public sealed class Moved(Location location, float yaw, float pitch, bool onGrou
 {
     public Location Location => location;
 
-    public float Yaw  => yaw;
+    public float Yaw => yaw;
 
-    public float Pitch  => pitch;
+    public float Pitch => pitch;
 
-    public bool OnGround  => onGround;
+    public bool OnGround => onGround;
 }
