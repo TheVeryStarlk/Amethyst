@@ -16,26 +16,23 @@ internal sealed class InternalSubscriber : ISubscriber
         {
             consumer.On<Sent>((source, _, _) =>
             {
-                var chunks = new Chunk[]
-                {
-                    new(0, 0),
-                    new(-1, 0),
-                    new(-1, -1),
-                    new(0, -1),
-                };
+                var world = new World();
 
-                foreach (var chunk in chunks)
+                for (var x = -16; x < 16; x++)
                 {
-                    for (var x = 0; x < 16; x++)
+                    for (var z = -16; z < 16; z++)
                     {
-                        for (var z = 0; z < 16; z++)
-                        {
-                            chunk.SetBlock(new Block(1), x, 4, z);
-                        }
+                        world.SetBlock(new Block(1), x, 2, z);
                     }
+                }
 
-                    var build = chunk.Build();
-                    source.Client.Write(new ChunkPacket(chunk.X, chunk.Z, build.Buffer, build.Bitmask));
+                foreach (var region in world.Regions)
+                {
+                    foreach (var chunk in region.Chunks.OfType<Chunk>())
+                    {
+                        var build = chunk.Build();
+                        source.Client.Write(new ChunkPacket(region.X, region.Z, build.Buffer, build.Bitmask));
+                    }
                 }
 
                 return Task.CompletedTask;

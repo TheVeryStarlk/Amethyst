@@ -10,25 +10,25 @@ internal sealed class Chunk(int x, int z) : IChunk
 
     private readonly Section?[] sections = new Section[16];
 
-    public Block GetBlock(long x, long y, long z)
+    public Block GetBlock(int x, int y, int z)
     {
         var section = GetSection(y);
         return section.GetBlock(x % 16, y % 16, z % 16);
     }
 
-    public void SetBlock(Block block, long x, long y, long z)
+    public void SetBlock(Block block, int x, int y, int z)
     {
         var section = GetSection(y);
         section.SetBlock(block, x % 16, y % 16, z % 16);
     }
 
-    public byte GetSkyLight(long x, long y, long z)
+    public byte GetSkyLight(int x, int y, int z)
     {
         var section = GetSection(y);
         return section.GetSkyLight(x % 16, y % 16, z % 16);
     }
 
-    public void SetSkyLight(byte value, long x, long y, long z)
+    public void SetSkyLight(byte value, int x, int y, int z)
     {
         var section = GetSection(y);
         section.SetSkyLight(value, x % 16, y % 16, z % 16);
@@ -65,7 +65,7 @@ internal sealed class Chunk(int x, int z) : IChunk
         return (list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
     }
 
-    private Section GetSection(long y)
+    private Section GetSection(int y)
     {
         var index = y >> 4;
         return sections[index] ?? (sections[index] = new Section());
