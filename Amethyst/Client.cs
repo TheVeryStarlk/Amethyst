@@ -23,12 +23,14 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 {
     public int Identifier => identifier;
 
-    public IPlayer? Player { get; private set; }
+    public IPlayer? Player => player;
 
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
+
     private State state;
+    private Player? player;
     private Message reason = "No reason specified.";
 
     public Task StartAsync()
@@ -105,7 +107,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
             if (state is State.Play)
             {
-                await eventDispatcher.DispatchAsync(Player!, new Left(), source.Token).ConfigureAwait(false);
+                await eventDispatcher.DispatchAsync(player!, new Left(), source.Token).ConfigureAwait(false);
             }
         }
 
@@ -170,9 +172,9 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     {
         var loginStart = packet.Create<LoginStartPacket>();
 
-        Player = new Player(this, loginStart.Username);
+        player = new Player(this, loginStart.Username);
 
-        await eventDispatcher.DispatchAsync(Player, new Joining(), source.Token).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(player, new Joining(), source.Token).ConfigureAwait(false);
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();
@@ -181,7 +183,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         state = State.Play;
 
-        await eventDispatcher.DispatchAsync(Player, new Joined(), source.Token).ConfigureAwait(false);
+        await eventDispatcher.DispatchAsync(player, new Joined(), source.Token).ConfigureAwait(false);
     }
 
     private Task PlayAsync(Packet packet)
@@ -196,7 +198,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         }.ToFrozenDictionary();
 
         return dictionary.TryGetValue(packet.Identifier, out var factory)
-            ? factory(packet).DispatchAsync(Player!, eventDispatcher, source.Token)
+            ? factory(packet).DispatchAsync(player!, eventDispatcher, source.Token)
             : Task.CompletedTask;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Protocol;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
@@ -21,8 +22,11 @@ public sealed record PositionPacket(Location Location, bool OnGround) : IIngoing
             reader.ReadBoolean());
     }
 
-    async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
+        player.Location = Location;
+        player.OnGround = OnGround;
+
         var moved = new Moved(Location, player.Yaw, player.Pitch, OnGround);
         await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }

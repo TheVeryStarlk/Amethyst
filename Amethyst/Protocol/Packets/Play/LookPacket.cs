@@ -1,6 +1,6 @@
-﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Eventing.Sources.Players;
+﻿using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Protocol;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
@@ -15,8 +15,12 @@ public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoin
         return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
     }
 
-    async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
+        player.Yaw = Yaw;
+        player.Pitch = Pitch;
+        player.OnGround = OnGround;
+
         var moved = new Moved(player.Location, Yaw, Pitch, OnGround);
         await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
     }

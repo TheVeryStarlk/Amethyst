@@ -2,7 +2,6 @@
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
-using Amethyst.Entities;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
@@ -29,17 +28,9 @@ internal sealed class AmethystSubscriber : ISubscriber
                 return Task.CompletedTask;
             });
 
-            consumer.On<Moved>((source, moved, _) =>
+            consumer.On<Moved>((source, _, _) =>
             {
-                // We need to access the internal class to update the player's properties.
-                var player = (Player) source;
-
-                player.Location = moved.Location;
-                player.Yaw = moved.Yaw;
-                player.Pitch = moved.Pitch;
-                player.OnGround = moved.OnGround;
-
-                var vector = new Vector((int) player.Location.X >> 4, (int) player.Location.Z >> 4);
+                var vector = new Vector((int) source.Location.X >> 4, (int) source.Location.Z >> 4);
 
                 if (chunks.Contains(vector) || chunks.Count >= 32)
                 {
@@ -58,7 +49,7 @@ internal sealed class AmethystSubscriber : ISubscriber
 
                 chunks.Add(vector);
 
-                player.Client.Write(chunk.Build());
+                source.Client.Write(chunk.Build());
 
                 return Task.CompletedTask;
             });

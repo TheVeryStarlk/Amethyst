@@ -1,6 +1,6 @@
-﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Eventing.Sources.Players;
+﻿using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Protocol;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
@@ -24,7 +24,7 @@ public sealed record MessagePacket(string Message, byte Position) : IIngoingPack
         SpanWriter.Create(span).WriteVariableString(Message).WriteByte(Position);
     }
 
-    async Task IDispatchable.DispatchAsync(IPlayer player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
     {
         var sent = new Sent(Message);
         await eventDispatcher.DispatchAsync(player, sent, cancellationToken).ConfigureAwait(false);
