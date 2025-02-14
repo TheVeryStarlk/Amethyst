@@ -51,7 +51,6 @@ internal sealed class AmethystSubscriber : ISubscriber
                     }
                 }
 
-
                 var dead = chunks.Except(temporary).ToArray();
 
                 foreach (var position in dead)

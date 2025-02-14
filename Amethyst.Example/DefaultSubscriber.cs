@@ -18,7 +18,7 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger) : ISu
     {
         registry.For<IClient>(consumer => consumer.On<Request>((_, request, _) =>
         {
-            request.Status = Status.Create("Amethyst", 47, pairs.Count, pairs.Count, Message.Create("Hello, world!"), Icon);
+            request.Status = Status.Create("Amethyst", 47, 0, 0, Message.Create("Hello, world!"), Icon);
             return Task.CompletedTask;
         }));
 

@@ -11,12 +11,12 @@ public interface IClient
     public IPlayer? Player { get; }
 
     /// <summary>
-    /// Writes packet(s) to the client.
+    /// Writes <see cref="IOutgoingPacket"/>(s) to the client.
     /// </summary>
     /// <remarks>
     /// Misusing this method might result in crashes or weird behaviors.
     /// </remarks>
-    /// <param name="packets">The packet(s) to write.</param>
+    /// <param name="packets">The <see cref="IOutgoingPacket"/>(s) to write.</param>
     public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
 
     public void Stop(Message message);

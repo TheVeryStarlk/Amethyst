@@ -27,7 +27,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
-
     private State state;
     private Player? player;
     private Message reason = "No reason specified.";
