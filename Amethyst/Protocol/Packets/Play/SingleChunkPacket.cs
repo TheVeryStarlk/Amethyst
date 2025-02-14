@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record ChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmask) : IOutgoingPacket
+public sealed record SingleChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmask) : IOutgoingPacket
 {
     public int Identifier => 33;
 

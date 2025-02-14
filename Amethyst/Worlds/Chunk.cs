@@ -35,7 +35,7 @@ internal sealed class Chunk(int x, int z) : IChunk
         section.SetSkyLight(value, position % 16);
     }
 
-    public ChunkPacket Build()
+    public SingleChunkPacket Build()
     {
         var serializedSections = sections
             .OfType<Section>()
@@ -63,7 +63,7 @@ internal sealed class Chunk(int x, int z) : IChunk
         // Biomes.
         list.AddRange(new byte[256]);
 
-        return new ChunkPacket(X, Z, list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
+        return new SingleChunkPacket(X, Z, list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
     }
 
     private Section GetSection(int y)

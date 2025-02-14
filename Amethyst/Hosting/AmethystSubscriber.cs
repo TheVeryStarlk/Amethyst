@@ -2,15 +2,16 @@
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
+using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-using Vector = (int X, int Z);
-
 internal sealed class AmethystSubscriber : ISubscriber
 {
-    private readonly List<Vector> chunks = [];
+    private readonly List<Position> chunks = [];
+
+    private int range = 2;
 
     public void Subscribe(IRegistry registry)
     {
@@ -18,38 +19,63 @@ internal sealed class AmethystSubscriber : ISubscriber
         {
             consumer.On<Joined>((source, _, _) =>
             {
-                source.Spawn(new World("Funny"));
+                source.Spawn(new World("Default"));
                 return Task.CompletedTask;
             });
 
-            consumer.On<Sent>((source, _, _) =>
+            consumer.On<Sent>((source, original, _) =>
             {
-                source.Spawn(new World("Funny"));
+                range = int.Parse(original.Message);
+
+                foreach (var chunk in chunks)
+                {
+                    source.Client.Write(new ChunkUnloadPacket(chunk.X, chunk.Z));
+                }
+
+                chunks.Clear();
+
                 return Task.CompletedTask;
             });
 
             consumer.On<Moved>((source, _, _) =>
             {
-                var vector = new Vector((int) source.Location.X >> 4, (int) source.Location.Z >> 4);
+                var current = new Position((int) source.Location.X >> 4, 0, (int) source.Location.Z >> 4);
 
-                if (chunks.Contains(vector) || chunks.Count >= 32)
+                var temporary = new List<Position>();
+
+                for (var x = current.X - range; x < current.X + range; x++)
                 {
-                    return Task.CompletedTask;
-                }
-
-                var chunk = new Chunk(vector.X, vector.Z);
-
-                for (var x = 0; x < 16; x++)
-                {
-                    for (var z = 0; z < 16; z++)
+                    for (var z = current.Z - range; z < current.Z + range; z++)
                     {
-                        chunk.SetBlock(new Block(35, Random.Shared.Next(15)), new Position(x, 2, z));
+                        temporary.Add(new Position(x, 0, z));
                     }
                 }
 
-                chunks.Add(vector);
 
-                source.Client.Write(chunk.Build());
+                var dead = chunks.Except(temporary).ToArray();
+
+                foreach (var position in dead)
+                {
+                    source.Client.Write(new ChunkUnloadPacket(position.X, position.Z));
+                    chunks.Remove(position);
+                }
+
+                foreach (var position in temporary.Where(position => !chunks.Contains(position)))
+                {
+                    chunks.Add(position);
+
+                    var chunk = new Chunk(position.X, position.Z);
+
+                    for (var x = 0; x < 16; x++)
+                    {
+                        for (var z = 0; z < 16; z++)
+                        {
+                            chunk.SetBlock(new Block(1), new Position(x, 2, z));
+                        }
+                    }
+
+                    source.Client.Write(chunk.Build());
+                }
 
                 return Task.CompletedTask;
             });
