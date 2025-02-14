@@ -8,7 +8,7 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
 {
     private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events = Registry.Create(subscribers);
 
-    public async Task<TEvent> DispatchAsync<TEvent, TSource>(TSource source, TEvent original, CancellationToken cancellationToken)
+    public async Task<TEvent> DispatchAsync<TSource, TEvent>(TSource source, TEvent original, CancellationToken cancellationToken)
     {
         if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
