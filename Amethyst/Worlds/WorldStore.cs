@@ -1,4 +1,5 @@
-﻿using Amethyst.Components.Worlds;
+﻿using System.Collections;
+using Amethyst.Components.Worlds;
 
 namespace Amethyst.Worlds;
 
@@ -14,5 +15,15 @@ internal sealed class WorldStore : IWorldStore
     {
         var world = new World(name);
         worlds[name] = world;
+    }
+
+    public IEnumerator<IWorld> GetEnumerator()
+    {
+        return worlds.Values.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return worlds.Values.GetEnumerator();
     }
 }

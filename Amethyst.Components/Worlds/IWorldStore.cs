@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Components.Worlds;
 
-public interface IWorldStore
+public interface IWorldStore : IEnumerable<IWorld>
 {
     public IWorld this[string name] { get; }
 
