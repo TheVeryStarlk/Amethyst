@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Collections.Frozen;
+using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Clients;
@@ -63,22 +64,20 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     {
         var reader = new ProtocolReader(connection.Transport.Input);
 
+        var states = new Dictionary<State, Action<Packet>>
+        {
+            { State.Handshake, Handshake },
+            { State.Status, Status },
+            { State.Login, Login },
+            { State.Play, Play }
+        }.ToFrozenDictionary();
+
         while (true)
         {
             try
             {
                 var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
-
-                Action<Packet> action = state switch
-                {
-                    State.Handshake => Handshake,
-                    State.Status => Status,
-                    State.Login => Login,
-                    State.Play => Play,
-                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state.")
-                };
-
-                action(packet);
+                states[state](packet);
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {

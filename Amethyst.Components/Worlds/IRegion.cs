@@ -2,9 +2,7 @@
 
 public interface IRegion
 {
-    public int X { get; }
-
-    public int Z { get; }
+    public Position Position { get; }
 
     public IEnumerable<IChunk> Chunks { get; }
 }

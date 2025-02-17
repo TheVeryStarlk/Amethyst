@@ -22,9 +22,11 @@ internal sealed class Player(Client client, string username) : IPlayer
 
     public bool OnGround { get; set; }
 
-    public IWorld? World { get; set; }
+    public IWorld? World => world;
 
     private readonly List<Position> chunks = [];
+
+    private World? world;
 
     public void Update()
     {
@@ -50,29 +52,16 @@ internal sealed class Player(Client client, string username) : IPlayer
             chunks.Remove(position);
         }
 
-        var world = (World) World!;
-
         foreach (var position in temporary.Where(position => !chunks.Contains(position)))
         {
             chunks.Add(position);
-
-            var chunk = world.GetChunk(position);
-
-            for (var x = 0; x < 16; x++)
-            {
-                for (var z = 0; z < 16; z++)
-                {
-                    chunk.SetBlock(new Block(1), new Position(x, 2, z));
-                }
-            }
-
-            client.Write(chunk.Build());
+            client.Write(world!.GetChunk(position).Build());
         }
     }
 
-    public void Spawn(IWorld world)
+    public void Spawn(IWorld spawn)
     {
-        if (World == world)
+        if (world == spawn)
         {
             return;
         }
@@ -83,7 +72,7 @@ internal sealed class Player(Client client, string username) : IPlayer
 
         client.Write(packet, new PositionLookPacket(Location, Yaw, Pitch, OnGround));
 
-        World = world;
+        world = (World) spawn;
     }
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box)

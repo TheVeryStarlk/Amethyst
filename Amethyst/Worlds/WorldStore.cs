@@ -11,9 +11,9 @@ internal sealed class WorldStore : IWorldStore
 
     private readonly Dictionary<string, IWorld> worlds = [];
 
-    public void Create(string name)
+    public void Create(string name, IGenerator generator)
     {
-        var world = new World(name);
+        var world = new World(name, generator);
         worlds[name] = world;
     }
 

@@ -6,5 +6,5 @@ public interface IWorldStore : IEnumerable<IWorld>
 
     public int Count { get; }
 
-    public void Create(string name);
+    public void Create(string name, IGenerator generator);
 }

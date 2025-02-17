@@ -16,7 +16,7 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger, IPlay
 
     public void Subscribe(IRegistry registry)
     {
-        registry.For<IServer>(consumer => consumer.On<Starting>((_, _) => worldStore.Create("Default")));
+        registry.For<IServer>(consumer => consumer.On<Starting>((_, _) => worldStore.Create("Default", new FlatGenerator())));
         registry.For<IClient>(consumer => consumer.On<Request>((_, request) => request.Status = Status.Create("Amethyst", 47, 0, 0, Message.Create("Hello, world!"), Icon)));
 
         registry.For<IPlayer>(consumer =>

@@ -2,7 +2,7 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name) : IWorld
+internal sealed class World(string name, IGenerator generator) : IWorld
 {
     public string Name { get; } = name;
 
@@ -27,18 +27,14 @@ internal sealed class World(string name) : IWorld
 
     private Region GetRegion(int x, int z)
     {
-        var region = regions.FirstOrDefault(region => (region.X, region.Z) == (x, z));
+        var region = regions.FirstOrDefault(region => (region.Position.X, region.Position.Z) == (x, z));
 
         if (region is not null)
         {
             return region;
         }
 
-        region = new Region
-        {
-            X = x,
-            Z = z
-        };
+        region = new Region(new Position(x, 0, z), generator);
 
         regions.Add(region);
 

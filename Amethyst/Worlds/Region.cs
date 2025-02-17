@@ -2,11 +2,9 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class Region : IRegion
+internal sealed class Region(Position where, IGenerator generator) : IRegion
 {
-    public required int X { get; init; }
-
-    public required int Z { get; init; }
+    public Position Position => where;
 
     public IEnumerable<IChunk> Chunks => chunks;
 
@@ -22,6 +20,7 @@ internal sealed class Region : IRegion
         }
 
         chunk = new Chunk(x, z);
+        generator.Generate(chunk);
         chunks.Add(chunk);
 
         return chunk;
