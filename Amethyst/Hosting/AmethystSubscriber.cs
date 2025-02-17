@@ -2,13 +2,15 @@
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
+using Amethyst.Entities;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystSubscriber : ISubscriber
+internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
 {
+    private readonly PlayerStore playerStore = (PlayerStore) store;
     private readonly List<Position> chunks = [];
 
     private int range = 2;
@@ -19,7 +21,19 @@ internal sealed class AmethystSubscriber : ISubscriber
         {
             consumer.On<Joined>((source, _, _) =>
             {
+                if (!playerStore.TryAdd(source))
+                {
+                    source.Disconnect("Joined from another location.");
+                    return Task.CompletedTask;
+                }
+
                 source.Spawn(new World("Default"));
+                return Task.CompletedTask;
+            });
+
+            consumer.On<Left>((source, _, _) =>
+            {
+                playerStore.Remove(source);
                 return Task.CompletedTask;
             });
 
