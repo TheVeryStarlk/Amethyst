@@ -14,10 +14,7 @@ internal sealed class Region : IRegion
 
     public Chunk GetChunk(int x, int z)
     {
-        x >>= 4;
-        z >>= 4;
-
-        var chunk = chunks.FirstOrDefault(chunk => chunk.X == x && chunk.Z == z);
+        var chunk = chunks.FirstOrDefault(chunk => (chunk.X, chunk.Z) == (x, z));
 
         if (chunk is not null)
         {
@@ -28,11 +25,6 @@ internal sealed class Region : IRegion
         chunks.Add(chunk);
 
         return chunk;
-    }
-
-    public void SetChunk(Chunk chunk)
-    {
-        chunks.Add(chunk);
     }
 
     public Block GetBlock(Position position)

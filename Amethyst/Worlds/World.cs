@@ -20,12 +20,14 @@ internal sealed class World(string name) : IWorld
         GetRegion(position.X, position.Z).SetBlock(block, position);
     }
 
+    public Chunk GetChunk(Position position)
+    {
+        return GetRegion(position.X >> 5, position.Z >> 5).GetChunk(position.X, position.Z);
+    }
+
     private Region GetRegion(int x, int z)
     {
-        x = (int) Math.Floor((double) (x >> 4) / 32);
-        z = (int) Math.Floor((double) (z >> 4) / 32);
-
-        var region = regions.FirstOrDefault(region => region.X == x && region.Z == z);
+        var region = regions.FirstOrDefault(region => (region.X, region.Z) == (x, z));
 
         if (region is not null)
         {

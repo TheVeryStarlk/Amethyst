@@ -36,7 +36,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
     private async Task ListeningAsync()
     {
         var starting = eventDispatcher.Dispatch(this, new Starting());
-        await using var listener = await listenerFactory.BindAsync(starting.EndPoint);
+        await using var listener = await listenerFactory.BindAsync(starting.EndPoint).ConfigureAwait(false);
 
         logger.LogInformation("Listening for new clients...");
 
@@ -46,7 +46,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
         {
             try
             {
-                var connection = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
+                var connection = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
                 var client = new Client(loggerFactory.CreateLogger<Client>(), connection!, eventDispatcher, identifier++);
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
@@ -100,7 +100,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
         {
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(5));
+                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
                 var packet = new KeepAlivePacket(Random.Shared.Next());
 
