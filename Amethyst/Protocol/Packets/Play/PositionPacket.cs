@@ -22,12 +22,12 @@ public sealed record PositionPacket(Location Location, bool OnGround) : IIngoing
             reader.ReadBoolean());
     }
 
-    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
         player.Location = Location;
         player.OnGround = OnGround;
 
         var moved = new Moved(Location, player.Yaw, player.Pitch, OnGround);
-        await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, moved);
     }
 }

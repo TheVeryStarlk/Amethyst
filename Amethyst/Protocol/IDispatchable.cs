@@ -9,7 +9,7 @@ namespace Amethyst.Protocol;
 
 internal interface IDispatchable
 {
-    public Task DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken);
+    public void Dispatch(Player player, EventDispatcher eventDispatcher);
 }
 
 internal static class Dispatchable

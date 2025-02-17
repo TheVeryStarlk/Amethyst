@@ -15,13 +15,13 @@ public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoin
         return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
     }
 
-    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
         player.Yaw = Yaw;
         player.Pitch = Pitch;
         player.OnGround = OnGround;
 
         var moved = new Moved(player.Location, Yaw, Pitch, OnGround);
-        await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, moved);
     }
 }

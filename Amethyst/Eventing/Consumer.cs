@@ -4,7 +4,7 @@ namespace Amethyst.Eventing;
 
 internal sealed class Consumer<TSource>(Dictionary<Type, List<Delegate>> events) : IConsumer<TSource>
 {
-    public void On<TEvent>(TaskDelegate<TSource, TEvent> callback) where TEvent : Event<TSource>
+    public void On<TEvent>(Action<TSource, TEvent> callback) where TEvent : Event<TSource>
     {
         if (events.TryGetValue(typeof(TEvent), out var callbacks))
         {

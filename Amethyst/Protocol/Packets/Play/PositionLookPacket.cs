@@ -46,7 +46,7 @@ public sealed record PositionLookPacket(Location Location, float Yaw, float Pitc
             .WriteBoolean(false);
     }
 
-    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
         player.Location = Location;
         player.Yaw = Yaw;
@@ -54,6 +54,6 @@ public sealed record PositionLookPacket(Location Location, float Yaw, float Pitc
         player.OnGround = OnGround;
 
         var moved = new Moved(Location, Yaw, Pitch, OnGround);
-        await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, moved);
     }
 }

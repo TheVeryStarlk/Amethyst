@@ -16,27 +16,14 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger, IPlay
 
     public void Subscribe(IRegistry registry)
     {
-        registry.For<IServer>(consumer => consumer.On<Starting>((_, _, _) =>
-        {
-            worldStore.Create("Default");
-            return Task.CompletedTask;
-        }));
-
-        registry.For<IClient>(consumer => consumer.On<Request>((_, request, _) =>
-        {
-            request.Status = Status.Create("Amethyst", 47, 0, 0, Message.Create("Hello, world!"), Icon);
-            return Task.CompletedTask;
-        }));
+        registry.For<IServer>(consumer => consumer.On<Starting>((_, _) => worldStore.Create("Default")));
+        registry.For<IClient>(consumer => consumer.On<Request>((_, request) => request.Status = Status.Create("Amethyst", 47, 0, 0, Message.Create("Hello, world!"), Icon)));
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _, _) =>
-            {
-                source.Spawn(worldStore["Default"]);
-                return Task.CompletedTask;
-            });
+            consumer.On<Joined>((source, _) => source.Spawn(worldStore["Default"]));
 
-            consumer.On<Sent>((source, sent, _) =>
+            consumer.On<Sent>((source, sent) =>
             {
                 logger.LogInformation("Broadcasting: \"{Message}\"", sent.Message);
 
@@ -50,8 +37,6 @@ internal sealed class DefaultSubscriber(ILogger<DefaultSubscriber> logger, IPlay
                 {
                     player.Send(message);
                 }
-
-                return Task.CompletedTask;
             });
         });
     }

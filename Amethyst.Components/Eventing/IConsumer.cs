@@ -2,5 +2,5 @@
 
 public interface IConsumer<TSource>
 {
-    public void On<TEvent>(TaskDelegate<TSource, TEvent> callback) where TEvent : Event<TSource>;
+    public void On<TEvent>(Action<TSource, TEvent> callback) where TEvent : Event<TSource>;
 }

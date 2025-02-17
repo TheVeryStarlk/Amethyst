@@ -69,16 +69,16 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             {
                 var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
 
-                var task = state switch
+                Action<Packet> action = state switch
                 {
-                    State.Handshake => HandshakeAsync(packet),
-                    State.Status => StatusAsync(packet),
-                    State.Login => LoginAsync(packet),
-                    State.Play => PlayAsync(packet),
-                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Invalid state.")
+                    State.Handshake => Handshake,
+                    State.Status => Status,
+                    State.Login => Login,
+                    State.Play => Play,
+                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Unknown state.")
                 };
 
-                await task.ConfigureAwait(false);
+                action(packet);
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
@@ -105,7 +105,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
             if (state is State.Play)
             {
-                await eventDispatcher.DispatchAsync(player!, new Left(), source.Token).ConfigureAwait(false);
+                eventDispatcher.Dispatch(player!, new Left());
             }
         }
 
@@ -137,7 +137,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         }
     }
 
-    private async Task HandshakeAsync(Packet packet)
+    private void Handshake(Packet packet)
     {
         var handshake = packet.Create<HandshakePacket>();
 
@@ -148,15 +148,15 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             return;
         }
 
-        var outdated = await eventDispatcher.DispatchAsync(this, new Outdated(handshake.Version), source.Token).ConfigureAwait(false);
+        var outdated = eventDispatcher.Dispatch(this, new Outdated(handshake.Version));
         Stop(outdated.Message);
     }
 
-    private async Task StatusAsync(Packet packet)
+    private void Status(Packet packet)
     {
         if (packet.Identifier == StatusRequestPacket.Identifier)
         {
-            var request = await eventDispatcher.DispatchAsync(this, new Request(), source.Token).ConfigureAwait(false);
+            var request = eventDispatcher.Dispatch(this, new Request());
             Write(new StatusResponsePacket(request.Status.Serialize()));
 
             return;
@@ -166,13 +166,13 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         Stop(string.Empty);
     }
 
-    private async Task LoginAsync(Packet packet)
+    private void Login(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
 
         player = new Player(this, loginStart.Username);
 
-        await eventDispatcher.DispatchAsync(player, new Joining(), source.Token).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, new Joining());
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();
@@ -181,14 +181,15 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         state = State.Play;
 
-        await eventDispatcher.DispatchAsync(player, new Joined(), source.Token).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, new Joined());
     }
 
-    private Task PlayAsync(Packet packet)
+    private void Play(Packet packet)
     {
-        return Dispatchable.TryCreate(packet, out var dispatchable)
-            ? dispatchable.DispatchAsync(player!, eventDispatcher, source.Token)
-            : Task.CompletedTask;
+        if (Dispatchable.TryCreate(packet, out var dispatchable))
+        {
+            dispatchable.Dispatch(player!, eventDispatcher);
+        }
     }
 }
 

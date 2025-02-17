@@ -15,11 +15,11 @@ public sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>
         return new OnGroundPacket(reader.ReadBoolean());
     }
 
-    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
         player.OnGround = Value;
 
         var moved = new Moved(player.Location, player.Yaw, player.Pitch, Value);
-        await eventDispatcher.DispatchAsync(player, moved, cancellationToken).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, moved);
     }
 }

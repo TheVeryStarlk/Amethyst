@@ -8,7 +8,7 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
 {
     private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events = Registry.Create(subscribers);
 
-    public async Task<TEvent> DispatchAsync<TSource, TEvent>(TSource source, TEvent original, CancellationToken cancellationToken)
+    public TEvent Dispatch<TSource, TEvent>(TSource source, TEvent original)
     {
         if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
@@ -18,9 +18,9 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
         // Maybe catch exceptions inside the loop?
         try
         {
-            foreach (var task in callbacks.Cast<TaskDelegate<TSource, TEvent>>())
+            foreach (var task in callbacks.Cast<Action<TSource, TEvent>>())
             {
-                await task(source, original, cancellationToken).ConfigureAwait(false);
+                task(source, original);
             }
         }
         catch (OperationCanceledException)

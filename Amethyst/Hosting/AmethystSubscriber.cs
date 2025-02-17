@@ -19,24 +19,17 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
     {
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _, _) =>
+            consumer.On<Joined>((source, _) =>
             {
-                if (playerStore.TryAdd(source))
+                if (!playerStore.TryAdd(source))
                 {
-                    return Task.CompletedTask;
+                    source.Disconnect("Joined from another location.");
                 }
-
-                source.Disconnect("Joined from another location.");
-                return Task.CompletedTask;
             });
 
-            consumer.On<Left>((source, _, _) =>
-            {
-                playerStore.Remove(source);
-                return Task.CompletedTask;
-            });
+            consumer.On<Left>((source, _) => playerStore.Remove(source));
 
-            consumer.On<Sent>((source, original, _) =>
+            consumer.On<Sent>((source, original) =>
             {
                 range = int.Parse(original.Message);
 
@@ -46,11 +39,9 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
                 }
 
                 chunks.Clear();
-
-                return Task.CompletedTask;
             });
 
-            consumer.On<Moved>((source, _, _) =>
+            consumer.On<Moved>((source, _) =>
             {
                 var current = new Position((int) source.Location.X >> 4, 0, (int) source.Location.Z >> 4);
 
@@ -88,8 +79,6 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
 
                     source.Client.Write(chunk.Build());
                 }
-
-                return Task.CompletedTask;
             });
         });
     }

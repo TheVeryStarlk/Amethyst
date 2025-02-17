@@ -24,9 +24,9 @@ public sealed record MessagePacket(string Message, byte Position) : IIngoingPack
         SpanWriter.Create(span).WriteVariableString(Message).WriteByte(Position);
     }
 
-    async Task IDispatchable.DispatchAsync(Player player, EventDispatcher eventDispatcher, CancellationToken cancellationToken)
+    void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
         var sent = new Sent(Message);
-        await eventDispatcher.DispatchAsync(player, sent, cancellationToken).ConfigureAwait(false);
+        eventDispatcher.Dispatch(player, sent);
     }
 }
