@@ -1,6 +1,8 @@
 ﻿using Amethyst.Components.Entities;
+using Amethyst.Components.Worlds;
 using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<EventDispatcher>();
         services.AddSingleton<IPlayerStore, PlayerStore>();
+        services.AddSingleton<IWorldStore, WorldStore>();
 
         services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
         services.AddTransient<Server>();

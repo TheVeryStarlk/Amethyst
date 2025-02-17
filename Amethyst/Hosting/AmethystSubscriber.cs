@@ -21,13 +21,12 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
         {
             consumer.On<Joined>((source, _, _) =>
             {
-                if (!playerStore.TryAdd(source))
+                if (playerStore.TryAdd(source))
                 {
-                    source.Disconnect("Joined from another location.");
                     return Task.CompletedTask;
                 }
 
-                source.Spawn(new World("Default"));
+                source.Disconnect("Joined from another location.");
                 return Task.CompletedTask;
             });
 

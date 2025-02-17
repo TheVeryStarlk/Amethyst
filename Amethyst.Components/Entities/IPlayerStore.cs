@@ -1,6 +1,8 @@
 ﻿namespace Amethyst.Components.Entities;
 
-public interface IPlayerStore
+public interface IPlayerStore : IEnumerable<IPlayer>
 {
-    public IReadOnlyDictionary<string, IPlayer> Players { get; }
+    public IPlayer this[string username] { get; }
+
+    public int Count { get; }
 }
