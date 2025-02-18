@@ -20,7 +20,8 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
         {
             if (worldStore.Any(world => world.Players.Any(pair => pair.Key == original.Username)))
             {
-                source.Stop("Bad!");
+                // Does this need to be customizable?
+                source.Stop("Logged in from another location.");
             }
         }));
 
