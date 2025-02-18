@@ -1,4 +1,5 @@
-﻿using Amethyst.Components;
+﻿using System.Numerics;
+using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Clients;
@@ -79,7 +80,13 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                     chunks.Remove(value);
                 }
 
-                foreach (var value in temporary)
+                var closest = temporary.OrderBy(value =>
+                {
+                    NumericHelper.Decode(value, out var x, out var z);
+                    return Vector2.Distance(new Vector2(current.X, current.Z), new Vector2(x, z));
+                });
+
+                foreach (var value in closest)
                 {
                     if (!chunks.Add(value))
                     {
