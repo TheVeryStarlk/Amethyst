@@ -33,7 +33,7 @@ internal sealed class Player(Client client, string username) : IPlayer
         // Should be configurable via client packets.
         const int range = 2;
 
-        var current = new Position((int) Location.X >> 4, 0, (int) Location.Z >> 4);
+        var current = Location.ToPosition().ToChunk();
         var temporary = new List<Position>();
 
         for (var x = current.X - range; x < current.X + range; x++)
@@ -55,7 +55,11 @@ internal sealed class Player(Client client, string username) : IPlayer
         foreach (var position in temporary.Where(position => !chunks.Contains(position)))
         {
             chunks.Add(position);
-            client.Write(world!.GetChunk(position).Build());
+
+            var chunk = world!.GetChunk(position);
+            var result = chunk.Build();
+
+            client.Write(new SingleChunkPacket(chunk.Position.X, chunk.Position.Z, result.Chunk, result.Bitmask));
         }
     }
 

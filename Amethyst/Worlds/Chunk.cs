@@ -1,41 +1,34 @@
 ﻿using Amethyst.Components.Worlds;
-using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Worlds;
 
 internal sealed class Chunk(int x, int z) : IChunk
 {
-    public int X { get; } = x;
-
-    public int Z { get; } = z;
+    public (int X, int Z) Position => (x, z);
 
     private readonly Section?[] sections = new Section[16];
 
     public Block GetBlock(Position position)
     {
-        var section = GetSection(position.Y);
-        return section.GetBlock(position % 16);
+        return GetSection(position.Y).GetBlock(position.ToSection());
     }
 
     public void SetBlock(Block block, Position position)
     {
-        var section = GetSection(position.Y);
-        section.SetBlock(block, position % 16);
+        GetSection(position.Y).SetBlock(block, position.ToSection());
     }
 
     public byte GetSkyLight(Position position)
     {
-        var section = GetSection(position.Y);
-        return section.GetSkyLight(position % 16);
+        return GetSection(position.Y).GetSkyLight(position.ToSection());
     }
 
     public void SetSkyLight(byte value, Position position)
     {
-        var section = GetSection(position.Y);
-        section.SetSkyLight(value, position % 16);
+        GetSection(position.Y).SetSkyLight(value, position.ToSection());
     }
 
-    public SingleChunkPacket Build()
+    public (byte[] Chunk, ushort Bitmask) Build()
     {
         var serializedSections = sections
             .OfType<Section>()
@@ -63,7 +56,7 @@ internal sealed class Chunk(int x, int z) : IChunk
         // Biomes.
         list.AddRange(new byte[256]);
 
-        return new SingleChunkPacket(X, Z, list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
+        return (list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
     }
 
     private Section GetSection(int y)

@@ -2,9 +2,7 @@
 
 public interface IChunk
 {
-    public int X { get; }
-
-    public int Z { get; }
+    public (int X, int Z) Position { get; }
 
     public Block GetBlock(Position position);
 

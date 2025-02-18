@@ -12,29 +12,30 @@ internal sealed class World(string name, IGenerator generator) : IWorld
 
     public Block GetBlock(Position position)
     {
-        return GetRegion(position.X, position.Z).GetBlock(position);
+        return GetRegion(position.ToRegion()).GetBlock(position.ToChunk());
     }
 
     public void SetBlock(Block block, Position position)
     {
-        GetRegion(position.X, position.Z).SetBlock(block, position);
+        GetRegion(position.ToRegion()).SetBlock(block, position.ToChunk());
     }
 
     public Chunk GetChunk(Position position)
     {
-        return GetRegion(position.X >> 5, position.Z >> 5).GetChunk(position.X, position.Z);
+        return GetRegion(position.ToRegion()).GetChunk(position);
     }
 
-    private Region GetRegion(int x, int z)
+    private Region GetRegion(Position position)
     {
-        var region = regions.FirstOrDefault(region => (region.Position.X, region.Position.Z) == (x, z));
-
-        if (region is not null)
+        foreach (var existing in regions)
         {
-            return region;
+            if (existing.Position == (position.X, position.Z))
+            {
+                return existing;
+            }
         }
 
-        region = new Region(new Position(x, 0, z), generator);
+        var region = new Region(position.X, position.Z, generator);
 
         regions.Add(region);
 
