@@ -57,7 +57,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 var chunks = loaded[source.Username];
                 var world = (World) source.World;
 
-                var current = new Position((int) source.Location.X, 0, (int) source.Location.Z).ToChunk();
+                var current = source.Location.ToPosition().ToChunk();
                 var temporary = new List<long>();
 
                 for (var x = current.X - source.ViewDistance; x < current.X + source.ViewDistance; x++)
