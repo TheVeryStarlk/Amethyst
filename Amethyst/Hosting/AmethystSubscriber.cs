@@ -5,7 +5,6 @@ using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
-using Amethyst.Entities;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
@@ -28,7 +27,11 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _) => ((World) source.World).AddPlayer(source));
+            consumer.On<Joined>((source, _) =>
+            {
+                ((World) source.World).AddPlayer(source);
+                loaded[source.Username] = [];
+            });
 
             consumer.On<Left>((source, _) =>
             {
@@ -36,27 +39,22 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 loaded.Remove(source.Username);
             });
 
-            consumer.On<Configuration>((source, original) =>
+            consumer.On<Configuration>((source, _) =>
             {
-                var player = (Player) source;
+                var chunks = loaded[source.Username];
 
-                if (player.ViewDistance == original.ViewDistance)
+                foreach (var value in chunks)
                 {
-                    return;
+                    NumericHelper.Decode(value, out var x, out var z);
+                    source.Client.Write(new ChunkUnloadPacket(x, z));
                 }
 
-                player.ViewDistance = original.ViewDistance;
-                loaded[player.Username] = [];
+                chunks.Clear();
             });
 
             consumer.On<Moved>((source, _) =>
             {
-                if (!loaded.TryGetValue(source.Username, out var chunks))
-                {
-                    chunks = [];
-                    loaded[source.Username] = chunks;
-                }
-
+                var chunks = loaded[source.Username];
                 var world = (World) source.World;
 
                 var current = new Position((int) source.Location.X, 0, (int) source.Location.Z).ToChunk();

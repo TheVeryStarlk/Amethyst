@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
 using Amethyst.Components.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
