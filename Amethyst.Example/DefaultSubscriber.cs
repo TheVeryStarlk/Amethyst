@@ -18,7 +18,7 @@ internal sealed class DefaultSubscriber(IPlayerStore playerStore, IWorldStore wo
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _) => source.Teleport(new Location(0, 8, 0)));
+            consumer.On<Joined>((source, _) => source.Teleport(new Location(0, 32, 0)));
 
             consumer.On<Sent>((source, original) =>
             {

@@ -28,7 +28,12 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
         registry.For<IPlayer>(consumer =>
         {
             consumer.On<Joined>((source, _) => playerStore.Add(source));
-            consumer.On<Left>((source, _) => playerStore.Remove(source));
+
+            consumer.On<Left>((source, _) =>
+            {
+                playerStore.Remove(source);
+                loaded.Remove(source.Username);
+            });
 
             consumer.On<Moved>((source, _) =>
             {
@@ -41,7 +46,7 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
                 var world = (World) source.World;
 
                 // Should be configurable via client packets.
-                const int range = 4;
+                const int range = 8;
 
                 var current = source.Location.ToPosition().ToChunk();
                 var temporary = new List<Position>();
