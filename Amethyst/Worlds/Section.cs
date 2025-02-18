@@ -10,7 +10,7 @@ internal sealed class Section
 
     public Block GetBlock(Position position)
     {
-        var index = position.AsIndex() * 2;
+        var index = GetIndex(position) * 2;
 
         var type = blocks[index] >> 4 | blocks[index + 1] << 4;
         var metadata = blocks[index] & 0x0F;
@@ -20,7 +20,7 @@ internal sealed class Section
 
     public void SetBlock(Block block, Position position)
     {
-        var index = position.AsIndex() * 2;
+        var index = GetIndex(position) * 2;
         var type = block.Type;
 
         blocks[index] = (byte) (type << 4 | block.Metadata);
@@ -29,12 +29,12 @@ internal sealed class Section
 
     public byte GetSkyLight(Position position)
     {
-        return skyLight[position.AsIndex()];
+        return skyLight[GetIndex(position)];
     }
 
     public void SetSkyLight(byte value, Position position)
     {
-        var index = position.AsIndex();
+        var index = GetIndex(position);
         skyLight[index] = value;
     }
 
@@ -47,5 +47,10 @@ internal sealed class Section
         }
 
         return (blocks, blocksLight, skyLight);
+    }
+
+    private static int GetIndex(Position position)
+    {
+        return (position.Y & 0xF) << 8 | (position.Z & 0xF) << 4 | position.X & 0xF;
     }
 }

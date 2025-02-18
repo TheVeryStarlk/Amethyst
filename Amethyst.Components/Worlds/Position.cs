@@ -16,9 +16,4 @@ public readonly record struct Position(int X, int Y, int Z)
     {
         return new Position(X % 16, Y % 16, Z % 16);
     }
-
-    public int AsIndex()
-    {
-        return (Y & 0xF) << 8 | (Z & 0xF) << 4 | X & 0xF;
-    }
 }

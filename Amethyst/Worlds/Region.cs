@@ -2,13 +2,9 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class Region(int x, int z, IGenerator generator) : IRegion
+internal sealed class Region(IGenerator generator)
 {
-    public (int X, int Z) Position => (x, z);
-
-    public IEnumerable<IChunk> Chunks => chunks;
-
-    private readonly List<Chunk> chunks = [];
+    private readonly Dictionary<long, Chunk> chunks = [];
 
     public Block GetBlock(Position position)
     {
@@ -32,18 +28,17 @@ internal sealed class Region(int x, int z, IGenerator generator) : IRegion
 
     public Chunk GetChunk(Position position)
     {
-        foreach (var existing in chunks)
+        var value = NumericsHelper.Encode(position.X, position.Z);
+
+        if (chunks.TryGetValue(value, out var chunk))
         {
-            if (existing.Position == (position.X, position.Z))
-            {
-                return existing;
-            }
+            return chunk;
         }
 
-        var chunk = new Chunk(position.X, position.Z);
+        chunk = new Chunk();
 
+        chunks[value] = chunk;
         generator.Generate(chunk);
-        chunks.Add(chunk);
 
         return chunk;
     }

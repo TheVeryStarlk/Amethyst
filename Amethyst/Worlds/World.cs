@@ -4,11 +4,9 @@ namespace Amethyst.Worlds;
 
 internal sealed class World(string name, IGenerator generator) : IWorld
 {
-    public string Name { get; } = name;
+    public string Name => name;
 
-    public IEnumerable<IRegion> Regions => regions;
-
-    private readonly List<Region> regions = [];
+    private readonly Dictionary<long, Region> regions = [];
 
     public Block GetBlock(Position position)
     {
@@ -27,17 +25,16 @@ internal sealed class World(string name, IGenerator generator) : IWorld
 
     private Region GetRegion(Position position)
     {
-        foreach (var existing in regions)
+        var value = NumericsHelper.Encode(position.X, position.Z);
+
+        if (regions.TryGetValue(value, out var region))
         {
-            if (existing.Position == (position.X, position.Z))
-            {
-                return existing;
-            }
+            return region;
         }
 
-        var region = new Region(position.X, position.Z, generator);
+        region = new Region(generator);
 
-        regions.Add(region);
+        regions[value] = region;
 
         return region;
     }

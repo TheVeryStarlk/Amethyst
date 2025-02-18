@@ -70,7 +70,7 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
                 foreach (var position in temporary.Where(position => !chunks.Contains(position)))
                 {
                     var result = world.GetChunk(position).Build();
-                    source.Client.Write(new SingleChunkPacket(position.X, position.Z, result.Chunk, result.Bitmask));
+                    source.Client.Write(new SingleChunkPacket(position.X, position.Z, result.Sections, result.Bitmask));
 
                     chunks.Add(position);
                 }

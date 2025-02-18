@@ -2,11 +2,10 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class Chunk(int x, int z) : IChunk
+internal sealed class Chunk : IChunk
 {
-    public (int X, int Z) Position => (x, z);
-
     private readonly Section?[] sections = new Section[16];
+    private readonly byte[] biomes = new byte[256];
 
     public Block GetBlock(Position position)
     {
@@ -16,6 +15,16 @@ internal sealed class Chunk(int x, int z) : IChunk
     public void SetBlock(Block block, Position position)
     {
         GetSection(position.Y).SetBlock(block, position.ToSection());
+    }
+
+    public Biome GetBiome(int x, int z)
+    {
+        return (Biome) biomes[(z & 0xF) * 16 + (x & 0xF)];
+    }
+
+    public void SetBiome(Biome biome, int x, int z)
+    {
+        biomes[(z & 0xF) * 16 + (x & 0xF)] = (byte) biome;
     }
 
     public byte GetSkyLight(Position position)
@@ -28,7 +37,7 @@ internal sealed class Chunk(int x, int z) : IChunk
         GetSection(position.Y).SetSkyLight(value, position.ToSection());
     }
 
-    public (byte[] Chunk, ushort Bitmask) Build()
+    public (byte[] Sections, ushort Bitmask) Build()
     {
         var serializedSections = sections
             .OfType<Section>()
@@ -53,8 +62,7 @@ internal sealed class Chunk(int x, int z) : IChunk
             list.AddRange(section.SkyLight);
         }
 
-        // Biomes.
-        list.AddRange(new byte[256]);
+        list.AddRange(biomes);
 
         return (list.ToArray(), (ushort) ((1 << serializedSections.Length) - 1));
     }
