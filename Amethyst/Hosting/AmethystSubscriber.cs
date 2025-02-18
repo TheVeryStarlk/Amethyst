@@ -4,6 +4,7 @@ using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
+using Amethyst.Entities;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
@@ -33,6 +34,19 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 loaded.Remove(source.Username);
             });
 
+            consumer.On<Configuration>((source, original) =>
+            {
+                var player = (Player) source;
+
+                if (player.ViewDistance == original.ViewDistance)
+                {
+                    return;
+                }
+
+                player.ViewDistance = original.ViewDistance;
+                loaded[player.Username] = [];
+            });
+
             consumer.On<Moved>((source, _) =>
             {
                 if (!loaded.TryGetValue(source.Username, out var chunks))
@@ -43,15 +57,12 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
 
                 var world = (World) source.World;
 
-                // Should be configurable via client packets.
-                const int range = 8;
-
-                var current = source.Location.ToPosition().ToChunk();
+                var current = new Position((int) source.Location.X, 0, (int) source.Location.Z).ToChunk();
                 var temporary = new List<long>();
 
-                for (var x = current.X - range; x < current.X + range; x++)
+                for (var x = current.X - source.ViewDistance; x < current.X + source.ViewDistance; x++)
                 {
-                    for (var z = current.Z - range; z < current.Z + range; z++)
+                    for (var z = current.Z - source.ViewDistance; z < current.Z + source.ViewDistance; z++)
                     {
                         temporary.Add(NumericHelper.Encode(x, z));
                     }

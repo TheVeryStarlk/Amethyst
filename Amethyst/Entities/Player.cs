@@ -12,6 +12,8 @@ internal sealed class Player(Client client, string username, IWorld world) : IPl
 
     public string Username => username;
 
+    public IWorld World => world;
+
     public Location Location { get; set; }
 
     public float Yaw { get; set; }
@@ -20,7 +22,7 @@ internal sealed class Player(Client client, string username, IWorld world) : IPl
 
     public bool OnGround { get; set; }
 
-    public IWorld World => world;
+    public byte ViewDistance { get; set; }
 
     public void Teleport(Location location)
     {

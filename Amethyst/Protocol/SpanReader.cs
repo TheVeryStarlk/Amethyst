@@ -9,6 +9,11 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
 
     private readonly ReadOnlySpan<byte> span = span;
 
+    public byte ReadByte()
+    {
+        return span[position++];
+    }
+
     public bool ReadBoolean()
     {
         return span[position++] > 0;
