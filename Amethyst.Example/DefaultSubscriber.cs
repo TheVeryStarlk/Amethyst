@@ -9,7 +9,7 @@ using Amethyst.Components.Worlds;
 
 namespace Amethyst.Example;
 
-internal sealed class DefaultSubscriber(IPlayerStore playerStore, IWorldStore worldStore) : ISubscriber
+internal sealed class DefaultSubscriber(IWorldStore worldStore) : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
@@ -28,9 +28,9 @@ internal sealed class DefaultSubscriber(IPlayerStore playerStore, IWorldStore wo
                     .Write(original.Message)
                     .Build();
 
-                foreach (var player in playerStore)
+                foreach (var player in source.World.Players)
                 {
-                    player.Send(message);
+                    player.Value.Send(message);
                 }
             });
         });

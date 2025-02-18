@@ -4,13 +4,15 @@ namespace Amethyst.Example;
 
 internal sealed class FlatGenerator : IGenerator
 {
+    private readonly Biome biome = (Biome) Random.Shared.Next(120);
+
     public void Generate(IChunk chunk)
     {
         for (var x = 0; x < 16; x++)
         {
             for (var z = 0; z < 16; z++)
             {
-                chunk.SetBiome(Biome.Desert, x, z);
+                chunk.SetBiome(biome, x, z);
 
                 chunk.SetBlock(new Block(7), new Position(x, 0, z));
                 chunk.SetBlock(new Block(3), new Position(x, 1, z));

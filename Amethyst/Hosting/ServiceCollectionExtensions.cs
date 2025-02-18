@@ -1,6 +1,4 @@
-﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Worlds;
-using Amethyst.Entities;
+﻿using Amethyst.Components.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
@@ -16,7 +14,6 @@ public static class ServiceCollectionExtensions
         configure(new AmethystOptions(services).AddSubscriber<AmethystSubscriber>());
 
         services.AddSingleton<EventDispatcher>();
-        services.AddSingleton<IPlayerStore, PlayerStore>();
         services.AddSingleton<IWorldStore, WorldStore>();
 
         services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();

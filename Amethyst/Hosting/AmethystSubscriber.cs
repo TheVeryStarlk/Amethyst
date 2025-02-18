@@ -4,22 +4,20 @@ using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
-using Amethyst.Entities;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
+internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
 {
-    private readonly PlayerStore playerStore = (PlayerStore) store;
-    private readonly Dictionary<string, List<Position>> loaded = [];
+    private readonly Dictionary<string, HashSet<long>> loaded = [];
 
     public void Subscribe(IRegistry registry)
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {
-            if (playerStore.Any(player => player.Username == original.Username))
+            if (worldStore.Any(world => world.Players.Any(pair => pair.Key == original.Username)))
             {
                 source.Stop("Bad!");
             }
@@ -27,11 +25,11 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _) => playerStore.Add(source));
+            consumer.On<Joined>((source, _) => ((World) source.World).AddPlayer(source));
 
             consumer.On<Left>((source, _) =>
             {
-                playerStore.Remove(source);
+                ((World) source.World).RemovePlayer(source);
                 loaded.Remove(source.Username);
             });
 
@@ -49,30 +47,37 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
                 const int range = 8;
 
                 var current = source.Location.ToPosition().ToChunk();
-                var temporary = new List<Position>();
+                var temporary = new List<long>();
 
                 for (var x = current.X - range; x < current.X + range; x++)
                 {
                     for (var z = current.Z - range; z < current.Z + range; z++)
                     {
-                        temporary.Add(new Position(x, 0, z));
+                        temporary.Add(NumericHelper.Encode(x, z));
                     }
                 }
 
                 var dead = chunks.Except(temporary).ToArray();
 
-                foreach (var position in dead)
+                foreach (var value in dead)
                 {
-                    source.Client.Write(new ChunkUnloadPacket(position.X, position.Z));
-                    chunks.Remove(position);
+                    NumericHelper.Decode(value, out var x, out var z);
+
+                    source.Client.Write(new ChunkUnloadPacket(x, z));
+                    chunks.Remove(value);
                 }
 
-                foreach (var position in temporary.Where(position => !chunks.Contains(position)))
+                foreach (var value in temporary)
                 {
-                    var result = world.GetChunk(position).Build();
-                    source.Client.Write(new SingleChunkPacket(position.X, position.Z, result.Sections, result.Bitmask));
+                    if (!chunks.Add(value))
+                    {
+                        continue;
+                    }
 
-                    chunks.Add(position);
+                    NumericHelper.Decode(value, out var x, out var z);
+
+                    var result = world.GetChunk(x, z).Build();
+                    source.Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
                 }
             });
         });
