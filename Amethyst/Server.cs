@@ -100,7 +100,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
         {
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(5), source!.Token).ConfigureAwait(false);
 
                 var packet = new KeepAlivePacket(Random.Shared.Next());
 
