@@ -41,7 +41,7 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
                 var world = (World) source.World;
 
                 // Should be configurable via client packets.
-                const int range = 2;
+                const int range = 4;
 
                 var current = source.Location.ToPosition().ToChunk();
                 var temporary = new List<Position>();
@@ -64,12 +64,10 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
 
                 foreach (var position in temporary.Where(position => !chunks.Contains(position)))
                 {
+                    var result = world.GetChunk(position).Build();
+                    source.Client.Write(new SingleChunkPacket(position.X, position.Z, result.Chunk, result.Bitmask));
+
                     chunks.Add(position);
-
-                    var chunk = world.GetChunk(position);
-                    var result = chunk.Build();
-
-                    source.Client.Write(new SingleChunkPacket(chunk.Position.X, chunk.Position.Z, result.Chunk, result.Bitmask));
                 }
             });
         });

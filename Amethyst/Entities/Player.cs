@@ -22,6 +22,12 @@ internal sealed class Player(Client client, string username, IWorld world) : IPl
 
     public IWorld World => world;
 
+    public void Teleport(Location location)
+    {
+        Location = location;
+        Client.Write(new PositionLookPacket(location, Yaw, Pitch, OnGround));
+    }
+
     public void Send(Message message, MessagePosition position = MessagePosition.Box)
     {
         Client.Write(new MessagePacket(message.Serialize(), (byte) position));

@@ -17,6 +17,8 @@ public interface IPlayer : IEntity
 
     public IWorld World { get; }
 
+    public void Teleport(Location location);
+
     public void Send(Message message, MessagePosition position = MessagePosition.Box);
 
     public void Disconnect(Message message);
