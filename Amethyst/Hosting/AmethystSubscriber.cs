@@ -1,5 +1,7 @@
-﻿using Amethyst.Components.Entities;
+﻿using Amethyst.Components;
+using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing;
+using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
 using Amethyst.Entities;
@@ -15,16 +17,16 @@ internal sealed class AmethystSubscriber(IPlayerStore store) : ISubscriber
 
     public void Subscribe(IRegistry registry)
     {
+        registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
+        {
+            if (playerStore.Any(player => player.Username == original.Username))
+            {
+                source.Stop("Bad!");
+            }
+        }));
+
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _) =>
-            {
-                if (!playerStore.TryAdd(source))
-                {
-                    source.Disconnect("Player with same username already exists.");
-                }
-            });
-
             consumer.On<Left>((source, _) => playerStore.Remove(source));
 
             consumer.On<Moved>((source, _) =>

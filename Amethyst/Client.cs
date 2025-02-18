@@ -168,7 +168,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     private void Login(Packet packet)
     {
         var loginStart = packet.Create<LoginStartPacket>();
-        var joining = eventDispatcher.Dispatch(this, new Joining());
+        var joining = eventDispatcher.Dispatch(this, new Joining(loginStart.Username));
 
         player = new Player(this, loginStart.Username, joining.World ?? throw new InvalidOperationException("No world specified."));
 
