@@ -25,15 +25,8 @@ internal static class Dispatchable
         { ConfigurationPacket.Identifier, static packet => packet.Create<ConfigurationPacket>() }
     }.ToFrozenDictionary();
 
-    public static bool TryCreate(Packet packet, [NotNullWhen(true)] out IDispatchable? dispatchable)
+    public static IDispatchable? Create(Packet packet)
     {
-        if (Dictionary.TryGetValue(packet.Identifier, out var factory))
-        {
-            dispatchable = factory(packet);
-            return true;
-        }
-
-        dispatchable = null;
-        return false;
+        return Dictionary.GetValueOrDefault(packet.Identifier)?.Invoke(packet);
     }
 }

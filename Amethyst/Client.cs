@@ -187,10 +187,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
     private void Play(Packet packet)
     {
-        if (Dispatchable.TryCreate(packet, out var dispatchable))
-        {
-            dispatchable.Dispatch(player!, eventDispatcher);
-        }
+        Dispatchable.Create(packet)?.Dispatch(player!, eventDispatcher);
     }
 }
 
