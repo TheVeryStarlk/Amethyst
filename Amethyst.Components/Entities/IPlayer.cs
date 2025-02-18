@@ -15,9 +15,7 @@ public interface IPlayer : IEntity
 
     public bool OnGround { get; }
 
-    public IWorld? World { get; }
-
-    public void Spawn(IWorld spawn);
+    public IWorld World { get; }
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box);
 
