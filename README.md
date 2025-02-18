@@ -5,7 +5,7 @@
 # Amethyst
 
 A light-weight implementation of the Minecraft Java edition server protocol.
-Amethyst is customizable and sacrifices many of the vanilla mechanics in favor of performance and memory usage.
+Amethyst is customizable and sacrifices many of the vanilla features in favor of performance and memory usage.
 
 ## Usage
 
