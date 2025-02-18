@@ -11,9 +11,9 @@ internal sealed class PlayerStore : IPlayerStore
 
     private readonly Dictionary<string, IPlayer> players = [];
 
-    public bool TryAdd(IPlayer player)
+    public void Add(IPlayer player)
     {
-        return players.TryAdd(player.Username, player);
+        players.Add(player.Username, player);
     }
 
     public void Remove(IPlayer player)
