@@ -26,7 +26,9 @@ internal sealed class ConfigurationPacket : IIngoingPacket<ConfigurationPacket>,
 
     public void Dispatch(Player player, EventDispatcher eventDispatcher)
     {
+        player.Locale = Locale;
         player.ViewDistance = ViewDistance;
+
         eventDispatcher.Dispatch(player, new Configuration(Locale, ViewDistance));
     }
 }

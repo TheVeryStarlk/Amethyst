@@ -10,6 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Amethyst.Extensions.Commands\Amethyst.Extensions.Commands.csproj"/>
 		<ProjectReference Include="..\Amethyst\Amethyst.csproj"/>
 	</ItemGroup>
 

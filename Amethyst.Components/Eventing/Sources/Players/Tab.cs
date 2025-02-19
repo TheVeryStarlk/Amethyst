@@ -1,0 +1,8 @@
+﻿using Amethyst.Components.Entities;
+
+namespace Amethyst.Components.Eventing.Sources.Players;
+
+public sealed class Tab(string behind) : Event<IPlayer>
+{
+    public string Behind => behind;
+}

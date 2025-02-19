@@ -22,6 +22,8 @@ internal sealed class Player(Client client, string username, IWorld world) : IPl
 
     public bool OnGround { get; set; }
 
+    public string? Locale { get; set; }
+
     public byte ViewDistance { get; set; }
 
     public void Teleport(Location location)
