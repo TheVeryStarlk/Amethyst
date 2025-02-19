@@ -39,19 +39,6 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 loaded.Remove(source.Username);
             });
 
-            consumer.On<Configuration>((source, _) =>
-            {
-                var chunks = loaded[source.Username];
-
-                foreach (var value in chunks)
-                {
-                    NumericHelper.Decode(value, out var x, out var z);
-                    source.Client.Write(new ChunkUnloadPacket(x, z));
-                }
-
-                chunks.Clear();
-            });
-
             consumer.On<Moved>((source, _) =>
             {
                 var chunks = loaded[source.Username];
@@ -74,7 +61,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 {
                     NumericHelper.Decode(value, out var x, out var z);
 
-                    source.Client.Write(new ChunkUnloadPacket(x, z));
+                    source.Client.Write(new SingleChunkPacket(x, z, [], 0));
                     chunks.Remove(value);
                 }
 

@@ -5,7 +5,7 @@ namespace Amethyst.Extensions.Commands;
 
 public sealed class CommandsEngine
 {
-    public string[] Registered => callbacks.Keys.ToArray();
+    public string[] Registered { get; }
 
     private readonly FrozenDictionary<string, CommandDelegate> callbacks;
     private readonly CommandDelegate failure;
@@ -14,6 +14,8 @@ public sealed class CommandsEngine
     {
         this.callbacks = callbacks;
         this.failure = failure ?? ((player, _) => player.Send("Failed to execute command."));
+
+        Registered = callbacks.Keys.ToArray();
     }
 
     public static CommandsEngineBuilder Create()

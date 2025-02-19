@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record TabCompletePacket(string[] Matches) : IOutgoingPacket
+public sealed record TabResponsePacket(string[] Matches) : IOutgoingPacket
 {
     public int Identifier => 58;
 

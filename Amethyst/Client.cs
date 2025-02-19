@@ -1,5 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Threading.Channels;
+﻿using System.Threading.Channels;
 using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Eventing.Sources.Clients;
@@ -13,6 +12,7 @@ using Amethyst.Protocol.Packets.Handshake;
 using Amethyst.Protocol.Packets.Login;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Protocol.Packets.Status;
+using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
@@ -64,20 +64,33 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
     {
         var reader = new ProtocolReader(connection.Transport.Input);
 
-        var states = new Dictionary<State, Action<Packet>>
-        {
-            { State.Handshake, Handshake },
-            { State.Status, Status },
-            { State.Login, Login },
-            { State.Play, Play }
-        }.ToFrozenDictionary();
-
         while (true)
         {
             try
             {
                 var packet = await reader.ReadAsync(source.Token).ConfigureAwait(false);
-                states[state](packet);
+
+                switch (state)
+                {
+                    case State.Handshake:
+                        Handshake(packet);
+                        break;
+
+                    case State.Status:
+                        Status(packet);
+                        break;
+
+                    case State.Login:
+                        Login(packet);
+                        break;
+
+                    case State.Play:
+                        Play(packet);
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
             {
@@ -170,7 +183,14 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         var loginStart = packet.Create<LoginStartPacket>();
         var joining = eventDispatcher.Dispatch(this, new Joining(loginStart.Username));
 
-        player = new Player(this, loginStart.Username, joining.World ?? throw new InvalidOperationException("No world specified."));
+        if (joining.World is World world)
+        {
+            player = new Player(this, loginStart.Username, world);
+        }
+        else
+        {
+            Stop("No joining world specified.");
+        }
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();

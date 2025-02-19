@@ -3,10 +3,11 @@ using Amethyst.Components.Entities;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Worlds;
 using Amethyst.Protocol.Packets.Play;
+using Amethyst.Worlds;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(Client client, string username, IWorld world) : IPlayer
+internal sealed class Player(Client client, string username, World world) : IPlayer
 {
     public IClient Client => client;
 

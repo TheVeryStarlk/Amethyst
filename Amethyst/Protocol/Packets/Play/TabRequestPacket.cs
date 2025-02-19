@@ -17,9 +17,6 @@ internal sealed record TabRequestPacket(string Behind) : IIngoingPacket<TabReque
 
     public void Dispatch(Player player, EventDispatcher eventDispatcher)
     {
-        var tab = eventDispatcher.Dispatch(player, new Tab(Behind));
-
-        // Needs more work. IDK if having logic here is "good" or not.
-        player.Client.Write(new TabCompletePacket(tab.Matches));
+        eventDispatcher.Dispatch(player, new Tab(Behind));
     }
 }
