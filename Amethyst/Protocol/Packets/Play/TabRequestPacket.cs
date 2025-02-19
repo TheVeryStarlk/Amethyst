@@ -5,20 +5,14 @@ using Amethyst.Eventing;
 
 namespace Amethyst.Protocol.Packets.Play;
 
-internal sealed class TabRequestPacket : IIngoingPacket<TabRequestPacket>, IDispatchable
+internal sealed record TabRequestPacket(string Behind) : IIngoingPacket<TabRequestPacket>, IDispatchable
 {
     public static int Identifier => 20;
-
-    public required string Behind { get; init; }
 
     public static TabRequestPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
-
-        return new TabRequestPacket
-        {
-            Behind = reader.ReadVariableString()
-        };
+        return new TabRequestPacket(reader.ReadVariableString());
     }
 
     public void Dispatch(Player player, EventDispatcher eventDispatcher)
