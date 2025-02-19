@@ -23,6 +23,9 @@ internal sealed class TabRequestPacket : IIngoingPacket<TabRequestPacket>, IDisp
 
     public void Dispatch(Player player, EventDispatcher eventDispatcher)
     {
-        eventDispatcher.Dispatch(player, new Tab(Behind));
+        var tab = eventDispatcher.Dispatch(player, new Tab(Behind));
+
+        // Needs more work. IDK if having logic here is "good" or not.
+        player.Client.Write(new TabCompletePacket(tab.Matches));
     }
 }

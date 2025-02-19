@@ -26,11 +26,7 @@ internal sealed class DefaultSubscriber(IWorldStore worldStore) : ISubscriber
         registry.For<IPlayer>(consumer =>
         {
             consumer.On<Joined>((source, _) => source.Teleport(new Location(0, 32, 0)));
-
-            consumer.On<Tab>((_, original) =>
-            {
-                Console.WriteLine(original.Behind);
-            });
+            consumer.On<Tab>((_, original) => original.Matches = commandsEngine.Registered);
 
             consumer.On<Sent>((source, original) =>
             {
