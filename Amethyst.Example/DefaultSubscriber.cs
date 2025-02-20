@@ -1,11 +1,11 @@
-﻿using Amethyst.Components;
-using Amethyst.Components.Entities;
-using Amethyst.Components.Eventing;
-using Amethyst.Components.Eventing.Sources.Clients;
-using Amethyst.Components.Eventing.Sources.Players;
-using Amethyst.Components.Eventing.Sources.Servers;
-using Amethyst.Components.Messages;
-using Amethyst.Components.Worlds;
+﻿using Amethyst.Abstractions;
+using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Eventing;
+using Amethyst.Abstractions.Eventing.Sources.Clients;
+using Amethyst.Abstractions.Eventing.Sources.Players;
+using Amethyst.Abstractions.Eventing.Sources.Servers;
+using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Extensions.Commands;
 
 namespace Amethyst.Example;

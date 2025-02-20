@@ -1,5 +1,5 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Components.Protocol;
+using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play.Players;

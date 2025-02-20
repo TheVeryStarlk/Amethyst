@@ -1,5 +1,5 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Components.Entities;
+using Amethyst.Abstractions.Entities;
 
 namespace Amethyst.Extensions.Commands;
 

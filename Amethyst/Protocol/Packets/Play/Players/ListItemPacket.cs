@@ -1,7 +1,7 @@
-﻿using Amethyst.Components;
-using Amethyst.Components.Entities;
-using Amethyst.Components.Messages;
-using Amethyst.Components.Protocol;
+﻿using Amethyst.Abstractions;
+using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Protocol;
 
 namespace Amethyst.Protocol.Packets.Play.Players;
 

@@ -1,10 +1,10 @@
 ﻿using System.Threading.Channels;
-using Amethyst.Components;
-using Amethyst.Components.Entities;
-using Amethyst.Components.Eventing.Sources.Clients;
-using Amethyst.Components.Eventing.Sources.Players;
-using Amethyst.Components.Messages;
-using Amethyst.Components.Protocol;
+using Amethyst.Abstractions;
+using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Eventing.Sources.Clients;
+using Amethyst.Abstractions.Eventing.Sources.Players;
+using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol;

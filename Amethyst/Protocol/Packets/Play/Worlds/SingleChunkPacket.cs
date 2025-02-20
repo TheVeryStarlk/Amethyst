@@ -1,4 +1,4 @@
-﻿using Amethyst.Components.Protocol;
+﻿using Amethyst.Abstractions.Protocol;
 
 namespace Amethyst.Protocol.Packets.Play.Worlds;
 

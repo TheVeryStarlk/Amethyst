@@ -1,4 +1,4 @@
-﻿using Amethyst.Components.Worlds;
+﻿using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Example;
 

@@ -1,5 +1,5 @@
-﻿using Amethyst.Components.Eventing.Sources.Players;
-using Amethyst.Components.Protocol;
+﻿using Amethyst.Abstractions.Eventing.Sources.Players;
+using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 

@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using Amethyst.Components;
-using Amethyst.Components.Entities;
-using Amethyst.Components.Messages;
-using Amethyst.Components.Worlds;
+using Amethyst.Abstractions;
+using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Protocol.Packets.Play.Players.Chat;
 using Amethyst.Protocol.Packets.Play.Players.Positioning;
 using Amethyst.Worlds;

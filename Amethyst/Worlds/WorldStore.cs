@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Amethyst.Components.Worlds;
+using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 

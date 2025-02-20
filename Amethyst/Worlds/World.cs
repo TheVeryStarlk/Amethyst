@@ -1,5 +1,5 @@
-﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Worlds;
+﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 

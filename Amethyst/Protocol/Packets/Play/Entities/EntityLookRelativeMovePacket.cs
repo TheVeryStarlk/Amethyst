@@ -1,5 +1,5 @@
-﻿using Amethyst.Components.Entities;
-using Amethyst.Components.Protocol;
+﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Protocol;
 
 namespace Amethyst.Protocol.Packets.Play.Entities;
 

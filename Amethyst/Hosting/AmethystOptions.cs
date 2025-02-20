@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Amethyst.Components.Eventing;
+using Amethyst.Abstractions.Eventing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Amethyst.Hosting;

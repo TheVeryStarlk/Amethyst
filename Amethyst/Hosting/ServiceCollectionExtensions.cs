@@ -1,4 +1,4 @@
-﻿using Amethyst.Components.Worlds;
+﻿using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
