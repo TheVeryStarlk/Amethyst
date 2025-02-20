@@ -11,6 +11,6 @@ public sealed record EntityHeadLook(IEntity Entity) : IOutgoingPacket
 
     public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteVariableInteger(Entity.Identifier).WriteVariableInteger((byte) (Entity.Yaw % 360 / 360 * 256));
+        SpanWriter.Create(span).WriteVariableInteger(Entity.Identifier).WriteByte(Entity.Yaw.ToAbsolute());
     }
 }

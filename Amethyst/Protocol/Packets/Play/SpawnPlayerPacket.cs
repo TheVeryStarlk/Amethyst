@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Numerics;
-using Amethyst.Components.Entities;
+﻿using Amethyst.Components.Entities;
 using Amethyst.Components.Protocol;
 
 namespace Amethyst.Protocol.Packets.Play;
@@ -22,15 +20,17 @@ public sealed record SpawnPlayerPacket(IPlayer Player) : IOutgoingPacket
 
     public void Write(Span<byte> span)
     {
+        var absolute = Player.Location.ToAbsolute();
+
         SpanWriter
             .Create(span)
             .WriteVariableInteger(Player.Identifier)
-            .Write(BigInteger.Parse(Player.Guid.ToString().Replace("-", ""), NumberStyles.HexNumber).ToByteArray(isBigEndian: true))
-            .WriteInteger((int) (Player.Location.X * 32D))
-            .WriteInteger((int) (Player.Location.Y * 32D))
-            .WriteInteger((int) (Player.Location.Z * 32D))
-            .WriteByte((byte) (Player.Yaw / 256))
-            .WriteByte((byte) (Player.Pitch / 256))
+            .Write(Player.Guid.ToArray())
+            .WriteInteger((int) absolute.X)
+            .WriteInteger((int) absolute.Y)
+            .WriteInteger((int) absolute.Z)
+            .WriteByte(Player.Yaw.ToAbsolute())
+            .WriteByte(Player.Pitch.ToAbsolute())
             .WriteShort(0)
             .WriteByte(127);
     }

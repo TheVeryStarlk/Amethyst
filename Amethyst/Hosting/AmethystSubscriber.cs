@@ -74,10 +74,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                     player.Client.Write(
                         new EntityLookRelativeMovePacket(
                             source,
-                            new Location(
-                                original.Location.X * 32D - source.Location.X * 32D,
-                                original.Location.Y * 32D - source.Location.Y * 32D,
-                                original.Location.Z * 32D - source.Location.Z * 32D)),
+                            (original.Location - source.Location).ToAbsolute()),
                         new EntityHeadLook(source));
                 }
 

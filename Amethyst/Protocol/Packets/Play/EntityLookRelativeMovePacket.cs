@@ -23,8 +23,8 @@ public sealed record EntityLookRelativeMovePacket(IEntity Entity, Location Relat
             .WriteByte((byte) Relative.X)
             .WriteByte((byte) Relative.Y)
             .WriteByte((byte) Relative.Z)
-            .WriteByte((byte) (Entity.Yaw % 360 / 360 * 256))
-            .WriteByte((byte) (Entity.Pitch % 360 / 360 * 256))
+            .WriteByte(Entity.Yaw.ToAbsolute())
+            .WriteByte(Entity.Pitch.ToAbsolute())
             .WriteBoolean(Entity.OnGround);
     }
 }

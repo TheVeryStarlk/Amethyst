@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Numerics;
-using Amethyst.Components;
+﻿using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
@@ -27,7 +25,7 @@ public sealed record ListItemPacket(ListItemAction Action, params IPlayer[] Play
 
         foreach (var player in Players)
         {
-            writer.Write(BigInteger.Parse(player.Guid.ToString().Replace("-", ""), NumberStyles.HexNumber).ToByteArray(isBigEndian: true));
+            writer.Write(player.Guid.ToArray());
             Action.Write(player, span[(Variable.GetByteCount(Action.Identifier) + Variable.GetByteCount(Players.Length) + sizeof(long) + sizeof(long))..]);
         }
     }

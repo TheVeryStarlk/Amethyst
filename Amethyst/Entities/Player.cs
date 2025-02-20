@@ -21,9 +21,9 @@ internal sealed class Player(Client client, string username, World world) : IPla
 
     public Location Location { get; set; }
 
-    public float Yaw { get; set; }
+    public Angle Yaw { get; set; }
 
-    public float Pitch { get; set; }
+    public Angle Pitch { get; set; }
 
     public bool OnGround { get; set; }
 
@@ -35,7 +35,6 @@ internal sealed class Player(Client client, string username, World world) : IPla
 
     public void Teleport(Location location)
     {
-        Location = location;
         Client.Write(new PositionLookPacket(location, Yaw, Pitch, OnGround));
     }
 
