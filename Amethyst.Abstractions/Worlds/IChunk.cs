@@ -10,5 +10,12 @@ public interface IChunk
 
     public void SetBiome(Biome biome, int x, int z);
 
+    /// <summary>
+    /// Serializes the <see cref="IChunk"/>'s sections and encodes a bitmask for it.
+    /// </summary>
+    /// <remarks>
+    /// This is intended for internal usage.
+    /// </remarks>
+    /// <returns>The serialized sections and their bitmask</returns>
     public (byte[] Sections, ushort Bitmask) Build();
 }
