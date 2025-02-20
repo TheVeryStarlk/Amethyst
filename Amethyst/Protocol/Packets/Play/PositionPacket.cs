@@ -24,10 +24,10 @@ public sealed record PositionPacket(Location Location, bool OnGround) : IIngoing
 
     void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
-        player.Location = Location;
-        player.OnGround = OnGround;
-
         var moved = new Moved(Location, player.Yaw, player.Pitch, OnGround);
         eventDispatcher.Dispatch(player, moved);
+
+        player.Location = Location;
+        player.OnGround = OnGround;
     }
 }

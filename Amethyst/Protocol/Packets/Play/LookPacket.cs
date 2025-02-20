@@ -17,11 +17,11 @@ public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoin
 
     void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
+        var moved = new Moved(player.Location, Yaw, Pitch, OnGround);
+        eventDispatcher.Dispatch(player, moved);
+
         player.Yaw = Yaw;
         player.Pitch = Pitch;
         player.OnGround = OnGround;
-
-        var moved = new Moved(player.Location, Yaw, Pitch, OnGround);
-        eventDispatcher.Dispatch(player, moved);
     }
 }

@@ -17,9 +17,9 @@ public sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>
 
     void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
-        player.OnGround = Value;
-
         var moved = new Moved(player.Location, player.Yaw, player.Pitch, Value);
         eventDispatcher.Dispatch(player, moved);
+
+        player.OnGround = Value;
     }
 }

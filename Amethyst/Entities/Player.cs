@@ -13,8 +13,6 @@ internal sealed class Player(Client client, string username, World world) : IPla
 {
     public IClient Client => client;
 
-    public Guid Guid { get; } = Guid.NewGuid();
-
     public string Username => username;
 
     public IWorld World => world;
@@ -28,6 +26,8 @@ internal sealed class Player(Client client, string username, World world) : IPla
     public float Pitch { get; set; }
 
     public bool OnGround { get; set; }
+
+    public Guid Guid { get; } = Guid.NewGuid();
 
     public string? Locale { get; set; }
 

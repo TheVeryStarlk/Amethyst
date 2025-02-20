@@ -48,12 +48,12 @@ public sealed record PositionLookPacket(Location Location, float Yaw, float Pitc
 
     void IDispatchable.Dispatch(Player player, EventDispatcher eventDispatcher)
     {
+        var moved = new Moved(Location, Yaw, Pitch, OnGround);
+        eventDispatcher.Dispatch(player, moved);
+
         player.Location = Location;
         player.Yaw = Yaw;
         player.Pitch = Pitch;
         player.OnGround = OnGround;
-
-        var moved = new Moved(Location, Yaw, Pitch, OnGround);
-        eventDispatcher.Dispatch(player, moved);
     }
 }

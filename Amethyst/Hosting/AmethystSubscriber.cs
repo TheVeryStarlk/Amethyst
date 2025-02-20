@@ -67,8 +67,15 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 }
             });
 
-            consumer.On<Moved>((source, _) =>
+            consumer.On<Moved>((source, original) =>
             {
+                foreach (var player in source.World.Players.Values.Where(player => player.Username != source.Username))
+                {
+                    player.Client.Write(new EntityLookRelativeMovePacket(
+                        source,
+                        new Location(original.Location.X * 32D - source.Location.X * 32D, original.Location.Y * 32D - source.Location.Y * 32D, original.Location.Z * 32D - source.Location.Z * 32D)));
+                }
+
                 var chunks = loaded[source.Username];
                 var world = (World) source.World;
 

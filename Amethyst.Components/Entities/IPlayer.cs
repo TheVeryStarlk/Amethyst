@@ -13,12 +13,6 @@ public interface IPlayer : IEntity
 
     public IWorld World { get; }
 
-    public float Yaw { get; }
-
-    public float Pitch { get; }
-
-    public bool OnGround { get; }
-
     public string? Locale { get; }
 
     public byte ViewDistance { get; }
