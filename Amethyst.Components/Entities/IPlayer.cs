@@ -7,6 +7,8 @@ public interface IPlayer : IEntity
 {
     public IClient Client { get; }
 
+    public Guid Guid { get; }
+
     public string Username { get; }
 
     public IWorld World { get; }

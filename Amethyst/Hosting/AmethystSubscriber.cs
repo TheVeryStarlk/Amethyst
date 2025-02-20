@@ -29,8 +29,18 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
         {
             consumer.On<Joined>((source, _) =>
             {
-                ((World) source.World).AddPlayer(source);
                 loaded[source.Username] = [];
+
+                var world = (World) source.World;
+                world.AddPlayer(source);
+
+                var action = new AddPlayerAction();
+
+                foreach (var player in world.Players.Values)
+                {
+                    source.Client.Write(new ListItemPacket(action, player));
+                    player.Client.Write(new ListItemPacket(action, source));
+                }
             });
 
             consumer.On<Left>((source, _) =>
