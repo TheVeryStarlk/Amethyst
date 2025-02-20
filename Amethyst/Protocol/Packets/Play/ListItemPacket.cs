@@ -7,24 +7,29 @@ using Amethyst.Components.Protocol;
 
 namespace Amethyst.Protocol.Packets.Play;
 
-public sealed record ListItemPacket(ListItemAction Action, IPlayer Player) : IOutgoingPacket
+// This currently only works with a single player.
+public sealed record ListItemPacket(ListItemAction Action, params IPlayer[] Players) : IOutgoingPacket
 {
     public int Identifier => 56;
 
     public int Length => Variable.GetByteCount(Action.Identifier)
-                         + Variable.GetByteCount(1)
-                         + Action.Length(Player)
-                         + 16;
+                         + Variable.GetByteCount(Players.Length)
+                         + Players.Sum(Action.Length)
+                         + sizeof(long)
+                         + sizeof(long);
 
     public void Write(Span<byte> span)
     {
         var writer = SpanWriter
             .Create(span)
             .WriteVariableInteger(Action.Identifier)
-            .WriteVariableInteger(1);
+            .WriteVariableInteger(Players.Length);
 
-        writer.Write(BigInteger.Parse(Player.Guid.ToString().Replace("-", ""), NumberStyles.HexNumber).ToByteArray(isBigEndian: true));
-        Action.Write(Player, span[(Variable.GetByteCount(Action.Identifier) + Variable.GetByteCount(1) + 16)..]);
+        foreach (var player in Players)
+        {
+            writer.Write(BigInteger.Parse(player.Guid.ToString().Replace("-", ""), NumberStyles.HexNumber).ToByteArray(isBigEndian: true));
+            Action.Write(player, span[(Variable.GetByteCount(Action.Identifier) + Variable.GetByteCount(Players.Length) + sizeof(long) + sizeof(long))..]);
+        }
     }
 }
 
@@ -41,14 +46,18 @@ public sealed class AddPlayerAction : ListItemAction
 {
     public override int Identifier => 0;
 
+    private string? username;
+
     public override int Length(IPlayer player)
     {
+        username = Message.Create(player.Username).Serialize();
+
         return Variable.GetByteCount(player.Username)
                + Variable.GetByteCount(0)
                + Variable.GetByteCount(1)
                + Variable.GetByteCount(0)
                + sizeof(bool)
-               + Variable.GetByteCount(Message.Create(player.Username).Serialize());
+               + Variable.GetByteCount(username);
     }
 
     public override void Write(IPlayer player, Span<byte> span)
@@ -60,7 +69,7 @@ public sealed class AddPlayerAction : ListItemAction
             .WriteVariableInteger(1)
             .WriteVariableInteger(0)
             .WriteBoolean(true)
-            .WriteVariableString(Message.Create(player.Username).Serialize());
+            .WriteVariableString(username!);
     }
 }
 

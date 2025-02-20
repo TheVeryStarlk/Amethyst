@@ -4,11 +4,16 @@ using System.Text;
 
 namespace Amethyst.Protocol;
 
-internal ref struct SpanWriter(Span<byte> span)
+internal ref struct SpanWriter
 {
     private int position;
 
-    private readonly Span<byte> span = span;
+    private readonly Span<byte> span;
+
+    private SpanWriter(Span<byte> span)
+    {
+        this.span = span;
+    }
 
     public static SpanWriter Create(Span<byte> span)
     {

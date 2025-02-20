@@ -10,7 +10,6 @@ public sealed record StatusResponsePacket(string Message) : IOutgoingPacket
 
     public void Write(Span<byte> span)
     {
-        var writer = new SpanWriter(span);
-        writer.WriteVariableString(Message);
+        SpanWriter.Create(span).WriteVariableString(Message);
     }
 }
