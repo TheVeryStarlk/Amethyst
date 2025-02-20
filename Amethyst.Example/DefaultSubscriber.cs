@@ -35,7 +35,6 @@ internal sealed class DefaultSubscriber(IWorldManager worldManager) : ISubscribe
                     return;
                 }
 
-
                 foreach (var world in worldManager)
                 {
                     foreach (var pair in world.Players)
