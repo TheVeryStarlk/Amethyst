@@ -1,4 +1,5 @@
-﻿using Amethyst.Components;
+﻿using System.Diagnostics;
+using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Worlds;
@@ -7,6 +8,7 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Entities;
 
+[DebuggerDisplay("{Username}")]
 internal sealed class Player(Client client, string username, World world) : IPlayer
 {
     public IClient Client => client;
@@ -16,6 +18,8 @@ internal sealed class Player(Client client, string username, World world) : IPla
     public string Username => username;
 
     public IWorld World => world;
+
+    public int Identifier => client.Identifier;
 
     public Location Location { get; set; }
 

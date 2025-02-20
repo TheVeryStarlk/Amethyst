@@ -40,6 +40,14 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 {
                     source.Client.Write(new ListItemPacket(action, player));
                     player.Client.Write(new ListItemPacket(action, source));
+
+                    if (player == source)
+                    {
+                        continue;
+                    }
+
+                    source.Client.Write(new SpawnPlayerPacket(player));
+                    player.Client.Write(new SpawnPlayerPacket(source));
                 }
             });
 
@@ -55,6 +63,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                 foreach (var player in world.Players.Values)
                 {
                     player.Client.Write(new ListItemPacket(action, source));
+                    player.Client.Write(new DestroyEntitiesPacket(source));
                 }
             });
 
