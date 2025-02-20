@@ -3,24 +3,13 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name, IGenerator generator) : IWorld
+internal sealed class World(string name, IGenerator generator, PlayerStore playerStore) : IWorld
 {
     public string Name => name;
 
-    public IReadOnlyDictionary<string, IPlayer> Players => players;
+    public IEnumerable<IPlayer> Players => playerStore.Where(player => player.World == this);
 
-    private readonly Dictionary<string, IPlayer> players = [];
     private readonly Dictionary<long, Region> regions = [];
-
-    public void AddPlayer(IPlayer player)
-    {
-        players.Add(player.Username, player);
-    }
-
-    public void RemovePlayer(IPlayer player)
-    {
-        players.Remove(player.Username);
-    }
 
     public Block GetBlock(Position position)
     {
@@ -32,7 +21,7 @@ internal sealed class World(string name, IGenerator generator) : IWorld
         GetRegion(position.X, position.Z).SetBlock(block, position.ToChunk());
     }
 
-    public Chunk GetChunk(int x, int z)
+    public IChunk GetChunk(int x, int z)
     {
         return GetRegion(x, z).GetChunk(x, z);
     }

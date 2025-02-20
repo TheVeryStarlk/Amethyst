@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class WorldStore : IWorldStore
+internal sealed class WorldManager(PlayerStore playerStore) : IWorldManager
 {
     public IWorld this[string name] => worlds[name];
 
@@ -13,7 +13,7 @@ internal sealed class WorldStore : IWorldStore
 
     public void Create(string name, IGenerator generator)
     {
-        var world = new World(name, generator);
+        var world = new World(name, generator, playerStore);
         worlds[name] = world;
     }
 
@@ -24,6 +24,6 @@ internal sealed class WorldStore : IWorldStore
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return worlds.Values.GetEnumerator();
+        return GetEnumerator();
     }
 }

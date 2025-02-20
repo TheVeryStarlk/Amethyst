@@ -4,7 +4,6 @@ using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Sources.Clients;
 using Amethyst.Abstractions.Eventing.Sources.Players;
-using Amethyst.Abstractions.Worlds;
 using Amethyst.Protocol.Packets.Play.Entities;
 using Amethyst.Protocol.Packets.Play.Players;
 using Amethyst.Protocol.Packets.Play.Worlds;
@@ -12,7 +11,7 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
+internal sealed class AmethystSubscriber(PlayerStore playerStore) : ISubscriber
 {
     private readonly Dictionary<string, HashSet<long>> loaded = [];
 
@@ -20,7 +19,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {
-            if (worldStore.Any(world => world.Players.Any(pair => pair.Key == original.Username)))
+            if (playerStore.Any(player => player.Username == original.Username))
             {
                 // Does this need to be customizable?
                 source.Stop("Already logged in.");
@@ -32,13 +31,11 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
             consumer.On<Joined>((source, _) =>
             {
                 loaded[source.Username] = [];
-
-                var world = (World) source.World;
-                world.AddPlayer(source);
+                playerStore.Add(source);
 
                 var action = new AddPlayerAction();
 
-                foreach (var player in world.Players.Values)
+                foreach (var player in source.World.Players)
                 {
                     source.Client.Write(new ListItemPacket(action, player));
                     player.Client.Write(new ListItemPacket(action, source));
@@ -56,13 +53,11 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
             consumer.On<Left>((source, _) =>
             {
                 loaded.Remove(source.Username);
-
-                var world = (World) source.World;
-                world.RemovePlayer(source);
+                playerStore.Remove(source);
 
                 var action = new RemovePlayerAction();
 
-                foreach (var player in world.Players.Values)
+                foreach (var player in source.World.Players)
                 {
                     player.Client.Write(new ListItemPacket(action, source));
                     player.Client.Write(new DestroyEntitiesPacket(source));
@@ -71,15 +66,12 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
 
             consumer.On<Moved>((source, original) =>
             {
-                foreach (var player in source.World.Players.Values.Where(player => player.Username != source.Username))
+                foreach (var player in source.World.Players.Where(player => player.Username != source.Username))
                 {
                     player.Client.Write(
                         new EntityLookRelativeMovePacket(source, (original.Location - source.Location).ToAbsolute()),
                         new EntityHeadLook(source));
                 }
-
-                var chunks = loaded[source.Username];
-                var world = (World) source.World;
 
                 var current = source.Location.ToPosition().ToChunk();
                 var temporary = new List<long>();
@@ -92,6 +84,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
                     }
                 }
 
+                var chunks = loaded[source.Username];
                 var dead = chunks.Except(temporary).ToArray();
 
                 foreach (var value in dead)
@@ -117,7 +110,7 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
 
                     NumericHelper.Decode(value, out var x, out var z);
 
-                    var result = world.GetChunk(x, z).Build();
+                    var result = source.World.GetChunk(x, z).Build();
                     source.Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
                 }
             });

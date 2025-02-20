@@ -9,4 +9,6 @@ public interface IChunk
     public Biome GetBiome(int x, int z);
 
     public void SetBiome(Biome biome, int x, int z);
+
+    public (byte[] Sections, ushort Bitmask) Build();
 }
