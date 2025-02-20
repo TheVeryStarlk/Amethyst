@@ -13,7 +13,8 @@ public sealed record ListItemPacket(ListItemAction Action, IPlayer Player) : IOu
 
     public int Length => Variable.GetByteCount(Action.Identifier)
                          + Variable.GetByteCount(1)
-                         + Action.Length(Player);
+                         + Action.Length(Player)
+                         + 16;
 
     public void Write(Span<byte> span)
     {
@@ -47,8 +48,7 @@ public sealed class AddPlayerAction : ListItemAction
                + Variable.GetByteCount(1)
                + Variable.GetByteCount(0)
                + sizeof(bool)
-               + Variable.GetByteCount(Message.Create(player.Username).Serialize())
-               + 16;
+               + Variable.GetByteCount(Message.Create(player.Username).Serialize());
     }
 
     public override void Write(IPlayer player, Span<byte> span)

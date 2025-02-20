@@ -45,8 +45,17 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
 
             consumer.On<Left>((source, _) =>
             {
-                ((World) source.World).RemovePlayer(source);
                 loaded.Remove(source.Username);
+
+                var world = (World) source.World;
+                world.RemovePlayer(source);
+
+                var action = new RemovePlayerAction();
+
+                foreach (var player in world.Players.Values)
+                {
+                    player.Client.Write(new ListItemPacket(action, source));
+                }
             });
 
             consumer.On<Moved>((source, _) =>
