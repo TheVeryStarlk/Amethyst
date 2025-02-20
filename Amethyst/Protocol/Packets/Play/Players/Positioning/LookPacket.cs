@@ -3,7 +3,7 @@ using Amethyst.Components.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players.Positioning;
 
 public sealed record LookPacket(float Yaw, float Pitch, bool OnGround) : IIngoingPacket<LookPacket>, IDispatchable
 {

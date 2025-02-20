@@ -2,7 +2,9 @@
 using Amethyst.Components.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
-using Amethyst.Protocol.Packets.Play;
+using Amethyst.Protocol.Packets.Play.Players;
+using Amethyst.Protocol.Packets.Play.Players.Chat;
+using Amethyst.Protocol.Packets.Play.Players.Positioning;
 
 namespace Amethyst.Protocol;
 

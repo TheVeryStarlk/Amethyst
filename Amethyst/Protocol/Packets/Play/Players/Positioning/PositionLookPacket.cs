@@ -4,7 +4,7 @@ using Amethyst.Components.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players.Positioning;
 
 public sealed record PositionLookPacket(Location Location, float Yaw, float Pitch, bool OnGround)
     : IIngoingPacket<PositionLookPacket>, IOutgoingPacket, IDispatchable

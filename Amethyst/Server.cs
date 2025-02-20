@@ -3,7 +3,7 @@ using Amethyst.Components;
 using Amethyst.Components.Eventing.Sources.Servers;
 using Amethyst.Entities;
 using Amethyst.Eventing;
-using Amethyst.Protocol.Packets.Play;
+using Amethyst.Protocol.Packets.Play.Players;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 

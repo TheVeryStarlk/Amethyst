@@ -3,7 +3,7 @@ using Amethyst.Components.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players;
 
 internal sealed record ConfigurationPacket(string Locale, byte ViewDistance) : IIngoingPacket<ConfigurationPacket>, IDispatchable
 {

@@ -3,7 +3,7 @@ using Amethyst.Components.Entities;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players;
 
 // This currently only works with a single player.
 public sealed record ListItemPacket(ListItemAction Action, params IPlayer[] Players) : IOutgoingPacket

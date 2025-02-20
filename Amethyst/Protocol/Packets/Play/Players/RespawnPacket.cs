@@ -1,6 +1,6 @@
 ﻿using Amethyst.Components.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players;
 
 public sealed record RespawnPacket(int Dimension, byte Difficulty, byte GameMode, string Type) : IOutgoingPacket
 {

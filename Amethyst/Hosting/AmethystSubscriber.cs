@@ -5,7 +5,9 @@ using Amethyst.Components.Eventing;
 using Amethyst.Components.Eventing.Sources.Clients;
 using Amethyst.Components.Eventing.Sources.Players;
 using Amethyst.Components.Worlds;
-using Amethyst.Protocol.Packets.Play;
+using Amethyst.Protocol.Packets.Play.Entities;
+using Amethyst.Protocol.Packets.Play.Players;
+using Amethyst.Protocol.Packets.Play.Worlds;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;

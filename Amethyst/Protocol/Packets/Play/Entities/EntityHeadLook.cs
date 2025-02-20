@@ -1,7 +1,7 @@
 ﻿using Amethyst.Components.Entities;
 using Amethyst.Components.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Entities;
 
 public sealed record EntityHeadLook(IEntity Entity) : IOutgoingPacket
 {

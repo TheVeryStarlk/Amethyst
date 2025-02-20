@@ -3,7 +3,8 @@ using Amethyst.Components;
 using Amethyst.Components.Entities;
 using Amethyst.Components.Messages;
 using Amethyst.Components.Worlds;
-using Amethyst.Protocol.Packets.Play;
+using Amethyst.Protocol.Packets.Play.Players.Chat;
+using Amethyst.Protocol.Packets.Play.Players.Positioning;
 using Amethyst.Worlds;
 
 namespace Amethyst.Entities;

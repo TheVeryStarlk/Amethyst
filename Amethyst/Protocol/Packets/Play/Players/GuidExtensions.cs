@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Numerics;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players;
 
 internal static class GuidExtensions
 {

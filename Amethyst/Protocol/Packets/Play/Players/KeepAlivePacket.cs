@@ -1,6 +1,6 @@
 ﻿using Amethyst.Components.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Players;
 
 public sealed record KeepAlivePacket(int Magic) : IIngoingPacket<KeepAlivePacket>, IOutgoingPacket
 {

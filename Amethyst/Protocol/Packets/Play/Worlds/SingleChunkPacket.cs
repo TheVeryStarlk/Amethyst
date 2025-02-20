@@ -1,6 +1,6 @@
 ﻿using Amethyst.Components.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play;
+namespace Amethyst.Protocol.Packets.Play.Worlds;
 
 public sealed record SingleChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmask) : IOutgoingPacket
 {
