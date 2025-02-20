@@ -18,6 +18,10 @@ public static class ServiceCollectionExtensions
 
         configure(options);
 
+        // This needs information from previous subscribers. So it should run the last.
+        // Perhaps all subscribers could be run last.
+        options.AddSubscriber<MessageSubscriber>();
+
         services.AddSingleton<EventDispatcher>();
         services.AddSingleton<WorldStore>();
         services.AddSingleton<IWorldManager, WorldManager>();

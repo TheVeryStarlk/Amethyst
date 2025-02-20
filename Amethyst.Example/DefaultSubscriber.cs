@@ -35,15 +35,19 @@ internal sealed class DefaultSubscriber(IWorldManager worldManager) : ISubscribe
                     return;
                 }
 
-                var message = Message
-                    .Create()
-                    .Write($"{source.Username}: ").Gray()
-                    .Write(original.Message)
-                    .Build();
 
-                foreach (var player in source.World.Players.Values)
+                foreach (var world in worldManager)
                 {
-                    player.Send(message);
+                    foreach (var pair in world.Players)
+                    {
+                        var message = Message
+                            .Create()
+                            .Write($"{world.Name} - {pair.Key}: ").Gray()
+                            .Write(original.Message)
+                            .Build();
+
+                        pair.Value.Send(message);
+                    }
                 }
             });
         });
