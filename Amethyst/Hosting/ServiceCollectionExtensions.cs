@@ -1,5 +1,6 @@
 ﻿using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
+using Amethyst.Hosting.Subscribers;
 using Amethyst.Worlds;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
@@ -11,7 +12,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAmethyst(this IServiceCollection services, Action<AmethystOptions> configure)
     {
-        configure(new AmethystOptions(services).AddSubscriber<AmethystSubscriber>());
+        var options = new AmethystOptions(services)
+            .AddSubscriber<PlayerSubscriber>()
+            .AddSubscriber<WorldSubscriber>();
+
+        configure(options);
 
         services.AddSingleton<EventDispatcher>();
         services.AddSingleton<WorldStore>();

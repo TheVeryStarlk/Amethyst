@@ -1,20 +1,16 @@
-﻿using System.Numerics;
-using Amethyst.Abstractions;
+﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Sources.Clients;
 using Amethyst.Abstractions.Eventing.Sources.Players;
 using Amethyst.Protocol.Packets.Play.Entities;
 using Amethyst.Protocol.Packets.Play.Players;
-using Amethyst.Protocol.Packets.Play.Worlds;
 using Amethyst.Worlds;
 
-namespace Amethyst.Hosting;
+namespace Amethyst.Hosting.Subscribers;
 
-internal sealed class AmethystSubscriber(WorldStore worldStore) : ISubscriber
+internal sealed class PlayerSubscriber(WorldStore worldStore) : ISubscriber
 {
-    private readonly Dictionary<string, HashSet<long>> loaded = [];
-
     public void Subscribe(IRegistry registry)
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
@@ -30,7 +26,6 @@ internal sealed class AmethystSubscriber(WorldStore worldStore) : ISubscriber
         {
             consumer.On<Joined>((source, _) =>
             {
-                loaded[source.Username] = [];
                 worldStore.Add(source);
 
                 var action = new AddPlayerAction();
@@ -52,7 +47,6 @@ internal sealed class AmethystSubscriber(WorldStore worldStore) : ISubscriber
 
             consumer.On<Left>((source, _) =>
             {
-                loaded.Remove(source.Username);
                 worldStore.Remove(source);
 
                 var action = new RemovePlayerAction();
@@ -71,47 +65,6 @@ internal sealed class AmethystSubscriber(WorldStore worldStore) : ISubscriber
                     player.Client.Write(
                         new EntityLookRelativeMovePacket(source, (original.Location - source.Location).ToAbsolute()),
                         new EntityHeadLook(source));
-                }
-
-                var current = source.Location.ToPosition().ToChunk();
-                var temporary = new List<long>();
-
-                for (var x = current.X - source.ViewDistance; x < current.X + source.ViewDistance; x++)
-                {
-                    for (var z = current.Z - source.ViewDistance; z < current.Z + source.ViewDistance; z++)
-                    {
-                        temporary.Add(NumericHelper.Encode(x, z));
-                    }
-                }
-
-                var chunks = loaded[source.Username];
-                var dead = chunks.Except(temporary).ToArray();
-
-                foreach (var value in dead)
-                {
-                    NumericHelper.Decode(value, out var x, out var z);
-
-                    source.Client.Write(new SingleChunkPacket(x, z, [], 0));
-                    chunks.Remove(value);
-                }
-
-                var closest = temporary.OrderBy(value =>
-                {
-                    NumericHelper.Decode(value, out var x, out var z);
-                    return Vector2.Distance(new Vector2(current.X, current.Z), new Vector2(x, z));
-                });
-
-                foreach (var value in closest)
-                {
-                    if (!chunks.Add(value))
-                    {
-                        continue;
-                    }
-
-                    NumericHelper.Decode(value, out var x, out var z);
-
-                    var result = source.World.GetChunk(x, z).Build();
-                    source.Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
                 }
             });
         });
