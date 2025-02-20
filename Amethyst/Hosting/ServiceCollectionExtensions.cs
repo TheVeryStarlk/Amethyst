@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
 
         // This needs information from previous subscribers. So it should run the last.
         // Perhaps all subscribers could be run last.
+        // Or maybe all of this could be in the commands extension.
         options.AddSubscriber<MessageSubscriber>();
 
         services.AddSingleton<EventDispatcher>();
