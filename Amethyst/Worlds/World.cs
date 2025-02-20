@@ -3,11 +3,11 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name, IGenerator generator, PlayerStore playerStore) : IWorld
+internal sealed class World(string name, IGenerator generator, WorldStore worldStore) : IWorld
 {
     public string Name => name;
 
-    public IEnumerable<IPlayer> Players => playerStore.Where(player => player.World == this);
+    public IReadOnlyDictionary<string, IPlayer> Players => worldStore[this];
 
     private readonly Dictionary<long, Region> regions = [];
 

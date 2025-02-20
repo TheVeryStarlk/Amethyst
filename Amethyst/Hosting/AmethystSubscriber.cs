@@ -11,7 +11,7 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystSubscriber(PlayerStore playerStore) : ISubscriber
+internal sealed class AmethystSubscriber(WorldStore worldStore) : ISubscriber
 {
     private readonly Dictionary<string, HashSet<long>> loaded = [];
 
@@ -19,7 +19,7 @@ internal sealed class AmethystSubscriber(PlayerStore playerStore) : ISubscriber
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {
-            if (playerStore.Any(player => player.Username == original.Username))
+            if (worldStore.Any(worlds => worlds.Value.Any(play => play.Key == original.Username)))
             {
                 // Does this need to be customizable?
                 source.Stop("Already logged in.");
@@ -31,11 +31,11 @@ internal sealed class AmethystSubscriber(PlayerStore playerStore) : ISubscriber
             consumer.On<Joined>((source, _) =>
             {
                 loaded[source.Username] = [];
-                playerStore.Add(source);
+                worldStore.Add(source);
 
                 var action = new AddPlayerAction();
 
-                foreach (var player in source.World.Players)
+                foreach (var player in source.World.Players.Values)
                 {
                     source.Client.Write(new ListItemPacket(action, player));
                     player.Client.Write(new ListItemPacket(action, source));
@@ -53,11 +53,11 @@ internal sealed class AmethystSubscriber(PlayerStore playerStore) : ISubscriber
             consumer.On<Left>((source, _) =>
             {
                 loaded.Remove(source.Username);
-                playerStore.Remove(source);
+                worldStore.Remove(source);
 
                 var action = new RemovePlayerAction();
 
-                foreach (var player in source.World.Players)
+                foreach (var player in source.World.Players.Values)
                 {
                     player.Client.Write(new ListItemPacket(action, source));
                     player.Client.Write(new DestroyEntitiesPacket(source));
@@ -66,7 +66,7 @@ internal sealed class AmethystSubscriber(PlayerStore playerStore) : ISubscriber
 
             consumer.On<Moved>((source, original) =>
             {
-                foreach (var player in source.World.Players.Where(player => player.Username != source.Username))
+                foreach (var player in source.World.Players.Values.Where(player => player.Username != source.Username))
                 {
                     player.Client.Write(
                         new EntityLookRelativeMovePacket(source, (original.Location - source.Location).ToAbsolute()),

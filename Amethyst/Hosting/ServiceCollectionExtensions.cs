@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
         configure(new AmethystOptions(services).AddSubscriber<AmethystSubscriber>());
 
         services.AddSingleton<EventDispatcher>();
-        services.AddSingleton<PlayerStore>();
+        services.AddSingleton<WorldStore>();
         services.AddSingleton<IWorldManager, WorldManager>();
 
         services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();

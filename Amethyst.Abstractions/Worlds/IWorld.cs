@@ -6,7 +6,7 @@ public interface IWorld
 {
     public string Name { get; }
 
-    public IEnumerable<IPlayer> Players { get; }
+    public IReadOnlyDictionary<string, IPlayer> Players { get; }
 
     public Block GetBlock(Position position);
 

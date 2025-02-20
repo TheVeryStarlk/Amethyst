@@ -41,7 +41,7 @@ internal sealed class DefaultSubscriber(IWorldManager worldManager) : ISubscribe
                     .Write(original.Message)
                     .Build();
 
-                foreach (var player in source.World.Players)
+                foreach (var player in source.World.Players.Values)
                 {
                     player.Send(message);
                 }
