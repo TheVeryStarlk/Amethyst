@@ -71,9 +71,14 @@ internal sealed class AmethystSubscriber(IWorldStore worldStore) : ISubscriber
             {
                 foreach (var player in source.World.Players.Values.Where(player => player.Username != source.Username))
                 {
-                    player.Client.Write(new EntityLookRelativeMovePacket(
-                        source,
-                        new Location(original.Location.X * 32D - source.Location.X * 32D, original.Location.Y * 32D - source.Location.Y * 32D, original.Location.Z * 32D - source.Location.Z * 32D)));
+                    player.Client.Write(
+                        new EntityLookRelativeMovePacket(
+                            source,
+                            new Location(
+                                original.Location.X * 32D - source.Location.X * 32D,
+                                original.Location.Y * 32D - source.Location.Y * 32D,
+                                original.Location.Z * 32D - source.Location.Z * 32D)),
+                        new EntityHeadLook(source));
                 }
 
                 var chunks = loaded[source.Username];

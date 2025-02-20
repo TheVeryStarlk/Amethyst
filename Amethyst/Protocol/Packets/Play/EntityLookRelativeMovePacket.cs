@@ -17,16 +17,14 @@ public sealed record EntityLookRelativeMovePacket(IEntity Entity, Location Relat
 
     public void Write(Span<byte> span)
     {
-        Console.WriteLine((byte) (Entity.Yaw / 256));
-
         SpanWriter
             .Create(span)
             .WriteVariableInteger(Entity.Identifier)
             .WriteByte((byte) Relative.X)
             .WriteByte((byte) Relative.Y)
             .WriteByte((byte) Relative.Z)
-            .WriteByte((byte) (Entity.Yaw / 256))
-            .WriteByte((byte) (Entity.Pitch / 256))
+            .WriteByte((byte) (Entity.Yaw % 360 / 360 * 256))
+            .WriteByte((byte) (Entity.Pitch % 360 / 360 * 256))
             .WriteBoolean(Entity.OnGround);
     }
 }
