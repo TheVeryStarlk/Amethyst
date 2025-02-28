@@ -1,8 +1,8 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
-using Amethyst.Abstractions.Eventing.Sources.Clients;
-using Amethyst.Abstractions.Eventing.Sources.Players;
+using Amethyst.Abstractions.Eventing.Clients;
+using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Protocol.Packets.Play.Entities;
 using Amethyst.Protocol.Packets.Play.Players;
 using Amethyst.Worlds;

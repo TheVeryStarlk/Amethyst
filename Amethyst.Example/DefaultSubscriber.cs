@@ -1,9 +1,9 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
-using Amethyst.Abstractions.Eventing.Sources.Clients;
-using Amethyst.Abstractions.Eventing.Sources.Players;
-using Amethyst.Abstractions.Eventing.Sources.Servers;
+using Amethyst.Abstractions.Eventing.Clients;
+using Amethyst.Abstractions.Eventing.Players;
+using Amethyst.Abstractions.Eventing.Servers;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Extensions.Commands;

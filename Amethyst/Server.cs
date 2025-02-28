@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Amethyst.Abstractions;
-using Amethyst.Abstractions.Eventing.Sources.Servers;
+using Amethyst.Abstractions.Eventing.Servers;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play.Players;

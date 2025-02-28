@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Entities;
 
-namespace Amethyst.Abstractions.Eventing.Sources.Players;
+namespace Amethyst.Abstractions.Eventing.Players;
 
 public sealed class Moved(Location location, float yaw, float pitch, bool onGround) : Event<IPlayer>
 {

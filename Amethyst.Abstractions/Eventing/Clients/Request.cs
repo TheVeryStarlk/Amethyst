@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Messages;
 
-namespace Amethyst.Abstractions.Eventing.Sources.Clients;
+namespace Amethyst.Abstractions.Eventing.Clients;
 
 public sealed class Request : Event<IClient>
 {

@@ -1,8 +1,8 @@
 ﻿using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing.Sources.Clients;
-using Amethyst.Abstractions.Eventing.Sources.Players;
+using Amethyst.Abstractions.Eventing.Clients;
+using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
