@@ -2,7 +2,7 @@
 
 namespace Amethyst.Protocol.Packets.Play.Worlds;
 
-public sealed record SingleChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmask) : IOutgoingPacket
+public sealed record SingleChunkPacket(int X, int Z, byte[] Sections, ushort Bitmask) : IOutgoingPacket
 {
     public int Identifier => 33;
 
@@ -10,8 +10,8 @@ public sealed record SingleChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmas
                          + sizeof(int)
                          + sizeof(bool)
                          + sizeof(ushort)
-                         + Variable.GetByteCount(Chunk.Length)
-                         + Chunk.Length;
+                         + Variable.GetByteCount(Sections.Length)
+                         + Sections.Length;
 
     public void Write(Span<byte> span)
     {
@@ -21,7 +21,7 @@ public sealed record SingleChunkPacket(int X, int Z, byte[] Chunk, ushort Bitmas
             .WriteInteger(Z)
             .WriteBoolean(true)
             .WriteUnsignedShort(Bitmask)
-            .WriteVariableInteger(Chunk.Length)
-            .Write(Chunk);
+            .WriteVariableInteger(Sections.Length)
+            .Write(Sections);
     }
 }
