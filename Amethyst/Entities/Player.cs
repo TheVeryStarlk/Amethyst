@@ -3,7 +3,7 @@ using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Worlds;
-using Amethyst.Protocol.Packets.Play.Players.Chat;
+using Amethyst.Protocol.Packets.Play.Players.Messages;
 using Amethyst.Protocol.Packets.Play.Players.Positioning;
 using Amethyst.Worlds;
 

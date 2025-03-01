@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play.Players.Chat;
+namespace Amethyst.Protocol.Packets.Play.Players.Messages;
 
 public sealed record TabResponsePacket(string[] Matches) : IOutgoingPacket
 {

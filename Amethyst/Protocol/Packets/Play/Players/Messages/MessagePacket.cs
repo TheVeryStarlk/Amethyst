@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 
-namespace Amethyst.Protocol.Packets.Play.Players.Chat;
+namespace Amethyst.Protocol.Packets.Play.Players.Messages;
 
 public sealed record MessagePacket(string Message, byte Position) : IIngoingPacket<MessagePacket>, IOutgoingPacket, IDispatchable
 {

@@ -2,9 +2,8 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Amethyst.Abstractions.Messages;
 
-namespace Amethyst.Abstractions;
+namespace Amethyst.Abstractions.Messages;
 
 public static class JsonSerializerExtensions
 {
