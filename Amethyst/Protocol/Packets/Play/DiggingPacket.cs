@@ -4,7 +4,7 @@ using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 
-namespace Amethyst.Protocol.Packets.Play.Players;
+namespace Amethyst.Protocol.Packets.Play;
 
 internal sealed record DiggingPacket(DiggingStatus Status, Position Position, BlockFace Face) : IIngoingPacket<DiggingPacket>, IDispatchable
 {

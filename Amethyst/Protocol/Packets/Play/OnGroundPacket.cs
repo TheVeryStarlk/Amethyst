@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 
-namespace Amethyst.Protocol.Packets.Play.Players.Positioning;
+namespace Amethyst.Protocol.Packets.Play;
 
 public sealed record OnGroundPacket(bool Value) : IIngoingPacket<OnGroundPacket>, IDispatchable
 {

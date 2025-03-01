@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play.Players;
+namespace Amethyst.Protocol.Packets.Play;
 
 public sealed record JoinGamePacket(int Entity, byte GameMode, sbyte Dimension, byte Difficulty, byte Players, string Type, bool ReducedDebugInformation) : IOutgoingPacket
 {

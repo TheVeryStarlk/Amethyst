@@ -3,8 +3,7 @@ using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Clients;
 using Amethyst.Abstractions.Eventing.Players;
-using Amethyst.Protocol.Packets.Play.Entities;
-using Amethyst.Protocol.Packets.Play.Players;
+using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
 namespace Amethyst.Hosting.Subscribers;
@@ -22,6 +21,8 @@ internal sealed class PlayerSubscriber(WorldStore worldStore) : ISubscriber
             }
         }));
 
+        // For some reason spawning player entities does not always work.
+        // This is a bug, should fix later.
         registry.For<IPlayer>(consumer =>
         {
             consumer.On<Joined>((source, _) =>

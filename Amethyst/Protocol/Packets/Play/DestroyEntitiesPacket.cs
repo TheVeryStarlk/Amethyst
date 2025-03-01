@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play.Entities;
+namespace Amethyst.Protocol.Packets.Play;
 
 public sealed record DestroyEntitiesPacket(params IEntity[] Entities) : IOutgoingPacket
 {

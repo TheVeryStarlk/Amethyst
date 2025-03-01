@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play.Players;
+namespace Amethyst.Protocol.Packets.Play;
 
 public sealed record SpawnPlayerPacket(IPlayer Player) : IOutgoingPacket
 {

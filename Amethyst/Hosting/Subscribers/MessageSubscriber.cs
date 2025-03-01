@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Players;
-using Amethyst.Protocol.Packets.Play.Players.Messages;
+using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Hosting.Subscribers;
 

@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Protocol;
 using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Protocol.Packets.Play.Players;
+namespace Amethyst.Protocol.Packets.Play;
 
 public sealed record BlockChangePacket(Position Position, Block Block) : IOutgoingPacket
 {

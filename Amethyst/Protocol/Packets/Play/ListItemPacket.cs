@@ -1,9 +1,8 @@
-﻿using Amethyst.Abstractions;
-using Amethyst.Abstractions.Entities;
+﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Protocol;
 
-namespace Amethyst.Protocol.Packets.Play.Players;
+namespace Amethyst.Protocol.Packets.Play;
 
 // This currently only works with a single player.
 public sealed record ListItemPacket(ListItemAction Action, params IPlayer[] Players) : IOutgoingPacket
