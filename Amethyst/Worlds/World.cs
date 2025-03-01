@@ -23,6 +23,7 @@ internal sealed class World(string name, IGenerator generator, WorldStore worldS
 
     public IChunk GetChunk(int x, int z)
     {
+        // This probably should not shift.
         return GetRegion(x, z).GetChunk(x << 4, z << 4);
     }
 

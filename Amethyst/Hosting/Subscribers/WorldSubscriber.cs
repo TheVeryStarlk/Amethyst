@@ -19,9 +19,22 @@ internal sealed class WorldSubscriber : ISubscriber
             consumer.On<Joined>((source, _) => loaded[source.Username] = []);
             consumer.On<Left>((source, _) => loaded.Remove(source.Username));
 
-            consumer.On<Digging>((source, original) =>
+            consumer.On<Digging>((source, original) => source.World.SetBlock(new Block(0), original.Position));
+
+            consumer.On<Placing>((source, original) =>
             {
-                source.World.SetBlock(new Block(0), original.Position);
+                var position = original.Face switch
+                {
+                    BlockFace.NegativeY => original.Position with { Y = original.Position.Y - 1 },
+                    BlockFace.PositiveY => original.Position with { Y = original.Position.Y + 1 },
+                    BlockFace.NegativeZ => original.Position with { Z = original.Position.Z - 1 },
+                    BlockFace.PositiveZ => original.Position with { Z = original.Position.Z + 1 },
+                    BlockFace.NegativeX => original.Position with { X = original.Position.X - 1 },
+                    BlockFace.PositiveX => original.Position with { X = original.Position.X + 1 },
+                    _ => throw new ArgumentOutOfRangeException(nameof(original.Face), original.Face, "Unknown face.")
+                };
+
+                source.World.SetBlock(new Block(1), position);
             });
 
             consumer.On<Moved>((source, _) =>
