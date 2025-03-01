@@ -24,7 +24,9 @@ internal static class Dispatchable
         { LookPacket.Identifier, static packet => packet.Create<LookPacket>() },
         { PositionLookPacket.Identifier, static packet => packet.Create<PositionLookPacket>() },
         { ConfigurationPacket.Identifier, static packet => packet.Create<ConfigurationPacket>() },
-        { TabRequestPacket.Identifier, static packet => packet.Create<TabRequestPacket>() }
+        { TabRequestPacket.Identifier, static packet => packet.Create<TabRequestPacket>() },
+        { PlacementPacket.Identifier, static packet => packet.Create<PlacementPacket>() },
+        { DiggingPacket.Identifier, static packet => packet.Create<DiggingPacket>() }
     }.ToFrozenDictionary();
 
     public static IDispatchable? Create(Packet packet)
