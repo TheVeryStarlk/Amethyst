@@ -19,8 +19,8 @@ internal sealed class FlatGenerator : IGenerator
                 chunk.SetBlock(new Block(3), new Position(x, 2, z));
                 chunk.SetBlock(new Block(2), new Position(x, 3, z));
 
-                var topping = Random.Shared.Next(byte.MaxValue) > sbyte.MaxValue ? new Block(31, 1) : new Block();
-                chunk.SetBlock(topping, new Position(x, 4, z));
+                // var topping = Random.Shared.Next(byte.MaxValue) > sbyte.MaxValue ? new Block(31, 1) : new Block();
+                // chunk.SetBlock(topping, new Position(x, 4, z));
             }
         }
     }

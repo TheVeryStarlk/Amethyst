@@ -13,17 +13,17 @@ internal sealed class World(string name, IGenerator generator, WorldStore worldS
 
     public Block GetBlock(Position position)
     {
-        return GetRegion(position.X, position.Z).GetBlock(position.ToChunk());
+        return GetRegion(position.X, position.Z).GetBlock(position);
     }
 
     public void SetBlock(Block block, Position position)
     {
-        GetRegion(position.X, position.Z).SetBlock(block, position.ToChunk());
+        GetRegion(position.X, position.Z).SetBlock(block, position);
     }
 
     public IChunk GetChunk(int x, int z)
     {
-        return GetRegion(x, z).GetChunk(x, z);
+        return GetRegion(x, z).GetChunk(x << 4, z << 4);
     }
 
     private Region GetRegion(int x, int z)

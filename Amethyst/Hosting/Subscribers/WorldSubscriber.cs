@@ -2,6 +2,7 @@
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Players;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Protocol.Packets.Play.Worlds;
 using Amethyst.Worlds;
 
@@ -18,21 +19,31 @@ internal sealed class WorldSubscriber : ISubscriber
             consumer.On<Joined>((source, _) => loaded[source.Username] = []);
             consumer.On<Left>((source, _) => loaded.Remove(source.Username));
 
+            consumer.On<Digging>((source, original) =>
+            {
+                source.World.SetBlock(new Block(0), original.Position);
+            });
+
             consumer.On<Moved>((source, _) =>
             {
                 var current = source.Location.ToPosition().ToChunk();
-                var temporary = new List<long>();
+
+                var length = (current.X - source.ViewDistance - (current.X + source.ViewDistance))
+                             * (current.Z - source.ViewDistance - (current.Z + source.ViewDistance));
+
+                var alive = new long[length];
+                var index = 0;
 
                 for (var x = current.X - source.ViewDistance; x < current.X + source.ViewDistance; x++)
                 {
                     for (var z = current.Z - source.ViewDistance; z < current.Z + source.ViewDistance; z++)
                     {
-                        temporary.Add(NumericHelper.Encode(x, z));
+                        alive[index++] = NumericHelper.Encode(x, z);
                     }
                 }
 
                 var chunks = loaded[source.Username];
-                var dead = chunks.Except(temporary).ToArray();
+                var dead = chunks.Except(alive).ToArray();
 
                 foreach (var value in dead)
                 {
@@ -42,7 +53,7 @@ internal sealed class WorldSubscriber : ISubscriber
                     chunks.Remove(value);
                 }
 
-                var closest = temporary.OrderBy(value =>
+                var closest = alive.OrderBy(value =>
                 {
                     NumericHelper.Decode(value, out var x, out var z);
                     return Vector2.Distance(new Vector2(current.X, current.Z), new Vector2(x, z));
