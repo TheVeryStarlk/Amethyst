@@ -18,6 +18,12 @@ internal sealed record PlacementPacket(Position Position, BlockFace Face) : IIng
 
     public void Dispatch(Player player, EventDispatcher eventDispatcher)
     {
+        // Will be removed later.
+        if (Face is (BlockFace) 255)
+        {
+            return;
+        }
+
         eventDispatcher.Dispatch(player, new Placing(Position, Face));
     }
 }

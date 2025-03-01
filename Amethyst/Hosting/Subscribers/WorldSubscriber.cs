@@ -3,6 +3,7 @@ using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Abstractions.Worlds;
+using Amethyst.Protocol.Packets.Play.Players;
 using Amethyst.Protocol.Packets.Play.Worlds;
 using Amethyst.Worlds;
 
@@ -19,7 +20,17 @@ internal sealed class WorldSubscriber : ISubscriber
             consumer.On<Joined>((source, _) => loaded[source.Username] = []);
             consumer.On<Left>((source, _) => loaded.Remove(source.Username));
 
-            consumer.On<Digging>((source, original) => source.World.SetBlock(new Block(0), original.Position));
+            consumer.On<Digging>((source, original) =>
+            {
+                var packet = new BlockChangePacket(original.Position, new Block(0));
+
+                foreach (var player in source.World.Players.Values.Where(player => player != source))
+                {
+                    player.Client.Write(packet);
+                }
+
+                source.World.SetBlock(new Block(0), original.Position);
+            });
 
             consumer.On<Placing>((source, original) =>
             {
@@ -31,8 +42,15 @@ internal sealed class WorldSubscriber : ISubscriber
                     BlockFace.PositiveZ => original.Position with { Z = original.Position.Z + 1 },
                     BlockFace.NegativeX => original.Position with { X = original.Position.X - 1 },
                     BlockFace.PositiveX => original.Position with { X = original.Position.X + 1 },
-                    _ => throw new ArgumentOutOfRangeException(nameof(original.Face), original.Face, "Unknown face.")
+                    _ => throw new ArgumentException("Unknown face.")
                 };
+
+                var packet = new BlockChangePacket(position, new Block(1));
+
+                foreach (var player in source.World.Players.Values)
+                {
+                    player.Client.Write(packet);
+                }
 
                 source.World.SetBlock(new Block(1), position);
             });
