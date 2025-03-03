@@ -2,7 +2,7 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class Region(IGenerator generator)
+internal sealed class Region(World world, IGenerator generator)
 {
     private readonly Dictionary<long, Chunk> chunks = [];
 
@@ -28,17 +28,20 @@ internal sealed class Region(IGenerator generator)
 
     public Chunk GetChunk(int x, int z)
     {
-        var value = NumericHelper.Encode(x >> 4, z >> 4);
+        x >>= 4;
+        z >>= 4;
+
+        var value = NumericHelper.Encode(x, z);
 
         if (chunks.TryGetValue(value, out var chunk))
         {
             return chunk;
         }
 
-        chunk = new Chunk();
+        chunk = new Chunk(x, z);
 
         chunks[value] = chunk;
-        generator.Generate(chunk);
+        generator.Generate(world, chunk);
 
         return chunk;
     }

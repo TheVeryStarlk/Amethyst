@@ -2,7 +2,7 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class Chunk : IChunk
+internal sealed record Chunk(int X, int Z) : IChunk
 {
     private readonly Section?[] sections = new Section[16];
     private readonly byte[] biomes = new byte[256];

@@ -13,12 +13,12 @@ internal sealed class World(string name, IGenerator generator, WorldStore worldS
 
     public Block GetBlock(Position position)
     {
-        return GetRegion(position.X, position.Z).GetBlock(position);
+        return GetRegion(position.X >> 4, position.Z >> 4).GetBlock(position);
     }
 
     public void SetBlock(Block block, Position position)
     {
-        GetRegion(position.X, position.Z).SetBlock(block, position);
+        GetRegion(position.X >> 4, position.Z >> 4).SetBlock(block, position);
     }
 
     public IChunk GetChunk(int x, int z)
@@ -36,7 +36,7 @@ internal sealed class World(string name, IGenerator generator, WorldStore worldS
             return region;
         }
 
-        region = new Region(generator);
+        region = new Region(this, generator);
 
         regions[value] = region;
 

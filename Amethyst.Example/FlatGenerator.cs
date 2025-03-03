@@ -6,7 +6,7 @@ internal sealed class FlatGenerator : IGenerator
 {
     private readonly Biome biome = (Biome) Random.Shared.Next(120);
 
-    public void Generate(IChunk chunk)
+    public void Generate(IWorld world, IChunk chunk)
     {
         for (var x = 0; x < 16; x++)
         {
