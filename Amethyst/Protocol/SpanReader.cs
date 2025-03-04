@@ -19,6 +19,11 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
         return span[position++] > 0;
     }
 
+    public short ReadShort()
+    {
+        return BinaryPrimitives.ReadInt16BigEndian(span[position..(position += sizeof(short))]);
+    }
+
     public ushort ReadUnsignedShort()
     {
         return BinaryPrimitives.ReadUInt16BigEndian(span[position..(position += sizeof(ushort))]);

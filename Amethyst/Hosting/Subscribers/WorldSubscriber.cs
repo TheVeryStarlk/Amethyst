@@ -33,6 +33,11 @@ internal sealed class WorldSubscriber : ISubscriber
 
             consumer.On<Placing>((source, original) =>
             {
+                if (!original.Item.IsBlock)
+                {
+                    return;
+                }
+
                 var position = original.Face switch
                 {
                     BlockFace.NegativeY => original.Position with { Y = original.Position.Y - 1 },
@@ -44,14 +49,15 @@ internal sealed class WorldSubscriber : ISubscriber
                     _ => throw new ArgumentException("Unknown face.")
                 };
 
-                var packet = new BlockChangePacket(position, new Block(1));
+                var block = new Block(original.Item.Type);
+                var packet = new BlockChangePacket(position, block);
 
                 foreach (var player in source.World.Players.Values)
                 {
                     player.Client.Write(packet);
                 }
 
-                source.World.SetBlock(new Block(1), position);
+                source.World.SetBlock(block, position);
             });
 
             consumer.On<Moved>((source, _) =>
