@@ -35,6 +35,7 @@ internal sealed class Player(Client client, string username, World world) : IPla
 
     public void Teleport(Location location)
     {
+        Location = location;
         Client.Write(new PositionLookPacket(location, Yaw, Pitch, OnGround));
     }
 
