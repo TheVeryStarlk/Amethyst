@@ -124,7 +124,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         // Give client some time to realize the packets.
         await Task.Delay(50).ConfigureAwait(false);
 
-        outgoing.Writer.Complete();
         connection.Abort();
     }
 
@@ -134,7 +133,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
 
         try
         {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
+            await foreach (var packet in outgoing.Reader.ReadAllAsync(connection.ConnectionClosed).ConfigureAwait(false))
             {
                 await writer.WriteAsync(packet).ConfigureAwait(false);
             }
