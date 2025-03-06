@@ -183,14 +183,13 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         var loginStart = packet.Create<LoginStartPacket>();
         var joining = eventDispatcher.Dispatch(this, new Joining(loginStart.Username));
 
-        if (joining.World is World world)
+        if (joining.World is not World world)
         {
-            player = new Player(this, loginStart.Username, world);
+            logger.LogWarning("No joining world specified.");
+            return;
         }
-        else
-        {
-            Stop("No joining world specified.");
-        }
+
+        player = new Player(this, loginStart.Username, world);
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();
