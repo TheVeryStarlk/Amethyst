@@ -183,6 +183,9 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         var loginStart = packet.Create<LoginStartPacket>();
         var joining = eventDispatcher.Dispatch(this, new Joining(loginStart.Username));
 
+        // Quit before switching to play state if token was cancelled.
+        source.Token.ThrowIfCancellationRequested();
+
         if (joining.World is not World world)
         {
             logger.LogWarning("No joining world specified.");
@@ -190,9 +193,6 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         }
 
         player = new Player(this, loginStart.Username, world);
-
-        // Quit before switching to play state if token was cancelled.
-        source.Token.ThrowIfCancellationRequested();
 
         Write(
             new LoginSuccessPacket(player.Guid.ToString(), loginStart.Username),
