@@ -195,7 +195,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         source.Token.ThrowIfCancellationRequested();
 
         Write(
-            new LoginSuccessPacket(Guid.NewGuid().ToString(), loginStart.Username),
+            new LoginSuccessPacket(player.Guid.ToString(), loginStart.Username),
             new JoinGamePacket(Identifier, 1, 0, 0, 1, "flat", false),
             new PositionLookPacket(new Location(), 0, 0, false));
 
