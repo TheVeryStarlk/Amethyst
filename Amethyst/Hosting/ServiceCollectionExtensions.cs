@@ -2,8 +2,6 @@
 using Amethyst.Eventing;
 using Amethyst.Hosting.Subscribers;
 using Amethyst.Worlds;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Amethyst.Hosting;
@@ -26,7 +24,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<WorldStore>();
         services.AddSingleton<IWorldManager, WorldManager>();
 
-        services.AddTransient<IConnectionListenerFactory, SocketTransportFactory>();
         services.AddTransient<Server>();
 
         services.AddHostedService<AmethystService>();

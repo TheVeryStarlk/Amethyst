@@ -8,11 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App"/>
+		<ProjectReference Include="..\Amethyst.Abstractions\Amethyst.Abstractions.csproj"/>
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Amethyst.Abstractions\Amethyst.Abstractions.csproj"/>
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2"/>
 	</ItemGroup>
 
 </Project>

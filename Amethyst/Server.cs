@@ -1,15 +1,15 @@
 ﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Eventing.Servers;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFactory listenerFactory, EventDispatcher eventDispatcher)
+internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher)
     : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
@@ -36,7 +36,11 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
     private async Task ListeningAsync()
     {
         var starting = eventDispatcher.Dispatch(this, new Starting());
-        await using var listener = await listenerFactory.BindAsync(starting.EndPoint).ConfigureAwait(false);
+
+        using var listener = new Socket(starting.EndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+        listener.Bind(starting.EndPoint);
+        listener.Listen();
 
         logger.LogInformation("Listening for new clients...");
 
@@ -46,8 +50,8 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
         {
             try
             {
-                var connection = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
-                var client = new Client(loggerFactory.CreateLogger<Client>(), connection!, eventDispatcher, identifier++);
+                var socket = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
+                var client = new Client(loggerFactory.CreateLogger<Client>(), socket, eventDispatcher, identifier++);
 
                 pairs[client.Identifier] = (client, ExecuteAsync(client));
                 logger.LogDebug("Started client {Identifier}", client.Identifier);
@@ -63,7 +67,6 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
             }
         }
 
-        await listener.UnbindAsync().ConfigureAwait(false);
         logger.LogDebug("Stopped listening");
 
         var stopping = eventDispatcher.Dispatch(this, new Stopping());
@@ -83,7 +86,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, IConnectionListenerFa
             await Task.Yield();
 
             await client.StartAsync().ConfigureAwait(false);
-            await client.DisposeAsync().ConfigureAwait(false);
+            client.Dispose();
 
             logger.LogDebug("Stopped client {Identifier}", client.Identifier);
 

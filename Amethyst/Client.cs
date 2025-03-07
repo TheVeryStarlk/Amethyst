@@ -1,4 +1,6 @@
-﻿using System.Threading.Channels;
+﻿using System.IO.Pipelines;
+using System.Net.Sockets;
+using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing.Clients;
@@ -13,19 +15,19 @@ using Amethyst.Protocol.Packets.Login;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Protocol.Packets.Status;
 using Amethyst.Worlds;
-using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, ConnectionContext connection, EventDispatcher eventDispatcher, int identifier)
-    : IClient, IAsyncDisposable
+internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatcher eventDispatcher, int identifier)
+    : IClient, IDisposable
 {
     public int Identifier => identifier;
 
     public IPlayer? Player => player;
 
-    private readonly CancellationTokenSource source = CancellationTokenSource.CreateLinkedTokenSource(connection.ConnectionClosed);
+    private readonly NetworkStream stream = new(socket);
+    private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
     private State state;
@@ -54,15 +56,14 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
         source.Cancel();
     }
 
-    public ValueTask DisposeAsync()
+    public void Dispose()
     {
         source.Dispose();
-        return connection.DisposeAsync();
     }
 
     private async Task ReadingAsync()
     {
-        var reader = new ProtocolReader(connection.Transport.Input);
+        var reader = new ProtocolReader(PipeReader.Create(stream));
 
         while (true)
         {
@@ -92,7 +93,7 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
+            catch (OperationCanceledException)
             {
                 break;
             }
@@ -119,32 +120,33 @@ internal sealed class Client(ILogger<Client> logger, ConnectionContext connectio
             {
                 eventDispatcher.Dispatch(player!, new Left());
             }
+
+            outgoing.Writer.Complete();
         }
 
         // Give client some time to realize the packets.
-        await Task.Delay(50).ConfigureAwait(false);
-
-        connection.Abort();
+        socket.Close(50);
     }
 
     private async Task WritingAsync()
     {
-        var writer = new ProtocolWriter(connection.Transport.Output);
+        var writer = new ProtocolWriter(PipeWriter.Create(stream));
 
-        try
+        await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
         {
-            await foreach (var packet in outgoing.Reader.ReadAllAsync(connection.ConnectionClosed).ConfigureAwait(false))
+            try
             {
                 await writer.WriteAsync(packet).ConfigureAwait(false);
             }
-        }
-        catch (OperationCanceledException)
-        {
-            // Nothing.
-        }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "Unexpected exception while writing to client");
+            catch (IOException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while writing to client");
+                break;
+            }
         }
     }
 
