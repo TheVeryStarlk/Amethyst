@@ -16,15 +16,15 @@ internal static class Dispatchable
     // I wonder if there's a better way to do this.
     private static readonly FrozenDictionary<int, Func<Packet, IDispatchable>> Dictionary = new Dictionary<int, Func<Packet, IDispatchable>>
     {
-        { MessagePacket.Identifier, static packet => packet.Create<MessagePacket>() },
-        { OnGroundPacket.Identifier, static packet => packet.Create<OnGroundPacket>() },
-        { PositionPacket.Identifier, static packet => packet.Create<PositionPacket>() },
-        { LookPacket.Identifier, static packet => packet.Create<LookPacket>() },
-        { PositionLookPacket.Identifier, static packet => packet.Create<PositionLookPacket>() },
-        { ConfigurationPacket.Identifier, static packet => packet.Create<ConfigurationPacket>() },
-        { TabRequestPacket.Identifier, static packet => packet.Create<TabRequestPacket>() },
-        { PlacementPacket.Identifier, static packet => packet.Create<PlacementPacket>() },
-        { DiggingPacket.Identifier, static packet => packet.Create<DiggingPacket>() }
+        { MessagePacket.Identifier, packet => packet.Create<MessagePacket>() },
+        { OnGroundPacket.Identifier, packet => packet.Create<OnGroundPacket>() },
+        { PositionPacket.Identifier, packet => packet.Create<PositionPacket>() },
+        { LookPacket.Identifier, packet => packet.Create<LookPacket>() },
+        { PositionLookPacket.Identifier, packet => packet.Create<PositionLookPacket>() },
+        { ConfigurationPacket.Identifier, packet => packet.Create<ConfigurationPacket>() },
+        { TabRequestPacket.Identifier, packet => packet.Create<TabRequestPacket>() },
+        { PlacementPacket.Identifier, packet => packet.Create<PlacementPacket>() },
+        { DiggingPacket.Identifier, packet => packet.Create<DiggingPacket>() }
     }.ToFrozenDictionary();
 
     public static IDispatchable? Create(Packet packet)

@@ -18,9 +18,9 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
         // Maybe catch exceptions inside the loop?
         try
         {
-            foreach (var task in callbacks.Cast<Action<TSource, TEvent>>())
+            foreach (var callback in callbacks.Cast<Action<TSource, TEvent>>())
             {
-                task(source, original);
+                callback(source, original);
             }
         }
         catch (OperationCanceledException)
