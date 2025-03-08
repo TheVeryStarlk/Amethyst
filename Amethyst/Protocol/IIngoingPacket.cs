@@ -1,15 +1,15 @@
 ﻿using System.Buffers;
 
-namespace Amethyst.Abstractions.Protocol;
+namespace Amethyst.Protocol;
 
-public interface IIngoingPacket<out T> where T : IIngoingPacket<T>
+internal interface IIngoingPacket<out T> where T : IIngoingPacket<T>
 {
     public static abstract int Identifier { get; }
 
     public static abstract T Create(ReadOnlySpan<byte> span);
 }
 
-public readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
+internal readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
 {
     public int Identifier => identifier;
 
