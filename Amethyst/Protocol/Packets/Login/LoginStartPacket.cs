@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Protocol;
-
-namespace Amethyst.Protocol.Packets.Login;
+﻿namespace Amethyst.Protocol.Packets.Login;
 
 public sealed record LoginStartPacket(string Username) : IIngoingPacket<LoginStartPacket>
 {

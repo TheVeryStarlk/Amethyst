@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Protocol;
-
-namespace Amethyst.Protocol.Packets.Status;
+﻿namespace Amethyst.Protocol.Packets.Status;
 
 public sealed record StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {

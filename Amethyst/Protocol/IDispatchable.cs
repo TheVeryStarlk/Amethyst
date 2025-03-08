@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Abstractions.Protocol;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play;

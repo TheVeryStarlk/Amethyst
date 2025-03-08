@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Protocol;
-
-namespace Amethyst.Protocol.Packets.Handshake;
+﻿namespace Amethyst.Protocol.Packets.Handshake;
 
 public sealed record HandshakePacket(int Version, string Address, ushort Port, int State) : IIngoingPacket<HandshakePacket>
 {

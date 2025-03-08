@@ -10,7 +10,7 @@ using Amethyst.Extensions.Commands;
 
 namespace Amethyst.Example;
 
-internal sealed class DefaultSubscriber(IWorldManager worldManager) : ISubscriber
+internal sealed class DefaultSubscriber : ISubscriber
 {
     private readonly CommandsEngine commandsEngine = CommandsEngine
         .Create()
@@ -18,10 +18,17 @@ internal sealed class DefaultSubscriber(IWorldManager worldManager) : ISubscribe
         .Failure((player, _) => player.Send(Message.Create("Incorrect usage!", color: Color.Red)))
         .Build();
 
+    private IWorldManager? worldManager;
+
     public void Subscribe(IRegistry registry)
     {
-        registry.For<IServer>(consumer => consumer.On<Starting>((_, _) => worldManager.Create("Default", new FlatGenerator())));
-        registry.For<IClient>(consumer => consumer.On<Joining>((_, original) => original.World = worldManager["Default"]));
+        registry.For<IServer>(consumer => consumer.On<Starting>((source, _) =>
+        {
+            worldManager = source.WorldManager;
+            source.WorldManager.Create("Default", new FlatGenerator());
+        }));
+
+        registry.For<IClient>(consumer => consumer.On<Joining>((_, original) => original.World = worldManager!["Default"]));
 
         registry.For<IPlayer>(consumer =>
         {
@@ -35,7 +42,7 @@ internal sealed class DefaultSubscriber(IWorldManager worldManager) : ISubscribe
                     return;
                 }
 
-                foreach (var world in worldManager)
+                foreach (var world in worldManager!)
                 {
                     foreach (var pair in world.Players)
                     {
