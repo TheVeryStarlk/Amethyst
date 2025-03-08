@@ -18,17 +18,17 @@ internal sealed class DefaultSubscriber : ISubscriber
         .Failure((player, _) => player.Send(Message.Create("Incorrect usage!", color: Color.Red)))
         .Build();
 
-    private IWorldManager? worldManager;
+    private IWorldService? worldService;
 
     public void Subscribe(IRegistry registry)
     {
         registry.For<IServer>(consumer => consumer.On<Starting>((source, _) =>
         {
-            worldManager = source.WorldManager;
+            worldService = source.WorldManager;
             source.WorldManager.Create("Default", new FlatGenerator());
         }));
 
-        registry.For<IClient>(consumer => consumer.On<Joining>((_, original) => original.World = worldManager!["Default"]));
+        registry.For<IClient>(consumer => consumer.On<Joining>((_, original) => original.World = worldService!.Worlds["Default"]));
 
         registry.For<IPlayer>(consumer =>
         {
@@ -42,17 +42,17 @@ internal sealed class DefaultSubscriber : ISubscriber
                     return;
                 }
 
-                foreach (var world in worldManager!)
+                foreach (var world in worldService!.Worlds)
                 {
-                    foreach (var pair in world.Players)
+                    foreach (var player in world.Value.Players)
                     {
                         var message = Message
                             .Create()
-                            .Write($"{world.Name} - {pair.Key}: ").Gray()
+                            .Write($"{world.Key} - {player.Key}: ").Gray()
                             .Write(original.Message)
                             .Build();
 
-                        pair.Value.Send(message);
+                        player.Value.Send(message);
                     }
                 }
             });

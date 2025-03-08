@@ -3,18 +3,18 @@ using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Clients;
 using Amethyst.Abstractions.Eventing.Players;
+using Amethyst.Entities;
 using Amethyst.Protocol.Packets.Play;
-using Amethyst.Worlds;
 
 namespace Amethyst.Hosting.Subscribers;
 
-internal sealed class PlayerSubscriber(WorldStore worldStore) : ISubscriber
+internal sealed class PlayerSubscriber(PlayerStore playerStore) : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {
-            if (worldStore.Any(worlds => worlds.Value.Any(play => play.Key == original.Username)))
+            if (playerStore.Players.ContainsKey(original.Username))
             {
                 // Does this need to be customizable?
                 source.Stop("Already logged in.");
@@ -27,7 +27,7 @@ internal sealed class PlayerSubscriber(WorldStore worldStore) : ISubscriber
         {
             consumer.On<Joined>((source, _) =>
             {
-                worldStore.Add(source);
+                playerStore.Add(source);
 
                 var action = new AddPlayerAction();
 
@@ -48,7 +48,7 @@ internal sealed class PlayerSubscriber(WorldStore worldStore) : ISubscriber
 
             consumer.On<Left>((source, _) =>
             {
-                worldStore.Remove(source);
+                playerStore.Remove(source);
 
                 var action = new RemovePlayerAction();
 

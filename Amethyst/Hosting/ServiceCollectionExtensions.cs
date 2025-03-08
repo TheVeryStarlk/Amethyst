@@ -1,4 +1,5 @@
 ﻿using Amethyst.Abstractions.Worlds;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Hosting.Subscribers;
 using Amethyst.Worlds;
@@ -17,12 +18,14 @@ public static class ServiceCollectionExtensions
         configure(options);
 
         // This needs information from previous subscribers. So it should run the last.
-        // Perhaps all subscribers could be run last.
+        // Perhaps all subscribers could run last, too.
         options.AddSubscriber<MessageSubscriber>();
 
         services.AddSingleton<EventDispatcher>();
         services.AddSingleton<WorldStore>();
-        services.AddSingleton<IWorldManager, WorldManager>();
+        services.AddSingleton<PlayerStore>();
+
+        services.AddTransient<Func<string, IGenerator, IWorld>>(provider => (name, generator) => new World(name, generator, provider.GetRequiredService<PlayerStore>()));
 
         services.AddTransient<Server>();
 

@@ -1,13 +1,15 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Worlds;
+using Amethyst.Entities;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name, IGenerator generator, WorldStore worldStore) : IWorld
+internal sealed class World(string name, IGenerator generator, PlayerStore playerStore) : IWorld
 {
     public string Name => name;
 
-    public IReadOnlyDictionary<string, IPlayer> Players => worldStore[this];
+    // Could this be more efficient?
+    public IReadOnlyDictionary<string, IPlayer> Players => playerStore.Players.Where(pair => pair.Value.World == this).ToDictionary();
 
     private readonly Dictionary<long, Region> regions = [];
 

@@ -11,10 +11,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, WorldManager worldManager, EventDispatcher eventDispatcher)
+internal sealed class Server(ILoggerFactory loggerFactory, WorldStore worldStore, EventDispatcher eventDispatcher)
     : IServer, IDisposable
 {
-    public IWorldManager WorldManager => worldManager;
+    public IWorldService WorldManager => worldStore;
 
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];
