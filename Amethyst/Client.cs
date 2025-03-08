@@ -120,12 +120,13 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
             {
                 eventDispatcher.Dispatch(player!, new Left());
             }
-
-            outgoing.Writer.Complete();
         }
 
         // Give client some time to realize the packets.
-        socket.Close(50);
+        await Task.Delay(50).ConfigureAwait(false);
+
+        outgoing.Writer.Complete();
+        socket.Close();
     }
 
     private async Task WritingAsync()
