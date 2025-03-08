@@ -27,7 +27,7 @@ internal sealed class Player(Client client, string username, World world) : IPla
 
     public bool OnGround { get; set; }
 
-    public Guid Guid { get; } = Guid.NewGuid();
+    public Guid Guid { get; } = GuidHelper.FromString(username);
 
     public string? Locale { get; set; }
 
