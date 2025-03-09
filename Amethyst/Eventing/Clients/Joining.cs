@@ -1,6 +1,7 @@
-﻿using Amethyst.Abstractions.Worlds;
+﻿using Amethyst.Abstractions;
+using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Abstractions.Eventing.Clients;
+namespace Amethyst.Eventing.Clients;
 
 public sealed class Joining(string username) : Event<IClient>
 {

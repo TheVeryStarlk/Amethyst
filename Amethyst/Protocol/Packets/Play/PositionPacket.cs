@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Eventing.Players;
 
 namespace Amethyst.Protocol.Packets.Play;
 

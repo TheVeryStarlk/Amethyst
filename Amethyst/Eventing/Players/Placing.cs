@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Abstractions.Eventing.Players;
+namespace Amethyst.Eventing.Players;
 
 public sealed class Placing(Position position, BlockFace face, Item item) : Event<IPlayer>
 {

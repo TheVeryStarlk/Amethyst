@@ -1,9 +1,9 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing.Clients;
-using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Eventing.Clients;
+using Amethyst.Eventing.Players;
 using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Hosting.Subscribers;
