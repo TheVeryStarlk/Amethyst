@@ -18,17 +18,23 @@ internal sealed class DefaultSubscriber : ISubscriber
         .Failure((player, _) => player.Send(Message.Create("Incorrect usage!", color: Color.Red)))
         .Build();
 
-    private IWorldService? worldService;
+    private IWorldStore? worldStore;
 
     public void Subscribe(Registry registry)
     {
-        registry.For<IServer>(consumer => consumer.On<Starting>((source, _) =>
-        {
-            worldService = source.WorldManager;
-            source.WorldManager.Create("Default", new FlatGenerator());
-        }));
+        registry.For<IServer>(consumer => consumer.On<Starting>((source, _) => worldStore = source.WorldStore));
 
-        registry.For<IClient>(consumer => consumer.On<Joining>((_, original) => original.World = worldService!.Worlds["Default"]));
+        registry.For<IClient>(consumer => consumer.On<Joining>((_, original) =>
+        {
+            const string name = "Default";
+
+            if (!worldStore!.Worlds.ContainsKey(name))
+            {
+                worldStore.Create("Default", new FlatGenerator());
+            }
+
+            original.World = worldStore!.Worlds["Default"];
+        }));
 
         registry.For<IPlayer>(consumer =>
         {
@@ -42,7 +48,7 @@ internal sealed class DefaultSubscriber : ISubscriber
                     return;
                 }
 
-                foreach (var world in worldService!.Worlds)
+                foreach (var world in worldStore!.Worlds)
                 {
                     foreach (var player in world.Value.Players)
                     {

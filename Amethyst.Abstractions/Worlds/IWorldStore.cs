@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Abstractions.Worlds;
 
-public interface IWorldService
+public interface IWorldStore
 {
     public IReadOnlyDictionary<string, IWorld> Worlds { get; }
 

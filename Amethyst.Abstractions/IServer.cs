@@ -4,7 +4,7 @@ namespace Amethyst.Abstractions;
 
 public interface IServer
 {
-    public IWorldService WorldManager { get; }
+    public IWorldStore WorldStore { get; }
 
     public void Stop();
 }

@@ -14,7 +14,7 @@ namespace Amethyst;
 internal sealed class Server(ILoggerFactory loggerFactory, WorldStore worldStore, EventDispatcher eventDispatcher)
     : IServer, IDisposable
 {
-    public IWorldService WorldManager => worldStore;
+    public IWorldStore WorldStore => worldStore;
 
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<int, (Client Client, Task Task)> pairs = [];

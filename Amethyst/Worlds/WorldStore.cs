@@ -2,7 +2,7 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed class WorldStore(Func<string, IGenerator, IWorld> worldFactory) : IWorldService
+internal sealed class WorldStore(Func<string, IGenerator, IWorld> worldFactory) : IWorldStore
 {
     public IReadOnlyDictionary<string, IWorld> Worlds => worlds;
 
