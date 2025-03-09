@@ -1,12 +1,27 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Abstractions.Eventing;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
+internal sealed class EventDispatcher
 {
-    private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events = Registry.Create(subscribers);
+    private readonly ILogger<EventDispatcher> logger;
+    private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events;
+
+    public EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
+    {
+        this.logger = logger;
+
+        var dictionary = new Dictionary<Type, List<Delegate>>();
+        var registry = new Registry(dictionary);
+
+        foreach (var subscriber in subscribers)
+        {
+            subscriber.Subscribe(registry);
+        }
+
+        events = dictionary.ToFrozenDictionary(pair => pair.Key, pair => pair.Value.AsEnumerable());
+    }
 
     public TEvent Dispatch<TSource, TEvent>(TSource source, TEvent original)
     {

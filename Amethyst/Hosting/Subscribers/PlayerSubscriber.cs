@@ -1,16 +1,16 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Clients;
 using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Entities;
+using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Hosting.Subscribers;
 
 internal sealed class PlayerSubscriber(PlayerStore playerStore) : ISubscriber
 {
-    public void Subscribe(IRegistry registry)
+    public void Subscribe(Registry registry)
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {

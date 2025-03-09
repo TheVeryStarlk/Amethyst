@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Abstractions.Worlds;
+using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play;
 using Amethyst.Worlds;
 
@@ -12,7 +12,7 @@ internal sealed class WorldSubscriber : ISubscriber
 {
     private readonly Dictionary<string, HashSet<long>> loaded = [];
 
-    public void Subscribe(IRegistry registry)
+    public void Subscribe(Registry registry)
     {
         registry.For<IPlayer>(consumer =>
         {

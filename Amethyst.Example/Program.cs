@@ -7,6 +7,6 @@ var builder = Host.CreateApplicationBuilder();
 
 builder.Logging.SetMinimumLevel(LogLevel.Trace);
 
-builder.Services.AddAmethyst(options => options.AddSubscriber<DefaultSubscriber>());
+builder.Services.AddAmethyst<DefaultSubscriber>();
 
 builder.Build().Run();

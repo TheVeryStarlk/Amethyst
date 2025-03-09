@@ -1,11 +1,11 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Clients;
 using Amethyst.Abstractions.Eventing.Players;
 using Amethyst.Abstractions.Eventing.Servers;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Worlds;
+using Amethyst.Eventing;
 using Amethyst.Extensions.Commands;
 
 namespace Amethyst.Example;
@@ -20,7 +20,7 @@ internal sealed class DefaultSubscriber : ISubscriber
 
     private IWorldService? worldService;
 
-    public void Subscribe(IRegistry registry)
+    public void Subscribe(Registry registry)
     {
         registry.For<IServer>(consumer => consumer.On<Starting>((source, _) =>
         {

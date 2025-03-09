@@ -1,13 +1,13 @@
 ﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Players;
+using Amethyst.Eventing;
 using Amethyst.Protocol.Packets.Play;
 
 namespace Amethyst.Hosting.Subscribers;
 
 internal sealed class MessageSubscriber : ISubscriber
 {
-    public void Subscribe(IRegistry registry)
+    public void Subscribe(Registry registry)
     {
         registry.For<IPlayer>(consumer => consumer.On<Tab>((source, original) =>
         {

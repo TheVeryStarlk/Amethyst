@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Worlds;
+﻿using System.Diagnostics.CodeAnalysis;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Hosting.Subscribers;
@@ -9,17 +10,13 @@ namespace Amethyst.Hosting;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAmethyst(this IServiceCollection services, Action<AmethystOptions> configure)
+    public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
     {
-        var options = new AmethystOptions(services)
-            .AddSubscriber<PlayerSubscriber>()
-            .AddSubscriber<WorldSubscriber>();
+        services.AddSingleton<ISubscriber, T>();
 
-        configure(options);
-
-        // This needs information from previous subscribers. So it should run the last.
-        // Perhaps all subscribers could run last, too.
-        options.AddSubscriber<MessageSubscriber>();
+        services.AddSingleton<ISubscriber, PlayerSubscriber>();
+        services.AddSingleton<ISubscriber, WorldSubscriber>();
+        services.AddSingleton<ISubscriber, MessageSubscriber>();
 
         services.AddSingleton<EventDispatcher>();
         services.AddSingleton<WorldStore>();

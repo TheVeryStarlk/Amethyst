@@ -2,7 +2,7 @@
 
 namespace Amethyst.Eventing;
 
-internal sealed class Consumer<TSource>(Dictionary<Type, List<Delegate>> events) : IConsumer<TSource>
+public sealed class Consumer<TSource>(Dictionary<Type, List<Delegate>> events)
 {
     public void On<TEvent>(Action<TSource, TEvent> callback) where TEvent : Event<TSource>
     {
