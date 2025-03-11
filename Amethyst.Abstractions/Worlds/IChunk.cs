@@ -8,6 +8,6 @@ public interface IChunk
 
     public int Z { get; }
 
-    // Should this be exposed in abstractions?
+    // Should this be public API?
     public SingleChunkPacket Build();
 }
