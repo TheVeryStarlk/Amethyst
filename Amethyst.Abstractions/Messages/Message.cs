@@ -1,4 +1,7 @@
-﻿namespace Amethyst.Abstractions.Messages;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+
+namespace Amethyst.Abstractions.Messages;
 
 public sealed class Message
 {
@@ -31,6 +34,13 @@ public sealed class Message
     public static MessageBuilder Create()
     {
         return new MessageBuilder();
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
+    public string Serialize()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializerExtensions.Options);
     }
 }
 

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Encodings.Web;
+﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -22,11 +21,4 @@ public static class JsonSerializerExtensions
             TypeInfoResolver = AmethystJsonSerializerContext.Default,
             Converters = { new JsonStringEnumConverter<Color>(JsonNamingPolicy.SnakeCaseLower) }
         };
-
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
-    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "https://github.com/dotnet/runtime/issues/51544#issuecomment-1516232559")]
-    public static string Serialize<T>(this T instance)
-    {
-        return JsonSerializer.Serialize(instance, Options);
-    }
 }
