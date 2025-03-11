@@ -10,6 +10,8 @@ public interface IPlayer : IEntity
 
     public IWorld World { get; }
 
+    public GameMode GameMode { get; }
+
     public string Username { get; }
 
     public string? Locale { get; }
