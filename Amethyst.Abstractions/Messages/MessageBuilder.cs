@@ -20,7 +20,7 @@ public sealed class MessageBuilder
 
     public MessageBuilder WriteLine(string text)
     {
-        extra[index++] = Message.Create($"{text}\n");
+        extra[index++] = Message.Create(text + "\n");
         return this;
     }
 

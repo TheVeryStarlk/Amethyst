@@ -3,6 +3,7 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Abstractions.Entities;
 
+// Research a good way to implement the UUID version used in Minecraft.
 public interface IPlayer : IEntity
 {
     public IClient Client { get; }

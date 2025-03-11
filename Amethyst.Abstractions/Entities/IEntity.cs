@@ -6,9 +6,9 @@ public interface IEntity
 
     public Location Location { get; }
 
-    public float Pitch { get; }
-
     public float Yaw { get; }
+
+    public float Pitch { get; }
 
     public bool OnGround { get; }
 }
