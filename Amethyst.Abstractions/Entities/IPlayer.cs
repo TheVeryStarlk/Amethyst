@@ -1,7 +1,7 @@
-﻿using Playground.Abstractions.Messages;
-using Playground.Abstractions.Worlds;
+﻿using Amethyst.Abstractions.Messages;
+using Amethyst.Abstractions.Worlds;
 
-namespace Playground.Abstractions.Entities;
+namespace Amethyst.Abstractions.Entities;
 
 public interface IPlayer : IEntity
 {

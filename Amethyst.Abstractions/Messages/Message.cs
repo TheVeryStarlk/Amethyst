@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-
-namespace Playground.Abstractions.Messages;
+﻿namespace Amethyst.Abstractions.Messages;
 
 public sealed class Message
 {

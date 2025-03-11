@@ -1,4 +1,4 @@
-﻿namespace Playground.Abstractions.Entities;
+﻿namespace Amethyst.Abstractions.Entities;
 
 public interface IEntity
 {

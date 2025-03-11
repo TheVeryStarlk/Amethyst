@@ -1,4 +1,4 @@
-﻿namespace Playground.Abstractions.Worlds;
+﻿namespace Amethyst.Abstractions.Worlds;
 
 public enum Biome
 {

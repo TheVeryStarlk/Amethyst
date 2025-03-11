@@ -3,7 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Playground.Abstractions.Messages;
+namespace Amethyst.Abstractions.Messages;
 
 public static class JsonSerializerExtensions
 {
@@ -16,7 +16,7 @@ public static class JsonSerializerExtensions
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            TypeInfoResolver = DefaultJsonSerializerContext.Default,
+            TypeInfoResolver = AmethystJsonSerializerContext.Default,
             Converters = { new JsonStringEnumConverter<Color>(JsonNamingPolicy.SnakeCaseLower) }
         };
 

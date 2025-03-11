@@ -1,3 +1,3 @@
-﻿namespace Playground.Abstractions.Networking;
+﻿namespace Amethyst.Abstractions.Networking;
 
 public interface IOutgoingPacket;

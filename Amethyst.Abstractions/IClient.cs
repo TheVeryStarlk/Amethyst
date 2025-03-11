@@ -1,6 +1,6 @@
-﻿using Playground.Abstractions.Networking;
+﻿using Amethyst.Abstractions.Networking;
 
-namespace Playground.Abstractions;
+namespace Amethyst.Abstractions;
 
 public interface IClient
 {

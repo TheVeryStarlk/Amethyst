@@ -1,4 +1,4 @@
-﻿namespace Playground.Abstractions;
+﻿namespace Amethyst.Abstractions;
 
 public interface IServer
 {
