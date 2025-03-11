@@ -2,6 +2,7 @@
 
 namespace Amethyst.Abstractions.Messages;
 
+// All status classes could be removed and replaced with adding JSON nodes manually.
 public sealed record Status(
     Version Version,
     [property: JsonPropertyName("players")]

@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Entities;
+﻿namespace Amethyst.Abstractions;
 
 public readonly record struct Location(double X, double Y, double Z)
 {

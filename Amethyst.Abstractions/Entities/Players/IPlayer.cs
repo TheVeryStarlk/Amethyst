@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Abstractions.Entities;
+namespace Amethyst.Abstractions.Entities.Players;
 
 // Research a good way to implement the UUID version used in Minecraft.
 public interface IPlayer : IEntity
