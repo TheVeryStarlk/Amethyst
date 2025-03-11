@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Entities;
+﻿namespace Playground.Abstractions.Entities;
 
 public interface IEntity
 {
@@ -6,9 +6,9 @@ public interface IEntity
 
     public Location Location { get; }
 
-    public Angle Yaw { get; }
+    public float Pitch { get; }
 
-    public Angle Pitch { get; }
+    public float Yaw { get; }
 
     public bool OnGround { get; }
 }

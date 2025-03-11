@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Amethyst.Abstractions.Messages;
+namespace Playground.Abstractions.Messages;
 
 public sealed record Status(
     Version Version,

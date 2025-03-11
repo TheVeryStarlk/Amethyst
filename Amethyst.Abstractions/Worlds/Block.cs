@@ -1,13 +1,4 @@
-﻿namespace Amethyst.Abstractions.Worlds;
+﻿namespace Playground.Abstractions.Worlds;
 
+// Probably should have a collection of hard-coded block types.
 public readonly record struct Block(int Type, int Metadata = 0);
-
-public enum BlockFace
-{
-    NegativeY,
-    PositiveY,
-    NegativeZ,
-    PositiveZ,
-    NegativeX,
-    PositiveX
-}

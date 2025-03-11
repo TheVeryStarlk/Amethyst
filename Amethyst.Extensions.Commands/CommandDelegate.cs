@@ -1,5 +1,0 @@
-﻿using Amethyst.Abstractions.Entities;
-
-namespace Amethyst.Extensions.Commands;
-
-public delegate void CommandDelegate(IPlayer player, string[] arguments);

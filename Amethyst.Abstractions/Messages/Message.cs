@@ -1,4 +1,7 @@
-﻿namespace Amethyst.Abstractions.Messages;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+
+namespace Playground.Abstractions.Messages;
 
 public sealed class Message
 {
@@ -23,25 +26,9 @@ public sealed class Message
         return new Message { Text = text };
     }
 
-    public static Message Create(
-        string text,
-        bool bold = false,
-        bool italic = false,
-        bool underlined = false,
-        bool strikeThrough = false,
-        bool obfuscated = false,
-        Color color = Color.White)
+    public static Message Create(string text)
     {
-        return new Message
-        {
-            Text = text,
-            Bold = bold,
-            Italic = italic,
-            Underlined = underlined,
-            StrikeThrough = strikeThrough,
-            Obfuscated = obfuscated,
-            Color = color
-        };
+        return new Message { Text = text };
     }
 
     public static MessageBuilder Create()

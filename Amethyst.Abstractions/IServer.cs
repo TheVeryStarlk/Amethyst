@@ -1,10 +1,6 @@
-﻿using Amethyst.Abstractions.Worlds;
-
-namespace Amethyst.Abstractions;
+﻿namespace Playground.Abstractions;
 
 public interface IServer
 {
-    public IWorldStore WorldStore { get; }
-
     public void Stop();
 }

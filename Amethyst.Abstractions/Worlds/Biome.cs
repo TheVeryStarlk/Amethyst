@@ -1,6 +1,6 @@
-﻿namespace Amethyst.Abstractions.Worlds;
+﻿namespace Playground.Abstractions.Worlds;
 
-public enum Biome : byte
+public enum Biome
 {
     Ocean,
     Plains,

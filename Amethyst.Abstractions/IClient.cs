@@ -1,23 +1,12 @@
-﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Protocol;
+﻿using Playground.Abstractions.Networking;
 
-namespace Amethyst.Abstractions;
+namespace Playground.Abstractions;
 
 public interface IClient
 {
     public int Identifier { get; }
 
-    public IPlayer? Player { get; }
+    public void Write(IOutgoingPacket packet);
 
-    /// <summary>
-    /// Writes <see cref="IOutgoingPacket"/>(s) to the client.
-    /// </summary>
-    /// <remarks>
-    /// Misusing this method might result in crashes or weird behaviors.
-    /// </remarks>
-    /// <param name="packets">The <see cref="IOutgoingPacket"/>(s) to write.</param>
-    public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
-
-    public void Stop(Message message);
+    public void Stop();
 }

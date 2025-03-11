@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Messages;
+﻿namespace Playground.Abstractions.Messages;
 
 public enum MessagePosition
 {

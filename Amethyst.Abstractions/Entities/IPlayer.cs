@@ -1,23 +1,19 @@
-﻿using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Worlds;
+﻿using Playground.Abstractions.Messages;
+using Playground.Abstractions.Worlds;
 
-namespace Amethyst.Abstractions.Entities;
+namespace Playground.Abstractions.Entities;
 
 public interface IPlayer : IEntity
 {
     public IClient Client { get; }
 
-    public Guid Guid { get; }
+    public IWorld World { get; }
 
     public string Username { get; }
-
-    public IWorld World { get; }
 
     public string? Locale { get; }
 
     public byte ViewDistance { get; }
-
-    public void Teleport(Location location);
 
     public void Send(Message message, MessagePosition position = MessagePosition.Box);
 
