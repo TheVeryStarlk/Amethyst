@@ -8,7 +8,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
     {
-        services.AddTransient<T>();
+        services.AddTransient<ISubscriber, T>();
+
+        services.AddSingleton<EventDispatcher>();
 
         services.AddHostedService<AmethystService>();
 
