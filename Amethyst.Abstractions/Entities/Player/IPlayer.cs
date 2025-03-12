@@ -9,8 +9,7 @@ public interface IPlayer : IEntity
 
     public IWorld World { get; }
 
-    // Could be a string - where we get it from Minecraft's account services.
-    public Guid Guid { get; }
+    public string Unique { get; }
 
     public GameMode GameMode { get; }
 
