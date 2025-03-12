@@ -17,4 +17,6 @@ public interface IWorld
     public IGenerator Generator { get; }
 
     public Block this[int x, int y, int z] { get; }
+
+    public Biome this[int x, int z] { get; }
 }
