@@ -3,28 +3,34 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
 
-internal sealed class EventDispatcher
+internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
 {
-    private readonly ILogger<EventDispatcher> logger;
-    private readonly FrozenDictionary<Type, IEnumerable<Delegate>> events;
+    private readonly FrozenDictionary<Type, FrozenSet<Delegate>> events = Registry.Create(subscribers);
 
-    public EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
+    public TEvent Dispatch<TSource, TEvent>(TSource source, TEvent original)
     {
-        this.logger = logger;
-
-        var dictionary = new Dictionary<Type, List<Delegate>>();
-        var registry = new Registry(dictionary);
-
-        foreach (var subscriber in subscribers)
+        if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
-            subscriber.Subscribe(registry);
+            return original;
         }
 
-        events = dictionary.ToFrozenDictionary(pair => pair.Key, pair => pair.Value.AsEnumerable());
-    }
+        // Maybe catch exceptions inside the loop?
+        try
+        {
+            foreach (var callback in callbacks.Cast<Action<TSource, TEvent>>())
+            {
+                callback(source, original);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Nothing.
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "An exception occurred while running event.");
+        }
 
-    public void Dispatch()
-    {
-
+        return original;
     }
 }
