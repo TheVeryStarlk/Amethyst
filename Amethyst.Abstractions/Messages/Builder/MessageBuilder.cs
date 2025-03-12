@@ -23,10 +23,10 @@ public sealed class MessageBuilder
         return new Coloring(this, extra);
     }
 
-    public MessageBuilder Reset()
+    public Delimiter Reset()
     {
         extra[^1] = Message.Simple("§r");
-        return this;
+        return new Delimiter(this, extra);
     }
 
     public Message Build()

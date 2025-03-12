@@ -23,6 +23,11 @@ public sealed class Formatting
         return parent;
     }
 
+    public Message Build()
+    {
+        return parent.Build();
+    }
+
     public MessageBuilder Bold()
     {
         extra[^1].Bold = true;

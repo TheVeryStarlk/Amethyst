@@ -23,6 +23,11 @@ public sealed class Coloring
         return parent;
     }
 
+    public Message Build()
+    {
+        return parent.Build();
+    }
+
     public Formatting Black()
     {
         extra[^1].Color = Color.Black;
