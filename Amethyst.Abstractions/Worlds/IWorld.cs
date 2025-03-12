@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Entities.Players;
+﻿using Amethyst.Abstractions.Entities.Player;
 
 namespace Amethyst.Abstractions.Worlds;
 

@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Entities.Players;
+﻿namespace Amethyst.Abstractions.Entities.Player;
 
 // What about hardcore?
 public enum GameMode

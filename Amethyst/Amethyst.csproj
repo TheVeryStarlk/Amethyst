@@ -11,4 +11,8 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.3"/>
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\Amethyst.Abstractions\Amethyst.Abstractions.csproj"/>
+	</ItemGroup>
+
 </Project>
