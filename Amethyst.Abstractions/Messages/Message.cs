@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using Amethyst.Abstractions.Messages.Builder;
 
 namespace Amethyst.Abstractions.Messages;
 
@@ -26,7 +27,7 @@ public sealed class Message
         return new Message { Text = text };
     }
 
-    public static Message Create(string text)
+    public static Message Simple(string text)
     {
         return new Message { Text = text };
     }
