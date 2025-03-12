@@ -1,10 +1,13 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Entities.Players;
 
 namespace Amethyst.Abstractions.Worlds;
 
 public interface IWorld
 {
     public string Name { get; }
+
+    public IEnumerable<IPlayer> Players { get; }
 
     public WorldType Type { get; }
 
@@ -14,5 +17,5 @@ public interface IWorld
 
     public IGenerator Generator { get; }
 
-    public Block this[Location location] { get; }
+    public Block this[int x, int y, int z] { get; }
 }
