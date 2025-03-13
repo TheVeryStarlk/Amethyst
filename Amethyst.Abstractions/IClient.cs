@@ -3,10 +3,19 @@ using Amethyst.Abstractions.Networking;
 
 namespace Amethyst.Abstractions;
 
+/// <summary>
+/// Represents a Minecraft connection.
+/// </summary>
 public interface IClient
 {
+    /// <summary>
+    /// A unique number shared by <see cref="IClient"/> and <see cref="IPlayer"/>
+    /// </summary>
     public int Identifier { get; }
 
+    /// <summary>
+    /// The associated <see cref="IPlayer"/> instance with the <see cref="IClient"/>.
+    /// </summary>
     public IPlayer? Player { get; }
 
     /// <summary>
