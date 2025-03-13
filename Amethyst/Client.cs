@@ -14,7 +14,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
     // Probably shouldn't use random.
     public int Identifier { get; } = Random.Shared.Next();
 
-    public IPlayer Player => player ?? throw new InvalidOperationException();
+    public IPlayer? Player => player;
 
     private Player? player;
 

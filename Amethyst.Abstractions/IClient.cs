@@ -7,7 +7,7 @@ public interface IClient
 {
     public int Identifier { get; }
 
-    public IPlayer Player { get; }
+    public IPlayer? Player { get; }
 
     /// <summary>
     /// Writes an <see cref="IOutgoingPacket"/> to the <see cref="IClient"/>.
