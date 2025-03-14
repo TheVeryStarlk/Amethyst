@@ -22,10 +22,6 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
                 callback(source, original);
             }
         }
-        catch (OperationCanceledException)
-        {
-            // Nothing.
-        }
         catch (Exception exception)
         {
             logger.LogError(exception, "An exception occurred while running event.");
