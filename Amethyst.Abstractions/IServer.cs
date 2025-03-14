@@ -4,7 +4,7 @@ namespace Amethyst.Abstractions;
 
 public interface IServer
 {
-    public IEnumerable<IWorld> Worlds { get; }
+    public IWorldCollection Worlds { get; }
 
     public void Stop();
 }

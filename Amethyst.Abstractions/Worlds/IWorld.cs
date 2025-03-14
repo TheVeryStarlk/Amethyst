@@ -6,8 +6,6 @@ public interface IWorld
 {
     public string Name { get; }
 
-    public IEnumerable<IPlayer> Players { get; }
-
     public WorldType Type { get; }
 
     public Dimension Dimension { get; }
@@ -15,6 +13,8 @@ public interface IWorld
     public Difficulty Difficulty { get; }
 
     public IGenerator Generator { get; }
+
+    public IEnumerable<IPlayer> Players { get; }
 
     public Block this[int x, int y, int z] { get; set; }
 
