@@ -3,7 +3,6 @@ using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Networking;
-using Amethyst.Entities;
 using Amethyst.Eventing;
 using Microsoft.Extensions.Logging;
 
@@ -14,12 +13,12 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
     // Probably shouldn't use random.
     public int Identifier { get; } = Random.Shared.Next();
 
-    public IPlayer? Player => player;
-
-    private Player? player;
+    public IPlayer? Player { get; }
 
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
+
+    private State state;
 
     public void Write(IOutgoingPacket packet)
     {
