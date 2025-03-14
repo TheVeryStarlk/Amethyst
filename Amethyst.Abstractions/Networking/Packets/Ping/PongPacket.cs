@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Networking.Packets.Status;
+﻿namespace Amethyst.Abstractions.Networking.Packets.Ping;
 
 public sealed class PongPacket(long magic) : IOutgoingPacket
 {
