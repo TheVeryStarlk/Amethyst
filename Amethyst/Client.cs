@@ -42,7 +42,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 internal enum State
 {
     Handshake,
-    Status,
+    Ping,
     Login,
     Play
 }
