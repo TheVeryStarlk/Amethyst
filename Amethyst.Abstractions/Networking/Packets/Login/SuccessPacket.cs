@@ -1,11 +1,11 @@
 ﻿namespace Amethyst.Abstractions.Networking.Packets.Login;
 
-public sealed record LoginSuccessPacket(string Unique, string Username) : IOutgoingPacket
+public sealed class LoginSuccessPacket(string unique, string username) : IOutgoingPacket
 {
-    public int Length => Variable.GetByteCount(Unique) + Variable.GetByteCount(Username);
+    public int Length => Variable.GetByteCount(unique) + Variable.GetByteCount(username);
 
     public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteVariableString(Unique).WriteVariableString(Username);
+        SpanWriter.Create(span).WriteVariableString(unique).WriteVariableString(username);
     }
 }

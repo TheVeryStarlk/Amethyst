@@ -2,7 +2,7 @@
 
 namespace Amethyst.Abstractions.Networking.Packets.Play;
 
-public sealed record PositionLookPacket(Location Location, float Yaw, float Pitch) : IOutgoingPacket
+public sealed class PositionLookPacket(Location location, float yaw, float pitch) : IOutgoingPacket
 {
     public int Length => sizeof(double) + sizeof(double) + sizeof(double) + sizeof(float) + sizeof(float) + sizeof(bool);
 
@@ -10,10 +10,10 @@ public sealed record PositionLookPacket(Location Location, float Yaw, float Pitc
     {
         SpanWriter
             .Create(span)
-            .WriteDouble(Location.X)
-            .WriteDouble(Location.Y)
-            .WriteDouble(Location.Z)
-            .WriteFloat(Yaw)
-            .WriteFloat(Pitch);
+            .WriteDouble(location.X)
+            .WriteDouble(location.Y)
+            .WriteDouble(location.Z)
+            .WriteFloat(yaw)
+            .WriteFloat(pitch);
     }
 }

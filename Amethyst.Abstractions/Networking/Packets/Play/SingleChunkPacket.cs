@@ -1,18 +1,18 @@
 ﻿namespace Amethyst.Abstractions.Networking.Packets.Play;
 
-public sealed record SingleChunkPacket(int X, int Z, byte[] Sections, ushort Bitmask) : IOutgoingPacket
+public sealed class SingleChunkPacket(int x, int z, byte[] sections, ushort bitmask) : IOutgoingPacket
 {
-    public int Length => sizeof(int) + sizeof(int) + sizeof(bool) + sizeof(ushort) + Variable.GetByteCount(Sections.Length) + Sections.Length;
+    public int Length => sizeof(int) + sizeof(int) + sizeof(bool) + sizeof(ushort) + Variable.GetByteCount(sections.Length) + sections.Length;
 
     public void Write(Span<byte> span)
     {
         SpanWriter
             .Create(span)
-            .WriteInteger(X)
-            .WriteInteger(Z)
+            .WriteInteger(x)
+            .WriteInteger(z)
             .WriteBoolean(true)
-            .WriteUnsignedShort(Bitmask)
-            .WriteVariableInteger(Sections.Length)
-            .Write(Sections);
+            .WriteUnsignedShort(bitmask)
+            .WriteVariableInteger(sections.Length)
+            .Write(sections);
     }
 }
