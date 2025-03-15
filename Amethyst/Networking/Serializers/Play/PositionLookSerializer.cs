@@ -4,7 +4,7 @@ using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class PositionLookSerializer(Location location, float yaw, float pitch) : ISerializer<PositionLookPacket>
+internal sealed class PositionLookSerializer(Location location, float yaw, float pitch) : ISerializer<PositionLookPacket, PositionLookSerializer>
 {
     public int Length => sizeof(double)
                          + sizeof(double)
@@ -13,7 +13,7 @@ internal sealed class PositionLookSerializer(Location location, float yaw, float
                          + sizeof(float)
                          + sizeof(bool);
 
-    public static ISerializer Create(PositionLookPacket packet)
+    public static PositionLookSerializer Create(PositionLookPacket packet)
     {
         return new PositionLookSerializer(packet.Location, packet.Yaw, packet.Pitch);
     }

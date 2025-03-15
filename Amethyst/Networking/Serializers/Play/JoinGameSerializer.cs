@@ -10,7 +10,7 @@ internal sealed class JoinGameSerializer(
     byte difficulty,
     byte players,
     string type,
-    bool reducedDebugInformation) : ISerializer<JoinGamePacket>
+    bool reducedDebugInformation) : ISerializer<JoinGamePacket, JoinGameSerializer>
 {
     public int Length => sizeof(int)
                          + sizeof(byte)
@@ -20,7 +20,7 @@ internal sealed class JoinGameSerializer(
                          + Variable.GetByteCount(type)
                          + sizeof(bool);
 
-    public static ISerializer Create(JoinGamePacket packet)
+    public static JoinGameSerializer Create(JoinGamePacket packet)
     {
         return new JoinGameSerializer(
             packet.Entity,

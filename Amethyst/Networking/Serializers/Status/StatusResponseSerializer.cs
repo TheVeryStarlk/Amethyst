@@ -5,11 +5,11 @@ using Amethyst.Abstractions.Networking.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;
 
-internal sealed class StatusResponseSerializer(string status) : ISerializer<StatusResponsePacket>
+internal sealed class StatusResponseSerializer(string status) : ISerializer<StatusResponsePacket, StatusResponseSerializer>
 {
     public int Length => Variable.GetByteCount(status);
 
-    public static ISerializer Create(StatusResponsePacket packet)
+    public static StatusResponseSerializer Create(StatusResponsePacket packet)
     {
         var version = new JsonObject
         {

@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class SingleChunkSerializer(int x, int z, byte[] sections, ushort bitmask) : ISerializer<SingleChunkPacket>
+internal sealed class SingleChunkSerializer(int x, int z, byte[] sections, ushort bitmask) : ISerializer<SingleChunkPacket, SingleChunkSerializer>
 {
     public int Length => sizeof(int)
                          + sizeof(int)
@@ -12,7 +12,7 @@ internal sealed class SingleChunkSerializer(int x, int z, byte[] sections, ushor
                          + Variable.GetByteCount(sections.Length)
                          + sections.Length;
 
-    public static ISerializer Create(SingleChunkPacket packet)
+    public static SingleChunkSerializer Create(SingleChunkPacket packet)
     {
         return new SingleChunkSerializer(packet.X, packet.Z, packet.Sections, packet.Bitmask);
     }

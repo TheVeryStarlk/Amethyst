@@ -4,11 +4,11 @@ using Amethyst.Abstractions.Networking.Packets.Login;
 
 namespace Amethyst.Networking.Serializers.Login;
 
-internal sealed class FailureSerializer(string message) : ISerializer<FailurePacket>
+internal sealed class FailureSerializer(string message) : ISerializer<FailurePacket, FailureSerializer>
 {
     public int Length => Variable.GetByteCount(message);
 
-    public static ISerializer Create(FailurePacket packet)
+    public static FailureSerializer Create(FailurePacket packet)
     {
         return new FailureSerializer(packet.Message.Serialize());
     }

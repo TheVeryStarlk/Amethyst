@@ -15,9 +15,9 @@ internal interface ISerializer
     public void Write(Span<byte> span);
 }
 
-internal interface ISerializer<in T> : ISerializer where T : IOutgoingPacket
+internal interface ISerializer<in T, out TSerializer> : ISerializer where T : IOutgoingPacket where TSerializer : ISerializer
 {
-    public static abstract ISerializer Create(T packet);
+    public static abstract TSerializer Create(T packet);
 }
 
 internal static class OutgoingPacketExtensions

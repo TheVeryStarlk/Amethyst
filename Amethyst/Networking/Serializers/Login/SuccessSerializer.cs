@@ -3,11 +3,11 @@ using Amethyst.Abstractions.Networking.Packets.Login;
 
 namespace Amethyst.Networking.Serializers.Login;
 
-internal sealed class SuccessSerializer(string unique, string username) : ISerializer<SuccessPacket>
+internal sealed class SuccessSerializer(string unique, string username) : ISerializer<SuccessPacket, SuccessSerializer>
 {
     public int Length => Variable.GetByteCount(unique) + Variable.GetByteCount(username);
 
-    public static ISerializer Create(SuccessPacket packet)
+    public static SuccessSerializer Create(SuccessPacket packet)
     {
         return new SuccessSerializer(packet.Unique, packet.Username);
     }

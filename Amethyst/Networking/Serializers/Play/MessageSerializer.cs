@@ -4,11 +4,11 @@ using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class MessageSerializer(string message, byte position) : ISerializer<MessagePacket>
+internal sealed class MessageSerializer(string message, byte position) : ISerializer<MessagePacket, MessageSerializer>
 {
     public int Length => Variable.GetByteCount(message) + sizeof(byte);
 
-    public static ISerializer Create(MessagePacket packet)
+    public static MessageSerializer Create(MessagePacket packet)
     {
         return new MessageSerializer(packet.Message.Serialize(), (byte) packet.Position);
     }
