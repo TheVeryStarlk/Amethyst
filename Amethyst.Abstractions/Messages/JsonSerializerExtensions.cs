@@ -7,10 +7,7 @@ namespace Amethyst.Abstractions.Messages;
 
 public static class JsonSerializerExtensions
 {
-    /// <summary>
-    /// The <see cref="JsonSerializerOptions"/> used for Minecraft serialization.
-    /// </summary>
-    public static JsonSerializerOptions Options { get; } =
+    private static JsonSerializerOptions Options { get; } =
         new()
         {
             AllowTrailingCommas = true,
