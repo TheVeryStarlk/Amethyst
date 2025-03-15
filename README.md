@@ -14,12 +14,12 @@ Amethyst by nature has very little built-in logic, the way you implement logic i
 ```csharp
 registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
 {
-    var message = Message.Create("Welcome!", color: Color.Yellow);
-    player.Send(message, MessagePosition.Box);
+    var message = Message.Simple("Welcome!");
+    player.Send(message);
 }));
 ```
 
-The following example sends a message when a player joins.
+The following example sends a welcome message when a player joins.
 
 ## Credits
 
