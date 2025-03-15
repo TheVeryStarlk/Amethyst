@@ -2,9 +2,8 @@
 using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities.Player;
-using Amethyst.Abstractions.Networking;
+using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Eventing;
-using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;

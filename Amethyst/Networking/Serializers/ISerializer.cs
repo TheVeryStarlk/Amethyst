@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Networking;
+﻿using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Status;
 using Amethyst.Networking.Serializers.Status;
 
