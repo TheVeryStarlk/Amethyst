@@ -6,8 +6,6 @@ namespace Amethyst.Networking.Serializers;
 
 internal interface ISerializer
 {
-    public int Identifier { get; }
-
     public int Length { get; }
 
     public void Write(Span<byte> span);

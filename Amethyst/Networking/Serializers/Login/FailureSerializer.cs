@@ -6,8 +6,6 @@ namespace Amethyst.Networking.Serializers.Login;
 
 internal sealed class FailureSerializer(string message) : ISerializer<FailurePacket>
 {
-    public int Identifier => 0;
-
     public int Length => Variable.GetByteCount(message);
 
     public static ISerializer Create(FailurePacket packet)

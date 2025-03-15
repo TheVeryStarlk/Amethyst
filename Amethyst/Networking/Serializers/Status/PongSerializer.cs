@@ -5,8 +5,6 @@ namespace Amethyst.Networking.Serializers.Status;
 
 internal sealed class PongSerializer(PongPacket packet) : ISerializer<PongPacket>
 {
-    public int Identifier => 1;
-
     public int Length => sizeof(long);
 
     public static ISerializer Create(PongPacket packet)

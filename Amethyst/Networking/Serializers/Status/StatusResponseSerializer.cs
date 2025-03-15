@@ -7,8 +7,6 @@ namespace Amethyst.Networking.Serializers.Status;
 
 internal sealed class StatusResponseSerializer(string status) : ISerializer<StatusResponsePacket>
 {
-    public int Identifier => 0;
-
     public int Length => Variable.GetByteCount(status);
 
     public static ISerializer Create(StatusResponsePacket packet)
