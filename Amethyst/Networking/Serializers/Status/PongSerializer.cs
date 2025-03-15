@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Networking.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;
 
-internal sealed class PongSerializer : ISerializer<PongPacket>
+internal sealed class PongSerializer(PongPacket packet) : ISerializer<PongPacket>
 {
     public int Identifier => 1;
 
@@ -11,11 +11,11 @@ internal sealed class PongSerializer : ISerializer<PongPacket>
 
     public static ISerializer Create(PongPacket packet)
     {
-        return new PongSerializer();
+        return new PongSerializer(packet);
     }
 
     public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteLong(4);
+        SpanWriter.Create(span).WriteLong(packet.Magic);
     }
 }
