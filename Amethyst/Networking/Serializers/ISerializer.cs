@@ -22,6 +22,7 @@ internal static class OutgoingPacketExtensions
 {
     public static ISerializer Create(this IOutgoingPacket packet)
     {
+        // I think frozen dictionaries are faster than this.
         return packet switch
         {
             StatusResponsePacket statusPacket => StatusResponseSerializer.Create(statusPacket),
