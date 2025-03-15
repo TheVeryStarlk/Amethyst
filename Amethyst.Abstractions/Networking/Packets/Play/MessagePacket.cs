@@ -5,6 +5,8 @@ namespace Amethyst.Abstractions.Networking.Packets.Play;
 
 public sealed class MessagePacket(Message message, MessagePosition position) : IOutgoingPacket
 {
+    public int Identifier => 2;
+
     public int Length => Variable.GetByteCount(message) + sizeof(byte);
 
     private readonly string message = message.Serialize();

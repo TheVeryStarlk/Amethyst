@@ -2,6 +2,8 @@
 
 public sealed class KeepAlivePacket(long magic) : IOutgoingPacket
 {
+    public int Identifier => 0;
+
     public int Length => sizeof(long);
 
     public void Write(Span<byte> span)

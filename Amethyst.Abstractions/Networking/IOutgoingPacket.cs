@@ -6,6 +6,11 @@
 public interface IOutgoingPacket
 {
     /// <summary>
+    /// The <see cref="IOutgoingPacket"/> identifier.
+    /// </summary>
+    public int Identifier { get; }
+
+    /// <summary>
     /// The length of the <see cref="IOutgoingPacket"/> in <see cref="byte"/>s.
     /// </summary>
     public int Length { get; }

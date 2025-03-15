@@ -5,6 +5,8 @@ namespace Amethyst.Abstractions.Networking.Packets.Status;
 
 public sealed class StatusResponsePacket(string name, int numerical, int maximum, int online, Message description, string favicon) : IOutgoingPacket
 {
+    public int Identifier => 0;
+
     public int Length
     {
         get
