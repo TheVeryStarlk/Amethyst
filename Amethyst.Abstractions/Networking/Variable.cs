@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Text;
 
-namespace Amethyst.Abstractions.Networking.Packets;
+namespace Amethyst.Abstractions.Networking;
 
 internal static class Variable
 {
