@@ -5,44 +5,39 @@ using Amethyst.Abstractions.Networking.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;
 
-internal sealed class StatusResponseSerializer(StatusResponsePacket packet) : Serializer(packet)
+internal sealed class StatusResponseSerializer(string status) : ISerializer<StatusResponsePacket>
 {
-    public override int Identifier => 0;
+    public int Identifier => 0;
 
-    public override int Length
+    public int Length => Variable.GetByteCount(status);
+
+    public static ISerializer Create(StatusResponsePacket packet)
     {
-        get
+        var version = new JsonObject
         {
-            var version = new JsonObject
-            {
-                ["name"] = packet.Name,
-                ["protocol"] = packet.Numerical
-            };
+            ["name"] = packet.Name,
+            ["protocol"] = packet.Numerical
+        };
 
-            var players = new JsonObject
-            {
-                ["max"] = packet.Maximum,
-                ["online"] = packet.Online
-            };
+        var players = new JsonObject
+        {
+            ["max"] = packet.Maximum,
+            ["online"] = packet.Online
+        };
 
-            var parent = new JsonObject
-            {
-                ["version"] = version,
-                ["players"] = players,
-                ["description"] = JsonNode.Parse(packet.Description.Serialize()),
-                ["favicon"] = packet.Favicon
-            };
+        var parent = new JsonObject
+        {
+            ["version"] = version,
+            ["players"] = players,
+            ["description"] = JsonNode.Parse(packet.Description.Serialize()),
+            ["favicon"] = packet.Favicon
+        };
 
-            serialized = parent.ToJsonString();
-
-            return Variable.GetByteCount(serialized);
-        }
+        return new StatusResponseSerializer(parent.ToJsonString());
     }
 
-    private string? serialized;
-
-    public override void Write(Span<byte> span)
+    public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteVariableString(serialized!);
+        SpanWriter.Create(span).WriteVariableString(status);
     }
 }
