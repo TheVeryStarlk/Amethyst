@@ -22,22 +22,22 @@ internal interface ISerializer<in T, out TSerializer> : ISerializer where T : IO
 
 internal static class OutgoingPacketExtensions
 {
-    public static ISerializer Create(this IOutgoingPacket packet)
+    public static ISerializer Create(this IOutgoingPacket instance)
     {
         // I think frozen dictionaries are faster than this.
-        return packet switch
+        return instance switch
         {
-            FailurePacket instance => FailureSerializer.Create(instance),
-            SuccessPacket instance => SuccessSerializer.Create(instance),
-            StatusResponsePacket instance => StatusResponseSerializer.Create(instance),
-            PongPacket instance => PongSerializer.Create(instance),
-            KeepAlivePacket instance => KeepAliveSerializer.Create(instance),
-            JoinGamePacket instance => JoinGameSerializer.Create(instance),
-            MessagePacket instance => MessageSerializer.Create(instance),
-            PositionLookPacket instance => PositionLookSerializer.Create(instance),
-            SingleChunkPacket instance => SingleChunkSerializer.Create(instance),
-            DisconnectPacket instance => DisconnectSerializer.Create(instance),
-            _ => throw new ArgumentOutOfRangeException(nameof(packet), packet, "Unknown packet.")
+            FailurePacket packet => FailureSerializer.Create(packet),
+            SuccessPacket packet => SuccessSerializer.Create(packet),
+            StatusResponsePacket packet => StatusResponseSerializer.Create(packet),
+            PongPacket packet => PongSerializer.Create(packet),
+            KeepAlivePacket packet => KeepAliveSerializer.Create(packet),
+            JoinGamePacket packet => JoinGameSerializer.Create(packet),
+            MessagePacket packet => MessageSerializer.Create(packet),
+            PositionLookPacket packet => PositionLookSerializer.Create(packet),
+            SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
+            DisconnectPacket packet => DisconnectSerializer.Create(packet),
+            _ => throw new ArgumentOutOfRangeException(nameof(instance), instance, "Unknown packet.")
         };
     }
 }
