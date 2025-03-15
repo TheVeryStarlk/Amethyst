@@ -10,6 +10,7 @@ Amethyst is customizable and sacrifices many of the vanilla features in favor of
 ## Usage
 
 Amethyst by nature has very little built-in logic, the way you implement logic is by subscribing to events.
+The following example sends a welcome message when a player joins.
 
 ```csharp
 registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
@@ -18,8 +19,6 @@ registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
     player.Send(message);
 }));
 ```
-
-The following example sends a welcome message when a player joins.
 
 ## Credits
 
