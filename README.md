@@ -15,7 +15,7 @@ The following example sends a welcome message when a player joins.
 ```csharp
 registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
 {
-    var message = Message.Simple("Welcome!");
+    var message = Message.Simple($"Welcome {player.Username}!");
     player.Send(message);
 }));
 ```
