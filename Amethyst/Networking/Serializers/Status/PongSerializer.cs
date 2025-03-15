@@ -3,17 +3,17 @@ using Amethyst.Abstractions.Networking.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;
 
-internal sealed class PongSerializer(PongPacket packet) : ISerializer<PongPacket>
+internal sealed class PongSerializer(long magic) : ISerializer<PongPacket>
 {
     public int Length => sizeof(long);
 
     public static ISerializer Create(PongPacket packet)
     {
-        return new PongSerializer(packet);
+        return new PongSerializer(packet.Magic);
     }
 
     public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteLong(packet.Magic);
+        SpanWriter.Create(span).WriteLong(magic);
     }
 }
