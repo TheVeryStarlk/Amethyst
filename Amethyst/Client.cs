@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
+// Rewrite this when https://github.com/davidfowl/BedrockFramework/issues/172.
 internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatcher eventDispatcher) : IClient, IDisposable
 {
     // Probably shouldn't use random.
