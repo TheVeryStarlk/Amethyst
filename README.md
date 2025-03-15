@@ -4,7 +4,7 @@
 
 # Amethyst
 
-A light-weight implementation of the Minecraft Java edition server protocol.
+A light-weight library targeting a [specific protocol version](https://minecraft.wiki/w/Java_Edition_1.8.9) for developing Minecraft servers.
 Amethyst is customizable and sacrifices many of the vanilla features in favor of performance and memory usage.
 
 ## Usage
@@ -12,12 +12,14 @@ Amethyst is customizable and sacrifices many of the vanilla features in favor of
 Amethyst by nature has very little built-in logic, the way you implement logic is by subscribing to events.
 
 ```csharp
-registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) =>
+registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
 {
     var message = Message.Create("Welcome!", color: Color.Yellow);
     player.Send(message, MessagePosition.Box);
 }));
 ```
+
+The following example sends a message when a player joins.
 
 ## Credits
 
