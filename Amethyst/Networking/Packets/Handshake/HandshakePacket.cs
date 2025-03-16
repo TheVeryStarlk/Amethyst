@@ -14,14 +14,4 @@ internal sealed record HandshakePacket(int Version, string Address, ushort Port,
             reader.ReadUnsignedShort(),
             (State) reader.ReadVariableInteger());
     }
-
-    public void Process(Client client)
-    {
-        if (State is not (State.Status or State.Login) || Version > 47)
-        {
-            client.Stop();
-        }
-
-        client.State = State;
-    }
 }

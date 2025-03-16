@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Networking.Packets.Status;
-
-namespace Amethyst.Networking.Packets.Status;
+﻿namespace Amethyst.Networking.Packets.Status;
 
 internal sealed record PingPacket(long Magic) : IIngoingPacket<PingPacket>
 {
@@ -10,10 +8,5 @@ internal sealed record PingPacket(long Magic) : IIngoingPacket<PingPacket>
     {
         var reader = new SpanReader(span);
         return new PingPacket(reader.ReadLong());
-    }
-
-    public void Process(Client client)
-    {
-        client.Write(new PongPacket(Magic));
     }
 }
