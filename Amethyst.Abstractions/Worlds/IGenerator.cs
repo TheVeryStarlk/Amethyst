@@ -2,5 +2,5 @@
 
 public interface IGenerator
 {
-    public void Generate(IWorld world, IChunk chunk);
+    public void Generate(IChunk chunk);
 }

@@ -10,14 +10,14 @@ internal sealed record Chunk(int X, int Z) : IChunk
 
     public Block this[int x, int y, int z]
     {
-        get => GetSection(y).GetBlock(x, y, z);
-        set => GetSection(y).SetBlock(value, x, y, z);
+        get => GetSection(y)[x, y, z];
+        set => GetSection(y)[x, y, z] = value;
     }
 
     public Biome this[int x, int z]
     {
-        get => biomes[NumericUtility.AsIndex(x, z)];
-        set => biomes[NumericUtility.AsIndex(x, z)] = value;
+        get => biomes[AsIndex(x, z)];
+        set => biomes[AsIndex(x, z)] = value;
     }
 
     public SingleChunkPacket Build()
@@ -34,6 +34,11 @@ internal sealed record Chunk(int X, int Z) : IChunk
         }
 
         return new SingleChunkPacket(X, Z, final, (ushort) ((1 << parts.Length) - 1));
+    }
+
+    private static int AsIndex(int x, int z)
+    {
+        return (z & 0xF) * 16 + (x & 0xF);
     }
 
     private Section GetSection(int y)
