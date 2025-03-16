@@ -10,28 +10,31 @@ internal sealed record World(string Name, WorldType Type, Dimension Dimension, D
     // To be implemented...
     public IEnumerable<IPlayer> Players => [];
 
-    private readonly Dictionary<long, Region> regions = [];
+    private readonly Dictionary<long, Chunk> chunks = [];
 
     public Block this[int x, int y, int z]
     {
-        get => GetRegion(x.ToChunk(), z.ToChunk())[x, y, z];
-        set => GetRegion(x.ToChunk(), z.ToChunk())[x, y, z] = value;
+        get => this[x.ToChunk(), z.ToChunk()][x, y, z];
+        set => this[x.ToChunk(), z.ToChunk()][x, y, z] = value;
     }
 
-    public IChunk this[int x, int z] => GetRegion(x, z)[x, z];
-
-    private Region GetRegion(int x, int z)
+    public IChunk this[int x, int z]
     {
-        var value = NumericUtility.Encode(x >> 5, z >> 5);
-
-        if (regions.TryGetValue(value, out var region))
+        get
         {
-            return region;
+            var value = NumericUtility.Encode(x, z);
+
+            if (chunks.TryGetValue(value, out var chunk))
+            {
+                return chunk;
+            }
+
+            chunk = new Chunk(x, z);
+
+            chunks[value] = chunk;
+            Generator.Generate(this, chunk);
+
+            return chunk;
         }
-
-        region = new Region(this, Generator);
-        regions[value] = region;
-
-        return region;
     }
 }
