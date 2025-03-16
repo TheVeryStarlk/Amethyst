@@ -14,11 +14,6 @@ public interface IClient
     public int Identifier { get; }
 
     /// <summary>
-    /// The associated <see cref="IPlayer"/> instance with the <see cref="IClient"/>.
-    /// </summary>
-    public IPlayer? Player { get; }
-
-    /// <summary>
     /// Writes an <see cref="IOutgoingPacket"/> to the <see cref="IClient"/>.
     /// </summary>
     /// <remarks>
