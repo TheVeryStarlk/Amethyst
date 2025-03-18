@@ -1,14 +1,10 @@
-﻿using Amethyst.Abstractions.Entities.Player;
-using Amethyst.Abstractions.Worlds;
+﻿using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
 internal sealed record World(string Name, WorldType Type, Dimension Dimension, Difficulty Difficulty, IGenerator Generator) : IWorld
 {
     public Difficulty Difficulty { get; set; } = Difficulty;
-
-    // To be implemented...
-    public IReadOnlyDictionary<string, IPlayer> Players => new Dictionary<string, IPlayer>();
 
     private readonly Dictionary<long, Chunk> chunks = [];
 
