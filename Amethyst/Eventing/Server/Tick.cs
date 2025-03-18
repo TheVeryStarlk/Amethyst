@@ -2,4 +2,4 @@
 
 namespace Amethyst.Eventing.Server;
 
-public sealed class Tick : Event<IServer>;
+public sealed record Tick : Event<IServer>;

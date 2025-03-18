@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Entities.Player;
-
-namespace Amethyst.Abstractions.Worlds;
+﻿namespace Amethyst.Abstractions.Worlds;
 
 public interface IWorld
 {
@@ -13,8 +11,6 @@ public interface IWorld
     public Difficulty Difficulty { get; }
 
     public IGenerator Generator { get; }
-
-    public IEnumerable<IPlayer> Players { get; }
 
     public Block this[int x, int y, int z] { get; set; }
 

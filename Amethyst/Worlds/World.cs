@@ -8,7 +8,7 @@ internal sealed record World(string Name, WorldType Type, Dimension Dimension, D
     public Difficulty Difficulty { get; set; } = Difficulty;
 
     // To be implemented...
-    public IEnumerable<IPlayer> Players => [];
+    public IReadOnlyDictionary<string, IPlayer> Players => new Dictionary<string, IPlayer>();
 
     private readonly Dictionary<long, Chunk> chunks = [];
 
