@@ -6,7 +6,7 @@ public interface IClient
 {
     public int Identifier { get; }
 
-    public void Write(IOutgoingPacket packet);
+    public void Write(params ReadOnlySpan<IOutgoingPacket> packets);
 
     public void Stop();
 }

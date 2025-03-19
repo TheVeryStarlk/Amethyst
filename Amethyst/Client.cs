@@ -23,11 +23,14 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
     private State state;
 
-    public void Write(IOutgoingPacket packet)
+    public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
     {
-        if (!outgoing.Writer.TryWrite(packet))
+        foreach (var packet in packets)
         {
-            // Worth it to log that?
+            if (!outgoing.Writer.TryWrite(packet))
+            {
+                break;
+            }
         }
     }
 

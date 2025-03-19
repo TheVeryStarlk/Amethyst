@@ -10,7 +10,7 @@ internal sealed class Section
     {
         get
         {
-            var index = AsIndex(x, y, z) * 2;
+            var index = NumericUtility.AsIndex(x, y, z) * 2;
 
             var type = blocks[index] >> 4 | blocks[index + 1] << 4;
             var metadata = blocks[index] & 0x0F;
@@ -19,7 +19,7 @@ internal sealed class Section
         }
         set
         {
-            var index = AsIndex(x, y, z) * 2;
+            var index = NumericUtility.AsIndex(x, y, z) * 2;
             var type = value.Type;
 
             blocks[index] = (byte) (type << 4 | value.Metadata);
@@ -31,10 +31,5 @@ internal sealed class Section
     {
         // Lighting is not implemented "yet".
         return blocks;
-    }
-
-    private static int AsIndex(int x, int y, int z)
-    {
-        return (y & 0xF) << 8 | (z & 0xF) << 4 | x & 0xF;
     }
 }
