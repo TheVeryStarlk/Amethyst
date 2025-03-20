@@ -20,11 +20,6 @@ public sealed class Message
 
     public IEnumerable<Message>? Extra { get; set; }
 
-    public static implicit operator Message(string text)
-    {
-        return new Message { Text = text };
-    }
-
     public static Message Simple(string text)
     {
         return new Message { Text = text };

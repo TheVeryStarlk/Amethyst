@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Networking.Packets.Play;
+﻿using Amethyst.Eventing.Player;
+
+namespace Amethyst.Networking.Packets.Play;
 
 internal sealed record MessagePacket(string Message) : IIngoingPacket<MessagePacket>, IProcessor
 {
@@ -12,6 +14,6 @@ internal sealed record MessagePacket(string Message) : IIngoingPacket<MessagePac
 
     public void Process(Client client)
     {
-        // Dispatch a send event.
+        client.EventDispatcher.Dispatch(client.Player!, new Sent(Message));
     }
 }

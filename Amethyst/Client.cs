@@ -13,9 +13,6 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 {
     public EventDispatcher EventDispatcher => eventDispatcher;
 
-    // Probably shouldn't use random.
-    public int Identifier { get; } = Random.Shared.Next();
-
     public Player? Player { get; }
 
     private readonly CancellationTokenSource source = new();
@@ -25,8 +22,14 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
     public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
     {
+        if (source.IsCancellationRequested)
+        {
+            return;
+        }
+
         foreach (var packet in packets)
         {
+            // Writer complete is never called. Doesn't hurt to have this check, though.
             if (!outgoing.Writer.TryWrite(packet))
             {
                 break;

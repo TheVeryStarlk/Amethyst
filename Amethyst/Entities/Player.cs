@@ -7,8 +7,11 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Entities;
 
-internal sealed record Player(int Identifier, IClient Client, string Unique, string Username, IWorld World) : IPlayer
+internal sealed record Player(IClient Client, string Unique, string Username, IWorld World) : IPlayer
 {
+    // Probably shouldn't use random.
+    public int Identifier => Random.Shared.Next();
+
     public Location Location { get; set; }
 
     public float Yaw { get; set; }
