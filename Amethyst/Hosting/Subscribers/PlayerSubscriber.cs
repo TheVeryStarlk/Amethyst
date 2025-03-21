@@ -12,8 +12,8 @@ namespace Amethyst.Hosting.Subscribers;
 
 internal sealed class PlayerSubscriber : ISubscriber
 {
-    private readonly Dictionary<string, IPlayer> players = [];
-    private readonly FailurePacket packet = new(Message.Simple("Already logged in"));
+    private readonly Dictionary<string, IPlayer> pairs = [];
+    private readonly FailurePacket failure = new(Message.Simple("Already logged in"));
 
     private DateTime last;
 
@@ -21,15 +21,15 @@ internal sealed class PlayerSubscriber : ISubscriber
     {
         registry.For<IClient>(consumer => consumer.On<Login>((source, original) =>
         {
-            if (players.ContainsKey(original.Username))
+            if (pairs.ContainsKey(original.Username))
             {
-                source.Write(packet);
+                source.Write(failure);
             }
         }));
 
-        registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) => players[source.Username] = source));
+        registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) => pairs[source.Username] = source));
 
-        registry.For<IServer>(consumer => consumer.On<Tick>((source, _) =>
+        registry.For<IServer>(consumer => consumer.On<Tick>((_, _) =>
         {
             var now = DateTime.Now;
 
@@ -41,7 +41,12 @@ internal sealed class PlayerSubscriber : ISubscriber
 
             last = now;
 
-            var packet = new KeepAlivePacket(now.Ticks);
+            var alive = new KeepAlivePacket(now.Ticks);
+
+            foreach (var pair in pairs)
+            {
+                pair.Value.Client.Write(alive);
+            }
         }));
     }
 }

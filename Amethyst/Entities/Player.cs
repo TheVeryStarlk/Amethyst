@@ -9,12 +9,6 @@ namespace Amethyst.Entities;
 
 internal sealed class Player(IClient client, string unique, string username, IWorld world) : IPlayer
 {
-    public IClient Client => client;
-
-    public string Unique => unique;
-
-    public string Username => username;
-
     // Probably shouldn't use random.
     public int Identifier { get; } = Random.Shared.Next();
 
@@ -26,9 +20,15 @@ internal sealed class Player(IClient client, string unique, string username, IWo
 
     public bool OnGround { get; set; }
 
+    public IClient Client => client;
+
     public IWorld World { get; set; } = world;
 
+    public string Unique => unique;
+
     public GameMode GameMode { get; set; }
+
+    public string Username => username;
 
     public string? Locale { get; set; }
 
