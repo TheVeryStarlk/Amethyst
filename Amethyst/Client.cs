@@ -11,13 +11,10 @@ namespace Amethyst;
 // Rewrite this when https://github.com/davidfowl/BedrockFramework/issues/172.
 internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatcher eventDispatcher) : IClient, IDisposable
 {
-    public EventDispatcher EventDispatcher => eventDispatcher;
-
-    public Player? Player { get; }
-
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
+    private Player? player;
     private State state;
 
     public async Task StartAsync()

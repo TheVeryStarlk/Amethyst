@@ -39,7 +39,6 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
 
     private Section Section(int y)
     {
-        var index = y.ToChunk();
-        return sections[index] ?? (sections[index] = new Section());
+        return sections[y.ToChunk()] ?? (sections[y.ToChunk()] = new Section());
     }
 }

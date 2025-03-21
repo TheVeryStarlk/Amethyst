@@ -1,4 +1,7 @@
-﻿namespace Amethyst.Networking.Packets.Play;
+﻿using Amethyst.Entities;
+using Amethyst.Eventing;
+
+namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class OnGroundPacket(bool onGround) : IIngoingPacket<OnGroundPacket>, IProcessor
 {
@@ -10,8 +13,8 @@ internal sealed class OnGroundPacket(bool onGround) : IIngoingPacket<OnGroundPac
         return new OnGroundPacket(reader.ReadBoolean());
     }
 
-    public void Process(Client client)
+    public void Process(Player player, EventDispatcher eventDispatcher)
     {
-        client.Player!.OnGround = onGround;
+        player.OnGround = onGround;
     }
 }
