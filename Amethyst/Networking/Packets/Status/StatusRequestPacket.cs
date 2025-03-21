@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Status;
 
-internal sealed record StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
+internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {
     public static int Identifier => 0;
 

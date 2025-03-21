@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed record Chunk(int X, int Z) : IChunk
+internal sealed class Chunk(int x, int z) : IChunk
 {
     private readonly Section?[] sections = new Section[16];
     private readonly Biome[] biomes = new Biome[256];
@@ -33,7 +33,7 @@ internal sealed record Chunk(int X, int Z) : IChunk
             offset += 8192;
         }
 
-        return new SingleChunkPacket(X, Z, final, (ushort) ((1 << parts.Length) - 1));
+        return new SingleChunkPacket(x, z, final, (ushort) ((1 << parts.Length) - 1));
     }
 
     private Section Section(int y)

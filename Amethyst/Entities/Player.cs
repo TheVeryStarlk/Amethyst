@@ -7,10 +7,16 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Entities;
 
-internal sealed record Player(IClient Client, string Unique, string Username, IWorld World) : IPlayer
+internal sealed class Player(IClient client, string unique, string username, IWorld world) : IPlayer
 {
+    public IClient Client => client;
+
+    public string Unique => unique;
+
+    public string Username => username;
+
     // Probably shouldn't use random.
-    public int Identifier => Random.Shared.Next();
+    public int Identifier { get; } = Random.Shared.Next();
 
     public Location Location { get; set; }
 
@@ -20,7 +26,7 @@ internal sealed record Player(IClient Client, string Unique, string Username, IW
 
     public bool OnGround { get; set; }
 
-    public IWorld World { get; set; } = World;
+    public IWorld World { get; set; } = world;
 
     public GameMode GameMode { get; set; }
 

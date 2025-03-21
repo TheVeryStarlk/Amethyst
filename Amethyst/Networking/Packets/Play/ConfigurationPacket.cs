@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Play;
 
-internal sealed record ConfigurationPacket(string Locale, byte ViewDistance) : IIngoingPacket<ConfigurationPacket>, IProcessor
+internal sealed class ConfigurationPacket(string locale, byte viewDistance) : IIngoingPacket<ConfigurationPacket>, IProcessor
 {
     public static int Identifier => 21;
 
@@ -12,7 +12,7 @@ internal sealed record ConfigurationPacket(string Locale, byte ViewDistance) : I
 
     public void Process(Client client)
     {
-        client.Player!.Locale = Locale;
-        client.Player.ViewDistance = ViewDistance;
+        client.Player!.Locale = locale;
+        client.Player.ViewDistance = viewDistance;
     }
 }

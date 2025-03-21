@@ -3,14 +3,28 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Abstractions.Networking.Packets.Play;
 
-public sealed record JoinGamePacket(
-    int Entity,
-    GameMode GameMode,
-    Dimension Dimension,
-    Difficulty Difficulty,
-    byte Players,
-    WorldType Type,
-    bool ReducedDebugInformation) : IOutgoingPacket
+public sealed class JoinGamePacket(
+    int entity,
+    GameMode gameMode,
+    Dimension dimension,
+    Difficulty difficulty,
+    byte players,
+    WorldType type,
+    bool reducedDebugInformation) : IOutgoingPacket
 {
     public int Identifier => 1;
+
+    public int Entity => entity;
+
+    public GameMode GameMode => gameMode;
+
+    public Dimension Dimension => dimension;
+
+    public Difficulty Difficulty => difficulty;
+
+    public byte Players => players;
+
+    public WorldType Type => type;
+
+    public bool ReducedDebugInformation => reducedDebugInformation;
 }

@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Play;
 
-internal sealed record OnGroundPacket(bool OnGround) : IIngoingPacket<OnGroundPacket>, IProcessor
+internal sealed class OnGroundPacket(bool onGround) : IIngoingPacket<OnGroundPacket>, IProcessor
 {
     public static int Identifier => 3;
 
@@ -12,6 +12,6 @@ internal sealed record OnGroundPacket(bool OnGround) : IIngoingPacket<OnGroundPa
 
     public void Process(Client client)
     {
-        client.Player!.OnGround = OnGround;
+        client.Player!.OnGround = onGround;
     }
 }

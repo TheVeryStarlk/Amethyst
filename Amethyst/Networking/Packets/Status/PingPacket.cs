@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Status;
 
-internal sealed record PingPacket(long Magic) : IIngoingPacket<PingPacket>
+internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>
 {
     public static int Identifier => 1;
 

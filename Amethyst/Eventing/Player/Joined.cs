@@ -2,4 +2,4 @@
 
 namespace Amethyst.Eventing.Player;
 
-internal sealed record Joined : Event<IPlayer>;
+internal sealed class Joined : Event<IPlayer>;

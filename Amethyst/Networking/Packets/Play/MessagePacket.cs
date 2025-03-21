@@ -2,7 +2,7 @@
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed record MessagePacket(string Message) : IIngoingPacket<MessagePacket>, IProcessor
+internal sealed class MessagePacket(string message) : IIngoingPacket<MessagePacket>, IProcessor
 {
     public static int Identifier => 1;
 
@@ -14,6 +14,6 @@ internal sealed record MessagePacket(string Message) : IIngoingPacket<MessagePac
 
     public void Process(Client client)
     {
-        client.EventDispatcher.Dispatch(client.Player!, new Sent(Message));
+        client.EventDispatcher.Dispatch(client.Player!, new Sent(message));
     }
 }

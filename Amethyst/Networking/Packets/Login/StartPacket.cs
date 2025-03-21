@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Login;
 
-internal sealed record StartPacket(string Username) : IIngoingPacket<StartPacket>
+internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 {
     public static int Identifier => 0;
 

@@ -1,6 +1,8 @@
 ﻿namespace Amethyst.Abstractions.Networking.Packets.Play;
 
-public sealed record KeepAlivePacket(long Magic) : IOutgoingPacket
+public sealed class KeepAlivePacket(long magic) : IOutgoingPacket
 {
     public int Identifier => 0;
+
+    public long Magic => magic;
 }

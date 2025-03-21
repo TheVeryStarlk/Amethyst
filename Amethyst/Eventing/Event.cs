@@ -1,3 +1,3 @@
 ﻿namespace Amethyst.Eventing;
 
-public abstract record Event<T>;
+public abstract class Event<T>;

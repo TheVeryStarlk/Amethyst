@@ -1,6 +1,14 @@
 ﻿namespace Amethyst.Abstractions.Networking.Packets.Play;
 
-public sealed record SingleChunkPacket(int X, int Z, byte[] Sections, ushort Bitmask) : IOutgoingPacket
+public sealed class SingleChunkPacket(int x, int z, byte[] sections, ushort bitmask) : IOutgoingPacket
 {
     public int Identifier => 33;
+
+    public int X => x;
+
+    public int Z => z;
+
+    public byte[] Sections => sections;
+
+    public ushort Bitmask => bitmask;
 }

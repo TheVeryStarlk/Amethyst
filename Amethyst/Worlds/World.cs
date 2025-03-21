@@ -2,9 +2,17 @@
 
 namespace Amethyst.Worlds;
 
-internal sealed record World(string Name, WorldType Type, Dimension Dimension, Difficulty Difficulty, IGenerator Generator) : IWorld
+internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
 {
-    public Difficulty Difficulty { get; set; } = Difficulty;
+    public string Name => name;
+
+    public WorldType Type => type;
+
+    public Dimension Dimension => dimension;
+
+    public Difficulty Difficulty { get; set; } = difficulty;
+
+    public IGenerator Generator => generator;
 
     private readonly Dictionary<long, Chunk> chunks = [];
 
