@@ -9,7 +9,7 @@ public sealed class Status : Event<IClient>
 
     public int Numerical { get; set; } = 47;
 
-    public int Maximum { get; set; } = 10;
+    public int Maximum { get; set; } = byte.MaxValue;
 
     public int Online { get; set; } = 0;
 

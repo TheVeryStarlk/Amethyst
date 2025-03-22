@@ -67,7 +67,6 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
         foreach (var packet in packets)
         {
-            // Writer complete is never called. Doesn't hurt to have this check, though.
             if (!outgoing.Writer.TryWrite(packet))
             {
                 break;
@@ -198,12 +197,12 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
     private void Login(Packet packet)
     {
         var start = packet.Create<StartPacket>();
-        var joining = eventDispatcher.Dispatch(this, new Login(start.Username));
+        var login = eventDispatcher.Dispatch(this, new Login(start.Username));
 
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();
 
-        if (joining.World is World world)
+        if (login.World is World world)
         {
             player = new Player(this, Guid.NewGuid().ToString(), start.Username, world);
 
@@ -215,7 +214,8 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
                     world.Dimension,
                     world.Difficulty,
                     byte.MaxValue,
-                    world.Type, false),
+                    world.Type,
+                    false),
                 new PositionLookPacket(new Location(), 0, 0));
 
             state = State.Play;
