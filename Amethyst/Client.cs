@@ -1,9 +1,12 @@
-﻿using System.Net.Sockets;
+﻿using System.IO.Pipelines;
+using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Networking;
+using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -11,6 +14,7 @@ namespace Amethyst;
 // Rewrite this when https://github.com/davidfowl/BedrockFramework/issues/172.
 internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatcher eventDispatcher) : IClient, IDisposable
 {
+    private readonly NetworkStream stream = new(socket);
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
@@ -69,31 +73,47 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
     private async Task ReadingAsync()
     {
+        var input = PipeReader.Create(stream);
+
         while (true)
         {
+            var result = await input.ReadAsync(source.Token).ConfigureAwait(false);
+            var sequence = result.Buffer;
+
+            var consumed = sequence.Start;
+            var examined = sequence.End;
+
             try
             {
-                await socket.ReceiveAsync(ArraySegment<byte>.Empty, source.Token).ConfigureAwait(false);
+                if (Protocol.TryRead(ref sequence, out var packet))
+                {
+                    examined = consumed = sequence.Start;
+                }
+
+                if (result.IsCompleted)
+                {
+                    break;
+                }
             }
-            catch (OperationCanceledException)
+            finally
             {
-                break;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Exception while reading");
-                break;
+                input.AdvanceTo(consumed, examined);
             }
         }
     }
 
     private async Task WritingAsync()
     {
+        var output = PipeWriter.Create(stream);
+
         await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
         {
             try
             {
-                // Work...
+                var serializer = packet.Create();
+                var span = output.GetSpan(serializer.Length + sizeof(long));
+
+                output.Advance(Protocol.Write(span, packet, serializer));
             }
             catch (Exception exception)
             {

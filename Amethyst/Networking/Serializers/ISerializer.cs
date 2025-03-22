@@ -22,7 +22,7 @@ internal interface ISerializer<in T, out TSerializer> : ISerializer where T : IO
 
 internal static class OutgoingPacketExtensions
 {
-    public static ISerializer Serializer(this IOutgoingPacket instance)
+    public static ISerializer Create(this IOutgoingPacket instance)
     {
         // I think frozen dictionaries are faster than this.
         return instance switch
