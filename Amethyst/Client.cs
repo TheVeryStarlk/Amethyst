@@ -2,10 +2,15 @@
 using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
+using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking.Packets;
+using Amethyst.Abstractions.Networking.Packets.Login;
+using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Networking;
+using Amethyst.Networking.Packets;
+using Amethyst.Networking.Packets.Handshake;
 using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
@@ -77,27 +82,45 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
         while (true)
         {
-            var result = await input.ReadAsync(source.Token).ConfigureAwait(false);
-            var sequence = result.Buffer;
-
-            var consumed = sequence.Start;
-            var examined = sequence.End;
-
             try
             {
+                var result = await input.ReadAsync(source.Token).ConfigureAwait(false);
+                var sequence = result.Buffer;
+
+                var consumed = sequence.Start;
+                var examined = sequence.End;
+
                 if (Protocol.TryRead(ref sequence, out var packet))
                 {
                     examined = consumed = sequence.Start;
+
+                    Action<Packet> action = state switch
+                    {
+                        State.Handshake => Handshake,
+                        State.Status => Status,
+                        State.Login => Login,
+                        State.Play => Play,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+
+                    action(packet);
                 }
 
                 if (result.IsCompleted)
                 {
                     break;
                 }
-            }
-            finally
-            {
+
                 input.AdvanceTo(consumed, examined);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while reading from client");
+                break;
             }
         }
     }
@@ -121,6 +144,36 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
                 break;
             }
         }
+    }
+
+    private void Handshake(Packet packet)
+    {
+        var handshake = packet.Create<HandshakePacket>();
+
+        state = handshake.State;
+
+        if (state is State.Login or State.Play || handshake.Version is 47)
+        {
+            return;
+        }
+
+        var message = Message.Simple("Outdated!");
+        Write(state is State.Play ? new DisconnectPacket(message) : new FailurePacket(message));
+
+        Stop();
+    }
+
+    private void Status(Packet packet)
+    {
+    }
+
+    private void Login(Packet packet)
+    {
+
+    }
+
+    private void Play(Packet packet)
+    {
     }
 }
 
