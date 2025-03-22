@@ -95,8 +95,6 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
                 if (Protocol.TryRead(ref sequence, out var packet))
                 {
-                    examined = consumed = sequence.Start;
-
                     Action<Packet> action = state switch
                     {
                         State.Handshake => Handshake,
@@ -107,6 +105,8 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
                     };
 
                     action(packet);
+
+                    examined = consumed = sequence.Start;
                 }
 
                 if (result.IsCompleted)
@@ -140,6 +140,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
                 var span = output.GetSpan(serializer.Length + sizeof(long));
 
                 output.Advance(Protocol.Write(span, packet, serializer));
+                await output.FlushAsync().ConfigureAwait(false);
             }
             catch (Exception exception)
             {

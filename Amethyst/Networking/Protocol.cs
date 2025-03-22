@@ -25,7 +25,7 @@ internal static class Protocol
             return false;
         }
 
-        packet = new Packet(identifier, sequence);
+        packet = new Packet(identifier, part);
         sequence = sequence.Slice(part.End);
 
         return true;
