@@ -6,11 +6,14 @@ using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Abstractions.Networking.Packets.Status;
 using Amethyst.Entities;
 using Amethyst.Eventing;
+using Amethyst.Eventing.Client;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Handshake;
+using Amethyst.Networking.Packets.Status;
 using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
@@ -165,6 +168,23 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
     private void Status(Packet packet)
     {
+        if (packet.Identifier == StatusRequestPacket.Identifier)
+        {
+            var status = eventDispatcher.Dispatch(this, new Status());
+
+            Write(new StatusResponsePacket(
+                status.Name,
+                status.Numerical,
+                status.Maximum,
+                status.Online,
+                status.Description,
+                status.Favicon));
+
+            return;
+        }
+
+        Write(new PongPacket(packet.Create<PingPacket>().Magic));
+        Stop();
     }
 
     private void Login(Packet packet)
