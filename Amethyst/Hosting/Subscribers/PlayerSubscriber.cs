@@ -28,6 +28,7 @@ internal sealed class PlayerSubscriber : ISubscriber
         }));
 
         registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) => pairs[source.Username] = source));
+        registry.For<IPlayer>(consumer => consumer.On<Left>((source, _) => pairs.Remove(source.Username)));
 
         registry.For<IServer>(consumer => consumer.On<Tick>((_, _) =>
         {

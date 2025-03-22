@@ -2,7 +2,6 @@
 using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
-using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
@@ -10,6 +9,7 @@ using Amethyst.Abstractions.Networking.Packets.Status;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
+using Amethyst.Eventing.Player;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Handshake;
@@ -46,9 +46,13 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
             await writing.ConfigureAwait(false);
         }
 
-        // Writing might finish before reading, so in that case cancelling the token will stop
-        // the reading task thus marking the end of the entire reading writing process.
+        // Writing might finish before reading, so in that case cancelling the token will stop the reading task.
         source.Cancel();
+
+        if (state is State.Play)
+        {
+            eventDispatcher.Dispatch(player!, new Left());
+        }
     }
 
     public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
@@ -161,8 +165,8 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
             return;
         }
 
-        var message = Message.Simple("Outdated!");
-        Write(state is State.Play ? new DisconnectPacket(message) : new FailurePacket(message));
+        var outdated = eventDispatcher.Dispatch(this, new Outdated());
+        Write(state is State.Play ? new DisconnectPacket(outdated.Message) : new FailurePacket(outdated.Message));
 
         Stop();
     }

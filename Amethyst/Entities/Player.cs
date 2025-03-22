@@ -41,7 +41,7 @@ internal sealed class Player(IClient client, string unique, string username, IWo
 
     public void Disconnect(Message message)
     {
-        // We trust the client to actually disconnect.
         Client.Write(new DisconnectPacket(message));
+        Client.Stop();
     }
 }
