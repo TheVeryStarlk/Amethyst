@@ -44,11 +44,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
         // but there still is some work to do in the writing task, so wait for that work to finish.
         if (await Task.WhenAny(reading, writing).ConfigureAwait(false) == reading)
         {
-            if (!source.IsCancellationRequested)
-            {
-                outgoing.Writer.Complete();
-            }
-
+            outgoing.Writer.Complete();
             await writing.ConfigureAwait(false);
         }
 
@@ -205,30 +201,29 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
         // Quit before switching to play state if token was cancelled.
         source.Token.ThrowIfCancellationRequested();
 
-        if (login.World is World world)
-        {
-            Player = new Player(this, Guid.NewGuid().ToString(), start.Username, world);
-
-            Write(
-                new SuccessPacket(Player.Unique, start.Username),
-                new JoinGamePacket(
-                    Player.Identifier,
-                    Player.GameMode,
-                    world.Dimension,
-                    world.Difficulty,
-                    byte.MaxValue,
-                    world.Type,
-                    false),
-                new PositionLookPacket(new Location(), 0, 0));
-
-            state = State.Play;
-
-            eventDispatcher.Dispatch(Player, new Joined());
-        }
-        else
+        if (login.World is not World world)
         {
             logger.LogWarning("No joining world specified.");
+            return;
         }
+
+        Player = new Player(this, Guid.NewGuid().ToString(), start.Username, world);
+
+        Write(
+            new SuccessPacket(Player.Unique, start.Username),
+            new JoinGamePacket(
+                Player.Identifier,
+                Player.GameMode,
+                world.Dimension,
+                world.Difficulty,
+                byte.MaxValue,
+                world.Type,
+                false),
+            new PositionLookPacket(new Location(), 0, 0));
+
+        state = State.Play;
+
+        eventDispatcher.Dispatch(Player, new Joined());
     }
 
     private void Play(Packet packet)
