@@ -25,11 +25,14 @@ namespace Amethyst;
 // Rewrite this when https://github.com/davidfowl/BedrockFramework/issues/172.
 internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatcher eventDispatcher) : IClient, IDisposable
 {
+    public EventDispatcher EventDispatcher => eventDispatcher;
+
+    public Player? Player { get; private set; }
+
     private readonly NetworkStream stream = new(socket);
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
-    private Player? player;
     private State state;
 
     public async Task StartAsync()
@@ -54,7 +57,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
         if (state is State.Play)
         {
-            eventDispatcher.Dispatch(player!, new Left());
+            eventDispatcher.Dispatch(Player!, new Left());
         }
     }
 
@@ -204,13 +207,13 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
         if (login.World is World world)
         {
-            player = new Player(this, Guid.NewGuid().ToString(), start.Username, world);
+            Player = new Player(this, Guid.NewGuid().ToString(), start.Username, world);
 
             Write(
-                new SuccessPacket(player.Unique, start.Username),
+                new SuccessPacket(Player.Unique, start.Username),
                 new JoinGamePacket(
-                    player.Identifier,
-                    player.GameMode,
+                    Player.Identifier,
+                    Player.GameMode,
                     world.Dimension,
                     world.Difficulty,
                     byte.MaxValue,
@@ -220,7 +223,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
             state = State.Play;
 
-            eventDispatcher.Dispatch(player, new Joined());
+            eventDispatcher.Dispatch(Player, new Joined());
         }
         else
         {
