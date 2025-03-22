@@ -40,15 +40,12 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
         var reading = ReadingAsync();
         var writing = WritingAsync();
 
-        // If reading finishes first, then either the client stopped the connection or the token was cancelled,
-        // but there still is some work to do in the writing task, so wait for that work to finish.
         if (await Task.WhenAny(reading, writing).ConfigureAwait(false) == reading)
         {
             outgoing.Writer.Complete();
             await writing.ConfigureAwait(false);
         }
 
-        // Writing might finish before reading, so in that case cancelling the token will stop the reading task.
         source.Cancel();
 
         if (state is State.Play)
