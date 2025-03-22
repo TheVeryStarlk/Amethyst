@@ -42,7 +42,7 @@ internal sealed class PlayerSubscriber : ISubscriber
 
             last = now;
 
-            var alive = new KeepAlivePacket(now.Ticks);
+            var alive = new KeepAlivePacket((int) now.Ticks);
 
             foreach (var pair in pairs)
             {

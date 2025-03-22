@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISubscriber, T>();
 
         services.AddSingleton<EventDispatcher>();
+        services.AddSingleton<Server>();
 
         services.AddHostedService<AmethystService>();
 

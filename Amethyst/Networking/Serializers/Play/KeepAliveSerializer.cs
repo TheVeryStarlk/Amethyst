@@ -3,9 +3,9 @@ using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class KeepAliveSerializer(long magic) : ISerializer<KeepAlivePacket, KeepAliveSerializer>
+internal sealed class KeepAliveSerializer(int magic) : ISerializer<KeepAlivePacket, KeepAliveSerializer>
 {
-    public int Length => sizeof(long);
+    public int Length => Variable.GetByteCount(magic);
 
     public static KeepAliveSerializer Create(KeepAlivePacket packet)
     {
@@ -14,6 +14,6 @@ internal sealed class KeepAliveSerializer(long magic) : ISerializer<KeepAlivePac
 
     public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteLong(magic);
+        SpanWriter.Create(span).WriteVariableInteger(magic);
     }
 }

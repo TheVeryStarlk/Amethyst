@@ -10,7 +10,7 @@ internal sealed class DisconnectSerializer(string message) : ISerializer<Disconn
 
     public static DisconnectSerializer Create(DisconnectPacket packet)
     {
-        return new DisconnectSerializer(packet.Serialize());
+        return new DisconnectSerializer(packet.Message.Serialize());
     }
 
     public void Write(Span<byte> span)

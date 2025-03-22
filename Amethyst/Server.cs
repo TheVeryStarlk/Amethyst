@@ -17,7 +17,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
     public Task StartAsync()
     {
-        return Task.WhenAny(ListeningAsync(), TickingAsync());
+        return Task.WhenAll(ListeningAsync(), TickingAsync());
     }
 
     public IWorld Create(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator)
@@ -50,7 +50,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
         {
             try
             {
-                var socket = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
+                var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
                 var client = new Client(loggerFactory.CreateLogger<Client>(), socket, eventDispatcher);
 
                 pairs[client] = ExecuteAsync(client);
@@ -91,6 +91,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
         {
             await Task.Yield();
 
+            await client.StartAsync().ConfigureAwait(false);
             client.Dispose();
 
             logger.LogDebug("Stopped client");

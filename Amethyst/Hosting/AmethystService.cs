@@ -17,10 +17,15 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
         }
         finally
         {
-            server.Stop();
             server.Dispose();
         }
 
         logger.LogInformation("Server stopped");
+    }
+
+    public override Task StopAsync(CancellationToken cancellationToken)
+    {
+        server.Stop();
+        return base.StopAsync(cancellationToken);
     }
 }
