@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
@@ -13,8 +14,10 @@ using Amethyst.Eventing.Player;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Handshake;
+using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Status;
 using Amethyst.Networking.Serializers;
+using Amethyst.Worlds;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -194,7 +197,35 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
     private void Login(Packet packet)
     {
+        var start = packet.Create<StartPacket>();
+        var joining = eventDispatcher.Dispatch(this, new Login(start.Username));
 
+        // Quit before switching to play state if token was cancelled.
+        source.Token.ThrowIfCancellationRequested();
+
+        if (joining.World is World world)
+        {
+            player = new Player(this, Guid.NewGuid().ToString(), start.Username, world);
+
+            Write(
+                new SuccessPacket(player.Unique, start.Username),
+                new JoinGamePacket(
+                    player.Identifier,
+                    player.GameMode,
+                    world.Dimension,
+                    world.Difficulty,
+                    byte.MaxValue,
+                    world.Type, false),
+                new PositionLookPacket(new Location(), 0, 0));
+
+            state = State.Play;
+
+            eventDispatcher.Dispatch(player, new Joined());
+        }
+        else
+        {
+            logger.LogWarning("No joining world specified.");
+        }
     }
 
     private void Play(Packet packet)
