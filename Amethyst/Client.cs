@@ -225,6 +225,7 @@ internal sealed class Client(ILogger<Client> logger, Socket socket, EventDispatc
 
     private void Play(Packet packet)
     {
+        Processor.Create(packet)?.Process(this);
     }
 }
 
