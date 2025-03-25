@@ -22,7 +22,7 @@ registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
 
 ## Getting Started
 
-Create a subscriber by inheriting from ISubscriber, and add Amethyst to your service collection by doing `services.AddAmethyst<FooSubscriber>();`.
+Create a subscriber by inheriting from [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst/Eventing/ISubscriber.cs), and add Amethyst to your service collection by `services.AddAmethyst<FooSubscriber>();`.
 This is all you need to get a running Amethyst server, however, you need to create a default world for players to join to.
 
 ```cs
