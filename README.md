@@ -20,6 +20,24 @@ registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
 }));
 ```
 
+## Getting Started
+
+Create a subscriber by inheriting from ISubscriber, and add Amethyst to your service collection by doing `services.AddAmethyst<FooSubscriber>();`.
+This is all you need to get a running Amethyst server, however, you need to create a default world for players to join to.
+
+```cs
+public void Subscribe(IRegistry registry)
+{
+    // Create an over world named default and assign it to a field.
+    registry.For<IServer>(consumer => consumer.On<Starting>((source, _) => source.Create("Default", WorldType.Default, Dimension.OverWorld, Difficulty.Peaceful, EmptyGenerator.Instance)));
+   
+    // When a client attempts to join, assign the joining world to the world we created.
+    registry.For<IClient>(consumer => consumer.On<Login>((_, original) => original.World = world!));
+}
+```
+
+With that, your server is now join-able!
+
 ## Credits
 
 * [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.
