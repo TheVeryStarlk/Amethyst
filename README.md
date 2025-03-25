@@ -7,6 +7,22 @@
 A light-weight library targeting a [specific protocol version](https://minecraft.wiki/w/Java_Edition_1.8.9) for developing Minecraft servers.
 Amethyst is customizable and sacrifices many of the vanilla features in favor of performance and memory usage.
 
+## Getting Started
+
+Implement [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst/Eventing/ISubscriber.cs) and add Amethyst to a service collection by `services.AddAmethyst<FooSubscriber>();`.
+This is all you need to get a running Amethyst server, however, you need to create a default world for players to join to.
+
+```cs
+public void Subscribe(IRegistry registry)
+{
+    // Create an empty over world named default and assign it to a variable.
+    registry.For<IServer>(consumer => consumer.On<Starting>((server, _) => server.Create("Default", WorldType.Default, Dimension.OverWorld, Difficulty.Peaceful, EmptyGenerator.Instance)));
+   
+    // When a client attempts to join, assign the joining world to the world we created.
+    registry.For<IClient>(consumer => consumer.On<Login>((_, login) => login.World = world!));
+}
+```
+
 ## Usage
 
 Amethyst by nature has very little built-in logic, the way you implement logic is by subscribing to events.
@@ -18,22 +34,6 @@ registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
     var message = Message.Simple($"Welcome {player.Username}!");
     player.Send(message);
 }));
-```
-
-## Getting Started
-
-Create a subscriber by inheriting from [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst/Eventing/ISubscriber.cs), and add Amethyst to your service collection by `services.AddAmethyst<FooSubscriber>();`.
-This is all you need to get a running Amethyst server, however, you need to create a default world for players to join to.
-
-```cs
-public void Subscribe(IRegistry registry)
-{
-    // Create an over world named default and assign it to a field.
-    registry.For<IServer>(consumer => consumer.On<Starting>((source, _) => source.Create("Default", WorldType.Default, Dimension.OverWorld, Difficulty.Peaceful, EmptyGenerator.Instance)));
-   
-    // When a client attempts to join, assign the joining world to the world we created.
-    registry.For<IClient>(consumer => consumer.On<Login>((_, original) => original.World = world!));
-}
 ```
 
 With that, your server is now join-able!
