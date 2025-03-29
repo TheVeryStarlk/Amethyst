@@ -23,3 +23,11 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             (State) reader.ReadVariableInteger());
     }
 }
+
+internal enum State
+{
+    Handshake,
+    Status,
+    Login,
+    Play
+}

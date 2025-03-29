@@ -1,5 +1,4 @@
-﻿using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Networking;
+﻿using Amethyst.Abstractions.Networking;
 using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;

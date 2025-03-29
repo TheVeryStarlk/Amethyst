@@ -31,9 +31,10 @@ internal static class Protocol
         return true;
     }
 
-    public static int Write(Span<byte> span, IOutgoingPacket packet, ISerializer serializer)
+    public static int Write(Span<byte> span, IOutgoingPacket packet)
     {
         var identifier = Variable.GetByteCount(packet.Identifier);
+        var serializer = packet.Create();
 
         var length = identifier + serializer.Length;
         var body = Variable.GetByteCount(length);

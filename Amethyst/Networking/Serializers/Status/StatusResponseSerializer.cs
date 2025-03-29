@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking;
 using Amethyst.Abstractions.Networking.Packets.Status;
 

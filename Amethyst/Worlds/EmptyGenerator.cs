@@ -19,5 +19,6 @@ public sealed class EmptyGenerator : IGenerator
 
     public void Generate(IWorld world, IChunk chunk, int x, int z)
     {
+        chunk[x, 0, z] = Blocks.Air;
     }
 }
