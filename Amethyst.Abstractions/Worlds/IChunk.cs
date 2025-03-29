@@ -8,6 +8,5 @@ public interface IChunk
 
     public Biome this[int x, int z] { get; set; }
 
-    // Should this be public API?
     public SingleChunkPacket Build();
 }

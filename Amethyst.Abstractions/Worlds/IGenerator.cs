@@ -1,7 +1,7 @@
 ﻿namespace Amethyst.Abstractions.Worlds;
 
 /// <summary>
-/// Represents a <see cref="IChunk"/> generator.
+/// Represents an <see cref="IChunk"/> generator.
 /// </summary>
 public interface IGenerator
 {

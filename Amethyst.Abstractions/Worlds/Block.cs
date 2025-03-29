@@ -7,3 +7,8 @@ public readonly struct Block(int type, int metadata = 0)
 
     public int Metadata => metadata;
 }
+
+public static class Blocks
+{
+    public static Block Air { get; } = new(0, 1);
+}
