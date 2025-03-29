@@ -8,7 +8,7 @@ public interface IClient
 
     /// <summary>
     /// Signals the stopping of the connection, all subsequent calls of <see cref="Write"/> will not be processed.
-    /// Once all pending <see cref="IOutgoingPacket"/> packets have been sent, the underlying connection will stop.
+    /// Once all pending <see cref="IOutgoingPacket"/> packets have been sent, the underlying connection will close.
     /// </summary>
     public void Stop();
 }

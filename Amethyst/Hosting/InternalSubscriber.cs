@@ -8,12 +8,12 @@ using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
 
-namespace Amethyst.Hosting.Subscribers;
+namespace Amethyst.Hosting;
 
-internal sealed class PlayerSubscriber : ISubscriber
+internal sealed class InternalSubscriber : ISubscriber
 {
     private readonly Dictionary<string, IPlayer> pairs = [];
-    private readonly FailurePacket failure = new(Message.Simple("Already logged in"));
+    private readonly FailurePacket failure = new(Message.Simple("Already logged in!"));
 
     private DateTime last;
 
@@ -30,6 +30,7 @@ internal sealed class PlayerSubscriber : ISubscriber
         registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) => pairs[source.Username] = source));
         registry.For<IPlayer>(consumer => consumer.On<Left>((source, _) => pairs.Remove(source.Username)));
 
+        // Kinda stupid idea, move this to on ground packet and get rid of ticking?
         registry.For<IServer>(consumer => consumer.On<Tick>((_, _) =>
         {
             var now = DateTime.Now;
