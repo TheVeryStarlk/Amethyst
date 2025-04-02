@@ -9,8 +9,8 @@ Amethyst is customizable and sacrifices many of the vanilla features in favor of
 
 ## Getting Started
 
-Implement [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst/Eventing/ISubscriber.cs) and add Amethyst to a service collection by `services.AddAmethyst<FooSubscriber>();`.
-This is all you need to get a running Amethyst server, however, you need to create a default world for players to join to.
+Implementing [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst/Eventing/ISubscriber.cs) and registering Amethyst by `services.AddAmethyst<FooSubscriber>();` is all you need to get a running Amethyst server.
+However, you need to create/specify a world for players to join to.
 
 ```cs
 public void Subscribe(IRegistry registry)
@@ -35,8 +35,6 @@ registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
     player.Send(message);
 }));
 ```
-
-With that, your server is now join-able!
 
 ## Credits
 
