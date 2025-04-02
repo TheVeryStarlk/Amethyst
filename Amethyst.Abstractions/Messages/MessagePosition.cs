@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Entities.Player;
+﻿namespace Amethyst.Abstractions.Messages;
 
 public enum MessagePosition
 {

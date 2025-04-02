@@ -27,8 +27,11 @@ internal sealed class InternalSubscriber : ISubscriber
             }
         }));
 
-        registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) => pairs[source.Username] = source));
-        registry.For<IPlayer>(consumer => consumer.On<Left>((source, _) => pairs.Remove(source.Username)));
+        registry.For<IPlayer>(consumer =>
+        {
+            consumer.On<Joined>((source, _) => pairs[source.Username] = source);
+            consumer.On<Left>((source, _) => pairs.Remove(source.Username));
+        });
 
         // Kinda stupid idea, move this to on ground packet and get rid of ticking?
         registry.For<IServer>(consumer => consumer.On<Tick>((_, _) =>
