@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
+using Amethyst.Worlds;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Amethyst.Hosting;
@@ -12,6 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISubscriber, T>();
 
         services.AddSingleton<EventDispatcher>();
+        services.AddSingleton<IWorldFactory, WorldFactory>();
 
         services.AddHostedService<AmethystService>();
 

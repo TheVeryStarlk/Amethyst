@@ -3,7 +3,7 @@
 namespace Amethyst.Worlds;
 
 /// <summary>
-/// Represents an empty <see cref="IGenerator"/>.
+/// Generates <see cref="Blocks.Air"/>-filled <see cref="IChunk"/>s.
 /// </summary>
 public sealed class EmptyGenerator : IGenerator
 {

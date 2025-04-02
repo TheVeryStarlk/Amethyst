@@ -1,5 +1,4 @@
-﻿using Amethyst.Abstractions.Entities.Player;
-using Amethyst.Abstractions.Messages;
+﻿using Amethyst.Abstractions.Messages;
 
 namespace Amethyst.Abstractions.Networking.Packets.Play;
 
