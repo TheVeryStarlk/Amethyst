@@ -7,7 +7,7 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
 {
     private readonly FrozenDictionary<Type, FrozenSet<Delegate>> events = Registry.Create(subscribers);
 
-    public TEvent Dispatch<T, TEvent>(T source, TEvent original)
+    public TEvent Dispatch<T, TEvent>(T source, TEvent original) where TEvent : Event<T>
     {
         if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
