@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
     {
-        services.AddTransient<ISubscriber, InternalSubscriber>();
+        services.AddTransient<ISubscriber, AmethystSubscriber>();
         services.AddTransient<ISubscriber, T>();
 
         services.AddSingleton<EventDispatcher>();

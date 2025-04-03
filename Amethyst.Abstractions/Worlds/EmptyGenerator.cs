@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Worlds;
-
-namespace Amethyst.Worlds;
+﻿namespace Amethyst.Abstractions.Worlds;
 
 /// <summary>
 /// Generates <see cref="Blocks.Air"/>-filled <see cref="IChunk"/>s.

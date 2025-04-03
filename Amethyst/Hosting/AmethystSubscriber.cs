@@ -10,7 +10,7 @@ using Amethyst.Eventing.Server;
 
 namespace Amethyst.Hosting;
 
-internal sealed class InternalSubscriber : ISubscriber
+internal sealed class AmethystSubscriber : ISubscriber
 {
     private readonly Dictionary<string, IPlayer> pairs = [];
     private readonly FailurePacket failure = new(Message.Simple("Already logged in!"));
