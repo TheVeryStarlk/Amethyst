@@ -24,7 +24,7 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An exception occurred while running event.");
+            logger.LogError(exception, "An exception occurred while running event: '{Name}'", typeof(TEvent).Name);
         }
 
         return original;
