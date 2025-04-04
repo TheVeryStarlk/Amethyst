@@ -14,7 +14,7 @@ internal sealed class LoginProcessor : IProcessor
         var login = client.EventDispatcher.Dispatch(client, new Login(packet.Create<StartPacket>().Username));
         var world = login.World ?? throw new InvalidOperationException("No world was set.");
 
-        client.Player = new Player(client, Guid.NewGuid().ToString(), login.Username, world);
+        client.Player = new Player(client, Guid.NewGuid().ToString(), login.GameMode, login.Username, world);
 
         client.Write(
             new SuccessPacket(client.Player.Unique, client.Player.Username),
