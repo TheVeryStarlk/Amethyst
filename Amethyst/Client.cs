@@ -25,6 +25,20 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
+    public async Task StartAsync()
+    {
+        var reading = ReadingAsync();
+        var writing = WritingAsync();
+
+        if (await Task.WhenAny(reading, writing).ConfigureAwait(false) == reading)
+        {
+            outgoing.Writer.Complete();
+            await writing.ConfigureAwait(false);
+        }
+
+        source.Cancel();
+    }
+
     public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
     {
         if (source.IsCancellationRequested)

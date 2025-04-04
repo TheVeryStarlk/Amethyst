@@ -3,11 +3,29 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystService(ILogger<AmethystService> logger) : BackgroundService
+internal sealed class AmethystService(ILogger<AmethystService> logger, Server server) : BackgroundService
 {
-    protected override Task ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Hello, world!");
-        return Task.CompletedTask;
+        try
+        {
+            await server.StartAsync().ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "An unexpected exception occurred");
+        }
+        finally
+        {
+            server.Dispose();
+        }
+
+        logger.LogInformation("Server stopped");
+    }
+
+    public override Task StopAsync(CancellationToken cancellationToken)
+    {
+        server.Stop();
+        return base.StopAsync(cancellationToken);
     }
 }
