@@ -3,8 +3,11 @@ using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Networking.Packets;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Networking;
+using Amethyst.Networking.Packets;
+using Amethyst.Networking.Processors;
 using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
@@ -12,6 +15,12 @@ namespace Amethyst;
 
 internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispatcher, Socket socket) : IClient, IDisposable
 {
+    public EventDispatcher EventDispatcher => eventDispatcher;
+
+    public Player? Player { get; set; }
+
+    public State State { get; set; }
+
     private readonly NetworkStream stream = new(socket);
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
@@ -43,6 +52,55 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
         socket.Dispose();
     }
 
+    private async Task ReadingAsync()
+    {
+        var input = PipeReader.Create(stream);
+
+        while (true)
+        {
+            try
+            {
+                var result = await input.ReadAsync(source.Token).ConfigureAwait(false);
+                var sequence = result.Buffer;
+
+                var consumed = sequence.Start;
+                var examined = sequence.End;
+
+                if (Protocol.TryRead(ref sequence, out var packet))
+                {
+                    Action<Client, Packet> action = State switch
+                    {
+                        State.Handshake => HandshakeProcessor.Process,
+                        State.Status => StatusProcessor.Process,
+                        State.Login => LoginProcessor.Process,
+                        State.Play => PlayProcessor.Process,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+
+                    action(this, packet);
+
+                    examined = consumed = sequence.Start;
+                }
+
+                if (result.IsCompleted)
+                {
+                    break;
+                }
+
+                input.AdvanceTo(consumed, examined);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Unexpected exception while reading from client");
+                break;
+            }
+        }
+    }
+
     private async Task WritingAsync()
     {
         var output = PipeWriter.Create(stream);
@@ -68,4 +126,12 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
             }
         }
     }
+}
+
+internal enum State
+{
+    Handshake,
+    Status,
+    Login,
+    Play
 }

@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Handshake;
 
-internal sealed class HandshakePacket(int version, string address, ushort port, State state) : IIngoingPacket<HandshakePacket>
+internal sealed class HandshakePacket(int version, string address, ushort port, int state) : IIngoingPacket<HandshakePacket>
 {
     public static int Identifier => 0;
 
@@ -10,7 +10,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
 
     public ushort Port => port;
 
-    public State State => state;
+    public int State => state;
 
     public static HandshakePacket Create(ReadOnlySpan<byte> span)
     {
@@ -20,14 +20,6 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             reader.ReadVariableInteger(),
             reader.ReadVariableString(),
             reader.ReadUnsignedShort(),
-            (State) reader.ReadVariableInteger());
+            reader.ReadVariableInteger());
     }
-}
-
-internal enum State
-{
-    Handshake,
-    Status,
-    Login,
-    Play
 }
