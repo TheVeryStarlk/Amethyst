@@ -68,7 +68,6 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             if (pair.Key.Player is { } player)
             {
                 player.Disconnect(stopping.Message);
-                eventDispatcher.Dispatch(player, new Left());
             }
             else
             {
@@ -88,6 +87,11 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
             await client.StartAsync().ConfigureAwait(false);
             client.Dispose();
+
+            if (client.Player is { } player)
+            {
+                eventDispatcher.Dispatch(player, new Left());
+            }
 
             logger.LogDebug("Stopped client");
 

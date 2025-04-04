@@ -33,7 +33,6 @@ internal sealed class AmethystSubscriber : ISubscriber
             consumer.On<Left>((source, _) => pairs.Remove(source.Username));
         });
 
-        // Kinda stupid idea, move this to on ground packet and get rid of ticking?
         registry.For<IServer>(consumer => consumer.On<Tick>((_, _) =>
         {
             var now = DateTime.Now;

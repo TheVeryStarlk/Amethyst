@@ -16,6 +16,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<EventDispatcher>();
         services.AddSingleton<IWorldFactory, WorldFactory>();
 
+        services.AddTransient<Server>();
+
         services.AddHostedService<AmethystService>();
 
         return services;

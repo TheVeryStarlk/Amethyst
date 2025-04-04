@@ -6,7 +6,6 @@ using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Login;
-using Amethyst.Worlds;
 
 namespace Amethyst.Networking.Processors;
 
@@ -17,7 +16,7 @@ internal sealed class LoginProcessor : IProcessor
         var start = packet.Create<StartPacket>();
         var login = client.EventDispatcher.Dispatch(client, new Login(start.Username));
 
-        if (login.World is World world)
+        if (login.World is { } world)
         {
             client.Player = new Player(client, Guid.NewGuid().ToString(), start.Username, world);
 
