@@ -26,7 +26,7 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
         var parts = sections.OfType<Section>().Select(section => section.Build()).ToArray();
 
         // Use array pools for this.
-        var final = Enumerable.Repeat<byte>(255, 12288 * parts.Length + 256).ToArray();
+        var final = Enumerable.Repeat<byte>(255, 8192 + 2048 + 2048 * parts.Length + 256).ToArray();
 
         var offset = 0;
 

@@ -19,11 +19,14 @@ internal sealed class HandshakeProcessor : IProcessor
             client.Stop();
         }
 
-        if (handshake.State > 2)
+        client.State = (State) handshake.State;
+
+        if (client.State is State.Login or State.Status)
         {
-            client.Stop();
+            return;
         }
 
-        client.State = (State) handshake.State;
+        // Invalid state.
+        client.Stop();
     }
 }
