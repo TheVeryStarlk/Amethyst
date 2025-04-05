@@ -1,5 +1,4 @@
 ﻿using Amethyst.Abstractions;
-using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Worlds;
 
@@ -12,10 +11,4 @@ public sealed class Login(string username) : Event<IClient>
     public IWorld? World { get; set; }
 
     public GameMode GameMode { get; set; }
-
-    public Location Location { get; set; }
-
-    public float Yaw { get; set; }
-
-    public float Pitch { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Networking.Packets.Login;
+﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Entities;
 using Amethyst.Eventing.Client;
@@ -18,8 +19,8 @@ internal sealed class LoginProcessor : IProcessor
 
         client.Write(
             new SuccessPacket(client.Player.Unique, client.Player.Username),
-            new JoinGamePacket(client.Player.Identifier, login.GameMode, world.Dimension, world.Difficulty, byte.MaxValue, world.Type, false),
-            new PositionLookPacket(login.Location, login.Yaw, login.Pitch));
+            new JoinGamePacket(client.Player.Identifier, client.Player.GameMode, world.Dimension, world.Difficulty, byte.MaxValue, world.Type, false),
+            new PositionLookPacket(new Location(), 0, 0));
 
         client.State = State.Play;
     }
