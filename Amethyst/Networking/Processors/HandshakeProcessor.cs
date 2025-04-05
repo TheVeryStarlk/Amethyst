@@ -1,4 +1,5 @@
-﻿using Amethyst.Eventing.Client;
+﻿using Amethyst.Abstractions.Networking.Packets.Login;
+using Amethyst.Eventing.Client;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Handshake;
 
@@ -12,7 +13,10 @@ internal sealed class HandshakeProcessor : IProcessor
 
         if (handshake.Version != 47)
         {
-            client.EventDispatcher.Dispatch(client, new Outdated());
+            var outdated = client.EventDispatcher.Dispatch(client, new Outdated());
+
+            client.Write(new FailurePacket(outdated.Message));
+            client.Stop();
         }
 
         if (handshake.State > 2)
