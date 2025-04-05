@@ -12,7 +12,7 @@ internal abstract class Entity : IEntity
 
     public float Pitch { get; set; }
 
-    public bool OnGround { get; set; }
+    public bool Ground { get; set; }
 }
 
 internal static class Track

@@ -10,5 +10,5 @@ public interface IEntity
 
     public float Pitch { get; }
 
-    public bool OnGround { get; }
+    public bool Ground { get; }
 }

@@ -4,6 +4,10 @@ internal sealed class ConfigurationPacket(string locale, byte viewDistance) : II
 {
     public static int Identifier => 21;
 
+    public string Locale => locale;
+
+    public byte ViewDistance => viewDistance;
+
     public static ConfigurationPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
