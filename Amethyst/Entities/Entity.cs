@@ -4,7 +4,7 @@ namespace Amethyst.Entities;
 
 internal abstract class Entity : IEntity
 {
-    public int Identifier { get; } = Interlocked.Increment(ref identifier);
+    public int Identifier { get; } = Track.Next();
 
     public Location Location { get; set; }
 
@@ -13,6 +13,14 @@ internal abstract class Entity : IEntity
     public float Pitch { get; set; }
 
     public bool OnGround { get; set; }
+}
 
-    private static int identifier;
+internal static class Track
+{
+    private static int track;
+
+    public static int Next()
+    {
+        return Interlocked.Increment(ref track);
+    }
 }
