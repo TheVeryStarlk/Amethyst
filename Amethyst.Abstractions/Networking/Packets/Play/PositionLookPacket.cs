@@ -2,11 +2,11 @@
 
 namespace Amethyst.Abstractions.Networking.Packets.Play;
 
-public sealed class PositionLookPacket(Location location, float yaw, float pitch) : IOutgoingPacket
+public sealed class PositionLookPacket(Position position, float yaw, float pitch) : IOutgoingPacket
 {
     public int Identifier => 8;
 
-    public Location Location => location;
+    public Position Position => position;
 
     public float Yaw => yaw;
 

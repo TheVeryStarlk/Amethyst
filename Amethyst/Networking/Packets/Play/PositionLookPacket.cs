@@ -2,11 +2,11 @@
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class PositionLookPacket(Location location, float yaw, float pitch, bool ground) : IIngoingPacket<PositionLookPacket>
+internal sealed class PositionLookPacket(Position position, float yaw, float pitch, bool ground) : IIngoingPacket<PositionLookPacket>
 {
     public static int Identifier => 6;
 
-    public Location Location => location;
+    public Position Position => position;
 
     public float Yaw => yaw;
 
@@ -19,7 +19,7 @@ internal sealed class PositionLookPacket(Location location, float yaw, float pit
         var reader = new SpanReader(span);
 
         return new PositionLookPacket(
-            new Location(
+            new Position(
                 reader.ReadDouble(),
                 reader.ReadDouble(),
                 reader.ReadDouble()),

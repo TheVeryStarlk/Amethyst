@@ -6,7 +6,7 @@ internal abstract class Entity : IEntity
 {
     public int Identifier { get; } = Track.Next();
 
-    public Location Location { get; set; }
+    public Position Position { get; set; }
 
     public float Yaw { get; set; }
 

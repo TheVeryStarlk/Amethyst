@@ -3,9 +3,9 @@ using Amethyst.Abstractions.Entities.Player;
 
 namespace Amethyst.Eventing.Player;
 
-public sealed class Moving(Location location, float yaw, float pitch) : Event<IPlayer>
+public sealed class Moving(Position position, float yaw, float pitch) : Event<IPlayer>
 {
-    public Location Location => location;
+    public Position Position => position;
 
     public float Yaw => yaw;
 

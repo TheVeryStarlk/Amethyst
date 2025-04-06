@@ -21,7 +21,7 @@ internal sealed class LoginProcessor : IProcessor
         client.Write(
             new SuccessPacket(client.Player.Unique, client.Player.Username),
             new JoinGamePacket(client.Player.Identifier, client.Player.GameMode, world.Dimension, world.Difficulty, byte.MaxValue, world.Type, false),
-            new PositionLookPacket(new Location(), 0, 0));
+            new PositionLookPacket(new Position(), 0, 0));
 
         client.State = State.Play;
         client.EventDispatcher.Dispatch(client.Player, new Joined());
