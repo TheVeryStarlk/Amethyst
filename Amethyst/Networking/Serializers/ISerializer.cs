@@ -37,6 +37,7 @@ internal static class OutgoingPacketExtensions
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
             StatusResponsePacket packet => StatusResponseSerializer.Create(packet),
             SuccessPacket packet => SuccessSerializer.Create(packet),
+            TabResponsePacket packet => TabResponseSerializer.Create(packet),
             _ => throw new ArgumentOutOfRangeException(nameof(instance), instance, "Unknown packet.")
         };
     }

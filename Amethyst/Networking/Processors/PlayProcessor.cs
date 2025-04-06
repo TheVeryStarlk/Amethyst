@@ -1,7 +1,10 @@
 ﻿using System.Collections.Frozen;
+using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Eventing.Player;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Packets.Play;
+using MessagePacket = Amethyst.Networking.Packets.Play.MessagePacket;
+using PositionLookPacket = Amethyst.Networking.Packets.Play.PositionLookPacket;
 
 namespace Amethyst.Networking.Processors;
 
@@ -15,6 +18,7 @@ internal sealed class PlayProcessor : IProcessor
         { PositionPacket.Identifier, Position },
         { LookPacket.Identifier, Look },
         { PositionLookPacket.Identifier, PositionLook },
+        { TabRequestPacket.Identifier, TabRequest },
         { ConfigurationPacket.Identifier, Configuration }
     }.ToFrozenDictionary();
 
@@ -64,6 +68,16 @@ internal sealed class PlayProcessor : IProcessor
         client.Player.Yaw = positionLook.Yaw;
         client.Player.Pitch = positionLook.Pitch;
         client.Player.Ground = positionLook.Ground;
+    }
+
+    private static void TabRequest(Client client, Packet packet)
+    {
+        var tab = client.EventDispatcher.Dispatch(client.Player!, new Tab(packet.Create<TabRequestPacket>().Behind));
+
+        // This is not a complete implementation of the tab feature.
+        client.Write(tab.Behind.Contains(' ')
+            ? new TabResponsePacket(tab.Matches)
+            : new TabResponsePacket(tab.Matches.Select(match => $"/{match}").ToArray()));
     }
 
     private static void Configuration(Client client, Packet packet)
