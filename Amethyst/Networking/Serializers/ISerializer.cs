@@ -27,17 +27,22 @@ internal static class OutgoingPacketExtensions
         // I think frozen dictionaries are faster than this.
         return instance switch
         {
-            DisconnectPacket packet => DisconnectSerializer.Create(packet),
-            FailurePacket packet => FailureSerializer.Create(packet),
-            JoinGamePacket packet => JoinGameSerializer.Create(packet),
-            KeepAlivePacket packet => KeepAliveSerializer.Create(packet),
-            MessagePacket packet => MessageSerializer.Create(packet),
+            // Status.
+            StatusResponsePacket packet => StatusResponseSerializer.Create(packet),
             PongPacket packet => PongSerializer.Create(packet),
+
+            // Login.
+            FailurePacket packet => FailureSerializer.Create(packet),
+            SuccessPacket packet => SuccessSerializer.Create(packet),
+
+            // Play.
+            KeepAlivePacket packet => KeepAliveSerializer.Create(packet),
+            JoinGamePacket packet => JoinGameSerializer.Create(packet),
+            MessagePacket packet => MessageSerializer.Create(packet),
             PositionLookPacket packet => PositionLookSerializer.Create(packet),
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
-            StatusResponsePacket packet => StatusResponseSerializer.Create(packet),
-            SuccessPacket packet => SuccessSerializer.Create(packet),
             TabResponsePacket packet => TabResponseSerializer.Create(packet),
+            DisconnectPacket packet => DisconnectSerializer.Create(packet),
             _ => throw new ArgumentOutOfRangeException(nameof(instance), instance, "Unknown packet.")
         };
     }
