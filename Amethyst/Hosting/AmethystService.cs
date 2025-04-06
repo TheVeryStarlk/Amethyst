@@ -9,7 +9,7 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
     {
         try
         {
-            await server.StartAsync().ConfigureAwait(false);
+            await server.StartAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception)
         {
@@ -21,11 +21,5 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
         }
 
         logger.LogInformation("Server stopped");
-    }
-
-    public override Task StopAsync(CancellationToken cancellationToken)
-    {
-        server.Stop();
-        return base.StopAsync(cancellationToken);
     }
 }

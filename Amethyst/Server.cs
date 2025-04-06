@@ -12,21 +12,18 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];
-    private readonly CancellationTokenSource source = new();
 
-    public Task StartAsync()
+    private CancellationTokenSource? source;
+
+    public Task StartAsync(CancellationToken cancellationToken)
     {
+        source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         return Task.WhenAll(ListeningAsync(), TickingAsync());
-    }
-
-    public void Stop()
-    {
-        source.Cancel();
     }
 
     public void Dispose()
     {
-        source.Dispose();
+        source?.Dispose();
     }
 
     private async Task ListeningAsync()
@@ -44,7 +41,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
         {
             try
             {
-                var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
+                var socket = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
                 var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, socket);
 
                 clients[client] = ExecuteAsync(client);
@@ -111,7 +108,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
         {
             try
             {
-                if (!await timer.WaitForNextTickAsync(source.Token).ConfigureAwait(false))
+                if (!await timer.WaitForNextTickAsync(source!.Token).ConfigureAwait(false))
                 {
                     break;
                 }

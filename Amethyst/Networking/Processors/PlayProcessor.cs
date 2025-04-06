@@ -8,7 +8,7 @@ using PositionLookPacket = Amethyst.Networking.Packets.Play.PositionLookPacket;
 
 namespace Amethyst.Networking.Processors;
 
-// This screams refactor me!
+// This screams refactor me! Maybe move some logic to the packet itself.
 internal sealed class PlayProcessor : IProcessor
 {
     private static readonly FrozenDictionary<int, Action<Client, Packet>> Processors = new Dictionary<int, Action<Client, Packet>>
