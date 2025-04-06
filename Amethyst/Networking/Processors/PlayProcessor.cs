@@ -39,7 +39,7 @@ internal sealed class PlayProcessor : IProcessor
     private static void Position(Client client, Packet packet)
     {
         var position = packet.Create<PositionPacket>();
-        client.EventDispatcher.Dispatch(client.Player!, new Moving(position.Position, client.Player!.Yaw, client.Player.Pitch));
+        client.EventDispatcher.Dispatch(client.Player!, new Moved(position.Position, client.Player!.Yaw, client.Player.Pitch));
 
         client.Player.Position = position.Position;
         client.Player.Ground = position.Ground;
@@ -48,7 +48,7 @@ internal sealed class PlayProcessor : IProcessor
     private static void Look(Client client, Packet packet)
     {
         var look = packet.Create<LookPacket>();
-        client.EventDispatcher.Dispatch(client.Player!, new Moving(client.Player!.Position, look.Yaw, look.Pitch));
+        client.EventDispatcher.Dispatch(client.Player!, new Moved(client.Player!.Position, look.Yaw, look.Pitch));
 
         client.Player.Yaw = look.Yaw;
         client.Player.Pitch = look.Pitch;
@@ -58,7 +58,7 @@ internal sealed class PlayProcessor : IProcessor
     private static void PositionLook(Client client, Packet packet)
     {
         var positionLook = packet.Create<PositionLookPacket>();
-        client.EventDispatcher.Dispatch(client.Player!, new Moving(positionLook.Position, positionLook.Yaw, positionLook.Pitch));
+        client.EventDispatcher.Dispatch(client.Player!, new Moved(positionLook.Position, positionLook.Yaw, positionLook.Pitch));
 
         client.Player!.Position = positionLook.Position;
         client.Player.Yaw = positionLook.Yaw;

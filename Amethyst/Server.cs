@@ -11,7 +11,7 @@ namespace Amethyst;
 internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher) : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
-    private readonly ConcurrentDictionary<Client, Task> pairs = [];
+    private readonly ConcurrentDictionary<Client, Task> clients = [];
     private readonly CancellationTokenSource source = new();
 
     public Task StartAsync()
@@ -47,7 +47,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
                 var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
                 var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, socket);
 
-                pairs[client] = ExecuteAsync(client);
+                clients[client] = ExecuteAsync(client);
                 logger.LogDebug("Started client");
             }
             catch (OperationCanceledException)
@@ -63,7 +63,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
         var stopping = eventDispatcher.Dispatch(this, new Stopping());
 
-        foreach (var pair in pairs)
+        foreach (var pair in clients)
         {
             if (pair.Key.Player is { } player)
             {
@@ -75,7 +75,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             }
         }
 
-        await Task.WhenAll(pairs.Select(pair => pair.Value)).TimeoutAfter(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+        await Task.WhenAll(clients.Select(pair => pair.Value)).TimeoutAfter(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
         logger.LogInformation("Stopped listening");
 
@@ -95,7 +95,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
             logger.LogDebug("Stopped client");
 
-            if (!pairs.TryRemove(client, out _))
+            if (!clients.TryRemove(client, out _))
             {
                 logger.LogWarning("Failed to remove client");
             }
