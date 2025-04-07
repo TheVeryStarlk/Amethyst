@@ -22,7 +22,7 @@ internal sealed class AmethystSubscriber : ISubscriber
 
     public void Subscribe(IRegistry registry)
     {
-        registry.For<IClient>(consumer => consumer.On<Login>((source, original) =>
+        registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {
             if (players.ContainsKey(original.Username))
             {

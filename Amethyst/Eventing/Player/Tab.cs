@@ -2,7 +2,7 @@
 
 namespace Amethyst.Eventing.Player;
 
-public sealed class Tab(string behind) : Event<IPlayer>
+public sealed class Tab(string behind) : IEvent<IPlayer>
 {
     public string Behind => behind;
 

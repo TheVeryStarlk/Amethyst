@@ -1,3 +1,3 @@
 ﻿namespace Amethyst.Eventing;
 
-public abstract class Event<T>;
+public interface IEvent<T>;

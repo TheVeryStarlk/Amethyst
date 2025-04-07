@@ -13,10 +13,10 @@ internal sealed class LoginProcessor : IProcessor
 {
     public static void Process(Client client, Packet packet)
     {
-        var login = client.EventDispatcher.Dispatch(client, new Login(packet.Create<StartPacket>().Username));
-        var world = login.World ?? throw new InvalidOperationException("No world was set.");
+        var joining = client.EventDispatcher.Dispatch(client, new Joining(packet.Create<StartPacket>().Username));
+        var world = joining.World ?? throw new InvalidOperationException("No world was set.");
 
-        client.Player = new Player(client, Guid.NewGuid().ToString(), login.GameMode, login.Username, world);
+        client.Player = new Player(client, Guid.NewGuid().ToString(), joining.GameMode, joining.Username, world);
 
         client.Write(
             new SuccessPacket(client.Player.Unique, client.Player.Username),

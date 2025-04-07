@@ -2,4 +2,4 @@
 
 namespace Amethyst.Eventing.Player;
 
-public sealed class Left : Event<IPlayer>;
+public sealed class Left : IEvent<IPlayer>;
