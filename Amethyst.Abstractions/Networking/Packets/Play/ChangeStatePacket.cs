@@ -19,12 +19,12 @@ public interface IValueState : IState
     public float Value { get; }
 }
 
-public sealed class StartRainingState : IState
+public sealed class StopRainingState : IState
 {
     public byte Identifier => 1;
 }
 
-public sealed class StopRainingState : IState
+public sealed class StartRainingState : IState
 {
     public byte Identifier => 2;
 }
@@ -41,7 +41,7 @@ public sealed class EnterCreditsState : IState
     public byte Identifier => 4;
 }
 
-public sealed class DemoState(Demo demo) : IValueState
+public sealed class ShowDemoState(Demo demo) : IValueState
 {
     public byte Identifier => 5;
 
