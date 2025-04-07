@@ -2,7 +2,7 @@
 
 namespace Amethyst.Abstractions.Networking.Packets.Status;
 
-public sealed class StatusResponsePacket(
+internal sealed class StatusResponsePacket(
     string name,
     int numerical,
     int maximum,

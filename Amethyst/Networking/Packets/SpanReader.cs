@@ -5,9 +5,9 @@ namespace Amethyst.Networking.Packets;
 
 internal ref struct SpanReader(ReadOnlySpan<byte> span)
 {
-    private int position;
-
     private readonly ReadOnlySpan<byte> span = span;
+
+    private int position;
 
     public byte ReadByte()
     {

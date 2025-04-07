@@ -2,9 +2,9 @@
 
 internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 {
-    public string Username => username;
-
     public static int Identifier => 0;
+
+    public string Username => username;
 
     public static StartPacket Create(ReadOnlySpan<byte> span)
     {

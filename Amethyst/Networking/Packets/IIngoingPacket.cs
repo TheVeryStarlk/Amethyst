@@ -13,6 +13,7 @@ internal readonly struct Packet(int identifier, ReadOnlySequence<byte> sequence)
 {
     public int Identifier => identifier;
 
+    // Create an object pool for this.
     public T Create<T>() where T : IIngoingPacket<T>
     {
         if (T.Identifier != identifier)

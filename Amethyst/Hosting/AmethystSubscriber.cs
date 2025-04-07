@@ -16,7 +16,7 @@ internal sealed class AmethystSubscriber : ISubscriber
 {
     private readonly Dictionary<string, IPlayer> players = [];
     private readonly Dictionary<string, HashSet<long>> chunks = [];
-    private readonly FailurePacket failure = new(Message.Simple("Already logged in!"));
+    private readonly FailurePacket failure = new(Message.Simple("Bad username!"));
 
     private DateTime last;
 

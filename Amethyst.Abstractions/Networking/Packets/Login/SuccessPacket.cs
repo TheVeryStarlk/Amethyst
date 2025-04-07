@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Abstractions.Networking.Packets.Login;
 
-public sealed class SuccessPacket(string unique, string username) : IOutgoingPacket
+internal sealed class SuccessPacket(string unique, string username) : IOutgoingPacket
 {
     public int Identifier => 2;
 

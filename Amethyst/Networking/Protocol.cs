@@ -31,6 +31,7 @@ internal static class Protocol
         return true;
     }
 
+    // Both packets and serializers should be object pooled.
     public static int Write(Span<byte> span, IOutgoingPacket packet, ISerializer serializer)
     {
         var identifier = Variable.GetByteCount(packet.Identifier);

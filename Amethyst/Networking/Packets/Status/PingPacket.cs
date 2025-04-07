@@ -2,9 +2,9 @@
 
 internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>
 {
-    public long Magic => magic;
-
     public static int Identifier => 1;
+
+    public long Magic => magic;
 
     public static PingPacket Create(ReadOnlySpan<byte> span)
     {
