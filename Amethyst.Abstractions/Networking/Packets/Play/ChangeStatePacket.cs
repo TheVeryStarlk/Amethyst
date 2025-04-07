@@ -19,29 +19,29 @@ public interface IValueState : IState
     public float Value { get; }
 }
 
-public sealed class StopRainingState : IState
+public readonly struct StopRainingState : IState
 {
     public byte Identifier => 1;
 }
 
-public sealed class StartRainingState : IState
+public readonly struct StartRainingState : IState
 {
     public byte Identifier => 2;
 }
 
-public sealed class GameModeState(GameMode gameMode) : IValueState
+public readonly struct GameModeState(GameMode gameMode) : IValueState
 {
     public byte Identifier => 3;
 
     public float Value => (byte) gameMode;
 }
 
-public sealed class EnterCreditsState : IState
+public readonly struct EnterCreditsState : IState
 {
     public byte Identifier => 4;
 }
 
-public sealed class ShowDemoState(Demo demo) : IValueState
+public readonly struct ShowDemoState(Demo demo) : IValueState
 {
     public byte Identifier => 5;
 
