@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabRequestPacket>
+internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabRequestPacket>, IProcessor
 {
     public static int Identifier => 20;
 
@@ -10,5 +10,9 @@ internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabReques
     {
         var reader = new SpanReader(span);
         return new TabRequestPacket(reader.ReadVariableString());
+    }
+
+    public void Process(Client client)
+    {
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class PositionLookPacket(Position position, float yaw, float pitch, bool ground) : IIngoingPacket<PositionLookPacket>
+internal sealed class PositionLookPacket(Position position, float yaw, float pitch, bool ground) : IIngoingPacket<PositionLookPacket>, IProcessor
 {
     public static int Identifier => 6;
 
@@ -26,5 +26,9 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
             reader.ReadFloat(),
             reader.ReadFloat(),
             reader.ReadBoolean());
+    }
+
+    public void Process(Client client)
+    {
     }
 }

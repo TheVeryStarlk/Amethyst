@@ -1,6 +1,8 @@
-﻿namespace Amethyst.Networking.Packets.Status;
+﻿using Amethyst.Abstractions.Networking.Packets.Status;
 
-internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>
+namespace Amethyst.Networking.Packets.Status;
+
+internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>, IProcessor
 {
     public static int Identifier => 1;
 
@@ -10,5 +12,11 @@ internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>
     {
         var reader = new SpanReader(span);
         return new PingPacket(reader.ReadLong());
+    }
+
+    public void Process(Client client)
+    {
+        client.Write(new PongPacket(magic));
+        client.Stop();
     }
 }

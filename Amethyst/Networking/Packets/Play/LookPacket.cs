@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoingPacket<LookPacket>
+internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoingPacket<LookPacket>, IProcessor
 {
     public static int Identifier => 5;
 
@@ -14,5 +14,9 @@ internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoing
     {
         var reader = new SpanReader(span);
         return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
+    }
+
+    public void Process(Client client)
+    {
     }
 }

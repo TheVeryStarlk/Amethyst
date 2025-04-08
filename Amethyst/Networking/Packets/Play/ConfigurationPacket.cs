@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class ConfigurationPacket(string locale, byte viewDistance) : IIngoingPacket<ConfigurationPacket>
+internal sealed class ConfigurationPacket(string locale, byte viewDistance) : IIngoingPacket<ConfigurationPacket>, IProcessor
 {
     public static int Identifier => 21;
 
@@ -12,5 +12,9 @@ internal sealed class ConfigurationPacket(string locale, byte viewDistance) : II
     {
         var reader = new SpanReader(span);
         return new ConfigurationPacket(reader.ReadVariableString(), reader.ReadByte());
+    }
+
+    public void Process(Client client)
+    {
     }
 }

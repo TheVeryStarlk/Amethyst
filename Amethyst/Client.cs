@@ -7,7 +7,6 @@ using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets;
-using Amethyst.Networking.Processors;
 using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
@@ -82,17 +81,7 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
 
                 if (Protocol.TryRead(ref sequence, out var packet))
                 {
-                    Action<Client, Packet> action = State switch
-                    {
-                        State.Handshake => HandshakeProcessor.Process,
-                        State.Status => StatusProcessor.Process,
-                        State.Login => LoginProcessor.Process,
-                        State.Play => PlayProcessor.Process,
-                        _ => throw new ArgumentOutOfRangeException()
-                    };
-
-                    action(this, packet);
-
+                    packet.Create(State).Process(this);
                     examined = consumed = sequence.Start;
                 }
 

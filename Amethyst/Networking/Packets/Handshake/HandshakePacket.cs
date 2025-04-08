@@ -1,6 +1,9 @@
-﻿namespace Amethyst.Networking.Packets.Handshake;
+﻿using Amethyst.Abstractions.Networking.Packets.Login;
+using Amethyst.Eventing.Client;
 
-internal sealed class HandshakePacket(int version, string address, ushort port, int state) : IIngoingPacket<HandshakePacket>
+namespace Amethyst.Networking.Packets.Handshake;
+
+internal sealed class HandshakePacket(int version, string address, ushort port, State state) : IIngoingPacket<HandshakePacket>, IProcessor
 {
     public static int Identifier => 0;
 
@@ -10,7 +13,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
 
     public ushort Port => port;
 
-    public int State => state;
+    public State State => state;
 
     public static HandshakePacket Create(ReadOnlySpan<byte> span)
     {
@@ -20,6 +23,28 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             reader.ReadVariableInteger(),
             reader.ReadVariableString(),
             reader.ReadUnsignedShort(),
-            reader.ReadVariableInteger());
+            (State) reader.ReadVariableInteger());
+    }
+
+    public void Process(Client client)
+    {
+        if (state is not (State.Status or State.Login))
+        {
+            // Invalid state.
+            client.Stop();
+        }
+
+        client.State = State;
+
+        // The supported protocol version.
+        if (state is State.Status || version is 47)
+        {
+            return;
+        }
+
+        var outdated = client.EventDispatcher.Dispatch(client, new Outdated());
+
+        client.Write(new FailurePacket(outdated.Message));
+        client.Stop();
     }
 }

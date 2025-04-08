@@ -2,7 +2,7 @@
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class PositionPacket(Position position, bool ground) : IIngoingPacket<PositionPacket>
+internal sealed class PositionPacket(Position position, bool ground) : IIngoingPacket<PositionPacket>, IProcessor
 {
     public static int Identifier => 4;
 
@@ -20,5 +20,9 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
                 reader.ReadDouble(),
                 reader.ReadDouble()),
             reader.ReadBoolean());
+    }
+
+    public void Process(Client client)
+    {
     }
 }
