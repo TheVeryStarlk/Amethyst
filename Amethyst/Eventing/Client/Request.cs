@@ -3,8 +3,7 @@ using Amethyst.Abstractions.Messages;
 
 namespace Amethyst.Eventing.Client;
 
-// Find a better name.
-public sealed class StatusRequest : IEvent<IClient>
+public sealed class Request : IEvent<IClient>
 {
     public string Name { get; set; } = "Amethyst";
 

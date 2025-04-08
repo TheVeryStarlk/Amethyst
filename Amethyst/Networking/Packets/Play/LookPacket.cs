@@ -1,14 +1,10 @@
-﻿namespace Amethyst.Networking.Packets.Play;
+﻿using Amethyst.Eventing.Player;
+
+namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoingPacket<LookPacket>, IProcessor
 {
     public static int Identifier => 5;
-
-    public float Yaw => yaw;
-
-    public float Pitch => pitch;
-
-    public bool Ground => ground;
 
     public static LookPacket Create(ReadOnlySpan<byte> span)
     {
@@ -18,5 +14,10 @@ internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoing
 
     public void Process(Client client)
     {
+        client.EventDispatcher.Dispatch(client.Player!, new Moved(client.Player!.Position, yaw, pitch));
+
+        client.Player.Yaw = yaw;
+        client.Player.Pitch = pitch;
+        client.Player.Ground = ground;
     }
 }
