@@ -7,14 +7,6 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
 {
     public static int Identifier => 0;
 
-    public int Version => version;
-
-    public string Address => address;
-
-    public ushort Port => port;
-
-    public State State => state;
-
     public static HandshakePacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
@@ -34,7 +26,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             client.Stop();
         }
 
-        client.State = State;
+        client.State = state;
 
         // The supported protocol version.
         if (state is State.Status || version is 47)

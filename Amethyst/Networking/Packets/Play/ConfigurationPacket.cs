@@ -1,12 +1,10 @@
-﻿namespace Amethyst.Networking.Packets.Play;
+﻿using Amethyst.Eventing.Player;
+
+namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class ConfigurationPacket(string locale, byte viewDistance) : IIngoingPacket<ConfigurationPacket>, IProcessor
 {
     public static int Identifier => 21;
-
-    public string Locale => locale;
-
-    public byte ViewDistance => viewDistance;
 
     public static ConfigurationPacket Create(ReadOnlySpan<byte> span)
     {
@@ -16,5 +14,9 @@ internal sealed class ConfigurationPacket(string locale, byte viewDistance) : II
 
     public void Process(Client client)
     {
+        var configuration = client.EventDispatcher.Dispatch(client.Player!, new Configuration(locale, viewDistance));
+
+        client.Player!.Locale = configuration.Locale;
+        client.Player.ViewDistance = configuration.ViewDistance;
     }
 }

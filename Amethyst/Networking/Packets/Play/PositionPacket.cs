@@ -1,14 +1,11 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class PositionPacket(Position position, bool ground) : IIngoingPacket<PositionPacket>, IProcessor
 {
     public static int Identifier => 4;
-
-    public Position Position => position;
-
-    public bool Ground => ground;
 
     public static PositionPacket Create(ReadOnlySpan<byte> span)
     {
@@ -24,5 +21,9 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
 
     public void Process(Client client)
     {
+        client.EventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
+
+        client.Player.Position = position;
+        client.Player.Ground = ground;
     }
 }

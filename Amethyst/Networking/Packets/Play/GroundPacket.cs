@@ -4,8 +4,6 @@ internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, I
 {
     public static int Identifier => 3;
 
-    public bool Value => value;
-
     public static GroundPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
@@ -14,5 +12,6 @@ internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, I
 
     public void Process(Client client)
     {
+        client.Player!.Ground = value;
     }
 }
