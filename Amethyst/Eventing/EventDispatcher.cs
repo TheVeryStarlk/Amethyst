@@ -7,7 +7,8 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
 {
     private readonly FrozenDictionary<Type, FrozenSet<Delegate>> events = Registry.Create(subscribers);
 
-    public TEvent Dispatch<T, TEvent>(T source, TEvent original)
+    // Could use some better constraints.
+    public TEvent Dispatch<TSource, TEvent>(TSource source, TEvent original)
     {
         if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
@@ -17,7 +18,7 @@ internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerab
         // Maybe catch exceptions inside the loop?
         try
         {
-            foreach (var callback in callbacks.Cast<Action<T, TEvent>>())
+            foreach (var callback in callbacks.Cast<Action<TSource, TEvent>>())
             {
                 callback(source, original);
             }

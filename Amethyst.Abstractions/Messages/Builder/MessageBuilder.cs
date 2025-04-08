@@ -3,7 +3,6 @@
 // An unnecessarily overengineered message builder.
 public sealed class MessageBuilder
 {
-    // Arbitrary length.
     private readonly List<Message> extra = [];
 
     internal MessageBuilder()

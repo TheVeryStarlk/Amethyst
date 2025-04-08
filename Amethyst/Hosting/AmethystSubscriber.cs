@@ -85,7 +85,10 @@ internal sealed class AmethystSubscriber : ISubscriber
 
                     value.Decode(out var x, out var z);
 
-                    var result = source.World[x, z].Build();
+                    var chunk = source.World[x, z];
+                    source.World.Generator.Generate(source.World, chunk, x, z);
+
+                    var result = chunk.Build();
                     source.Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
                 }
             });
@@ -96,7 +99,6 @@ internal sealed class AmethystSubscriber : ISubscriber
         {
             var now = DateTime.Now;
 
-            // Make keep alive interval be configurable?
             if (now - last < TimeSpan.FromSeconds(5))
             {
                 return;

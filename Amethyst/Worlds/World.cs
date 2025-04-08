@@ -34,11 +34,7 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
             }
 
             chunk = new Chunk(x, z);
-
             chunks[value] = chunk;
-
-            // Removing this is probably a good idea.
-            Generator.Generate(this, chunk, x, z);
 
             return chunk;
         }
