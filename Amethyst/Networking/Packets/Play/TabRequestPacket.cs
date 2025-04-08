@@ -1,8 +1,10 @@
 ﻿namespace Amethyst.Networking.Packets.Play;
 
-internal sealed record TabRequestPacket(string Behind) : IIngoingPacket<TabRequestPacket>
+internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabRequestPacket>
 {
     public static int Identifier => 20;
+
+    public string Behind => behind;
 
     public static TabRequestPacket Create(ReadOnlySpan<byte> span)
     {
