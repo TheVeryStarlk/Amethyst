@@ -10,6 +10,16 @@ internal interface IProcessor
     public void Process(Client client);
 }
 
+internal sealed class EmptyProcessor : IProcessor
+{
+    public static EmptyProcessor Instance { get; } = new();
+
+    public void Process(Client client)
+    {
+        // Will remove this later.
+    }
+}
+
 internal static class PacketExtensions
 {
     public static IProcessor Create(this Packet packet, State state)
@@ -49,7 +59,7 @@ internal static class PacketExtensions
                 _ when PositionLookPacket.Identifier == packet.Identifier => packet.Create<PositionLookPacket>(),
                 _ when TabRequestPacket.Identifier == packet.Identifier => packet.Create<TabRequestPacket>(),
                 _ when ConfigurationPacket.Identifier == packet.Identifier => packet.Create<ConfigurationPacket>(),
-                _ => throw new ArgumentOutOfRangeException(nameof(packet.Identifier))
+                _ => EmptyProcessor.Instance
             },
             _ => throw new ArgumentOutOfRangeException(nameof(state))
         };
