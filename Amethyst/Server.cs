@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher) : IServer, IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, EventDispatching eventDispatching) : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];
@@ -28,7 +28,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
     private async Task ListeningAsync()
     {
-        var starting = eventDispatcher.Dispatch(this, new Starting());
+        var starting = eventDispatching.Dispatch(this, new Starting());
 
         using var listener = new Socket(starting.EndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -42,7 +42,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             try
             {
                 var socket = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
-                var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, socket);
+                var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatching, socket);
 
                 clients[client] = ExecuteAsync(client);
                 logger.LogDebug("Started client");
@@ -58,7 +58,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             }
         }
 
-        var stopping = eventDispatcher.Dispatch(this, new Stopping());
+        var stopping = eventDispatching.Dispatch(this, new Stopping());
 
         foreach (var pair in clients)
         {
@@ -87,7 +87,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
             if (client.Player is { } player)
             {
-                eventDispatcher.Dispatch(player, new Left());
+                eventDispatching.Dispatch(player, new Left());
             }
 
             logger.LogDebug("Stopped client");
@@ -113,7 +113,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
                     break;
                 }
 
-                eventDispatcher.Dispatch(this, tick);
+                eventDispatching.Dispatch(this, tick);
             }
             catch (OperationCanceledException)
             {

@@ -20,9 +20,9 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
             reader.ReadBoolean());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, EventDispatching eventDispatching)
     {
-        eventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
+        eventDispatching.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
 
         client.Player.Position = position;
         client.Player.Ground = ground;

@@ -18,9 +18,9 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         return new StartPacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, EventDispatching eventDispatching)
     {
-        var joining = eventDispatcher.Dispatch(client, new Joining(username));
+        var joining = eventDispatching.Dispatch(client, new Joining(username));
         var world = joining.World ?? throw new InvalidOperationException("No world was set.");
 
         client.Player = new Player(client, Guid.NewGuid().ToString(), joining.GameMode, joining.Username, world);
@@ -31,6 +31,6 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
             new PositionLookPacket(new Position(), 0, 0));
 
         client.State = State.Play;
-        eventDispatcher.Dispatch(client.Player, new Joined());
+        eventDispatching.Dispatch(client.Player, new Joined());
     }
 }

@@ -22,9 +22,9 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
             reader.ReadBoolean());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, EventDispatching eventDispatching)
     {
-        eventDispatcher.Dispatch(client.Player!, new Moved(position, yaw, pitch));
+        eventDispatching.Dispatch(client.Player!, new Moved(position, yaw, pitch));
 
         client.Player!.Position = position;
         client.Player.Yaw = yaw;
