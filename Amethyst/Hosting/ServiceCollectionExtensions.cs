@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
+using Amethyst.Hosting.Subscribing;
 using Amethyst.Worlds;
 using Microsoft.Extensions.DependencyInjection;
 
