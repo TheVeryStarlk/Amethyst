@@ -13,9 +13,9 @@ internal sealed class ConfigurationPacket(string locale, byte viewDistance) : II
         return new ConfigurationPacket(reader.ReadVariableString(), reader.ReadByte());
     }
 
-    public void Process(Client client, EventDispatching eventDispatching)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var configuration = eventDispatching.Dispatch(client.Player!, new Configuration(locale, viewDistance));
+        var configuration = eventDispatcher.Dispatch(client.Player!, new Configuration(locale, viewDistance));
 
         client.Player!.Locale = configuration.Locale;
         client.Player.ViewDistance = configuration.ViewDistance;

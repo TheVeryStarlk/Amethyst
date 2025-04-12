@@ -13,12 +13,9 @@ internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoing
         return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
     }
 
-    public void Process(Client client, EventDispatching eventDispatching)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        eventDispatching.Dispatch(client.Player!, new Moved(client.Player!.Position, yaw, pitch));
-
-        client.Player.Yaw = yaw;
-        client.Player.Pitch = pitch;
-        client.Player.Ground = ground;
+        eventDispatcher.Dispatch(client.Player!, new Moved(client.Player!.Position, yaw, pitch));
+        client.Player.Synchronize(client.Player.Position, yaw, pitch, ground);
     }
 }

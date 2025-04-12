@@ -19,7 +19,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             (State) reader.ReadVariableInteger());
     }
 
-    public void Process(Client client, EventDispatching eventDispatching)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
         if (state is not (State.Status or State.Login))
         {
@@ -35,7 +35,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             return;
         }
 
-        var outdated = eventDispatching.Dispatch(client, new Outdated());
+        var outdated = eventDispatcher.Dispatch(client, new Outdated());
 
         client.Write(new FailurePacket(outdated.Message));
         client.Stop();

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, EventDispatching eventDispatching, Socket socket) : IClient, IDisposable
+internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispatcher, Socket socket) : IClient, IDisposable
 {
     public Player? Player { get; set; }
 
@@ -79,7 +79,7 @@ internal sealed class Client(ILogger<Client> logger, EventDispatching eventDispa
 
                 if (Protocol.TryRead(ref sequence, out var packet))
                 {
-                    packet.Create(State).Process(this, eventDispatching);
+                    packet.Create(State).Process(this, eventDispatcher);
                     examined = consumed = sequence.Start;
                 }
 

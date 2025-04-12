@@ -14,9 +14,9 @@ internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabReques
         return new TabRequestPacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client, EventDispatching eventDispatching)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var tab = eventDispatching.Dispatch(client.Player!, new Tab(behind));
+        var tab = eventDispatcher.Dispatch(client.Player!, new Tab(behind));
 
         // This is not a complete implementation of the tab feature.
         client.Write(tab.Behind.Contains(' ')

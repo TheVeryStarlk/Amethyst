@@ -12,8 +12,8 @@ internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, I
         return new GroundPacket(reader.ReadBoolean());
     }
 
-    public void Process(Client client, EventDispatching eventDispatching)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.Player!.Ground = value;
+        client.Player!.Synchronize(client.Player.Position, client.Player.Yaw, client.Player.Pitch, value);
     }
 }

@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISubscriber, AmethystSubscriber>();
         services.AddTransient<ISubscriber, T>();
 
-        services.AddSingleton<EventDispatching>();
+        services.AddSingleton<EventDispatcher>();
         services.AddSingleton<IWorldFactory, WorldFactory>();
 
         services.AddTransient<Server>();

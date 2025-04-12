@@ -13,8 +13,8 @@ internal sealed class MessagePacket(string message) : IIngoingPacket<MessagePack
         return new MessagePacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client, EventDispatching eventDispatching)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        eventDispatching.Dispatch(client.Player!, new Sent(message));
+        eventDispatcher.Dispatch(client.Player!, new Sent(message));
     }
 }
