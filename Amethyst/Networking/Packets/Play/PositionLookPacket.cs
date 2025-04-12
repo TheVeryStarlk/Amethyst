@@ -1,4 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
@@ -21,9 +22,9 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
             reader.ReadBoolean());
     }
 
-    public void Process(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.EventDispatcher.Dispatch(client.Player!, new Moved(position, yaw, pitch));
+        eventDispatcher.Dispatch(client.Player!, new Moved(position, yaw, pitch));
 
         client.Player!.Position = position;
         client.Player.Yaw = yaw;

@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Networking.Packets.Play;
+﻿using Amethyst.Eventing;
+
+namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, IProcessor
 {
@@ -10,7 +12,7 @@ internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, I
         return new GroundPacket(reader.ReadBoolean());
     }
 
-    public void Process(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
         client.Player!.Ground = value;
     }

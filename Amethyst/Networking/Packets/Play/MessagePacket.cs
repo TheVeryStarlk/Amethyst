@@ -1,4 +1,5 @@
-﻿using Amethyst.Eventing.Player;
+﻿using Amethyst.Eventing;
+using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -12,8 +13,8 @@ internal sealed class MessagePacket(string message) : IIngoingPacket<MessagePack
         return new MessagePacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.EventDispatcher.Dispatch(client.Player!, new Sent(message));
+        eventDispatcher.Dispatch(client.Player!, new Sent(message));
     }
 }

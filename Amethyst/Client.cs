@@ -14,8 +14,6 @@ namespace Amethyst;
 
 internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispatcher, Socket socket) : IClient, IDisposable
 {
-    public EventDispatcher EventDispatcher => eventDispatcher;
-
     public Player? Player { get; set; }
 
     public State State { get; set; }
@@ -81,7 +79,7 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
 
                 if (Protocol.TryRead(ref sequence, out var packet))
                 {
-                    packet.Create(State).Process(this);
+                    packet.Create(State).Process(this, eventDispatcher);
                     examined = consumed = sequence.Start;
                 }
 

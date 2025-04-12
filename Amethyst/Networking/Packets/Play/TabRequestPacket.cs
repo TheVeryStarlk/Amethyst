@@ -1,4 +1,5 @@
 ﻿using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
@@ -13,9 +14,9 @@ internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabReques
         return new TabRequestPacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var tab = client.EventDispatcher.Dispatch(client.Player!, new Tab(behind));
+        var tab = eventDispatcher.Dispatch(client.Player!, new Tab(behind));
 
         // This is not a complete implementation of the tab feature.
         client.Write(tab.Behind.Contains(' ')

@@ -1,4 +1,5 @@
-﻿using Amethyst.Networking.Packets.Handshake;
+﻿using Amethyst.Eventing;
+using Amethyst.Networking.Packets.Handshake;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Play;
 using Amethyst.Networking.Packets.Status;
@@ -7,14 +8,14 @@ namespace Amethyst.Networking.Packets;
 
 internal interface IProcessor
 {
-    public void Process(Client client);
+    public void Process(Client client, EventDispatcher eventDispatcher);
 }
 
 internal sealed class EmptyProcessor : IProcessor
 {
     public static EmptyProcessor Instance { get; } = new();
 
-    public void Process(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
         // Will remove this later.
     }

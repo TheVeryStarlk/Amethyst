@@ -1,4 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
@@ -19,9 +20,9 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
             reader.ReadBoolean());
     }
 
-    public void Process(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.EventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
+        eventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
 
         client.Player.Position = position;
         client.Player.Ground = ground;
