@@ -2,7 +2,6 @@
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
-using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Worlds;
@@ -78,16 +77,5 @@ internal sealed class Player(IClient client, string unique, GameMode gameMode, s
             var result = chunk.Build();
             Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
         }
-    }
-
-    public void Send(Message message, MessagePosition position = MessagePosition.Box)
-    {
-        Client.Write(new MessagePacket(message, position));
-    }
-
-    public void Disconnect(Message message)
-    {
-        Client.Write(new DisconnectPacket(message));
-        Client.Stop();
     }
 }

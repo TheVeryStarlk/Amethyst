@@ -1,6 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
 using Amethyst.Abstractions;
+using Amethyst.Abstractions.Networking.Packets;
+using Amethyst.Abstractions.Networking.Packets.Login;
+using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
@@ -62,14 +65,15 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
         foreach (var pair in clients)
         {
-            if (pair.Key.Player is { } player)
+            IOutgoingPacket packet = pair.Key.State switch
             {
-                player.Disconnect(stopping.Message);
-            }
-            else
-            {
-                pair.Key.Stop();
-            }
+                State.Handshake or State.Status or State.Login => new FailurePacket(stopping.Message),
+                State.Play => new DisconnectPacket(stopping.Message),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            pair.Key.Write(packet);
+            pair.Key.Stop();
         }
 
         await Task.WhenAll(clients.Select(pair => pair.Value)).TimeoutAfter(TimeSpan.FromSeconds(5)).ConfigureAwait(false);

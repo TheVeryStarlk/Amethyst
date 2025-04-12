@@ -1,5 +1,4 @@
-﻿using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Worlds;
+﻿using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Abstractions.Entities.Player;
 
@@ -18,8 +17,4 @@ public interface IPlayer : IEntity
     public string? Locale { get; }
 
     public byte ViewDistance { get; }
-
-    public void Send(Message message, MessagePosition position = MessagePosition.Box);
-
-    public void Disconnect(Message message);
 }
