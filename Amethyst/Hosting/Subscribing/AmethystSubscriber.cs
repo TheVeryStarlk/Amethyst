@@ -3,6 +3,7 @@ using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities;
 using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;
@@ -30,6 +31,14 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
         {
             consumer.On<Joined>((source, _) => playerRepository.Add(source));
             consumer.On<Left>((source, _) => playerRepository.Remove(source));
+
+            consumer.On<Dig>((source, original) =>
+            {
+                foreach (var pair in playerRepository.Players.Where(pair => pair.Value.World == source.World))
+                {
+                    pair.Value.Client.Write(new BlockPacket(original.Position, Blocks.Air));
+                }
+            });
         });
 
         // How about removing the idea of ticking?
