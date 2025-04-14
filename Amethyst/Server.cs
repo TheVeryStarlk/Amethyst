@@ -6,6 +6,7 @@ using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Abstractions.Worlds;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
@@ -14,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher, WorldFactory worldFactory, IPlayerRepository playerRepository) : IServer, IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher, WorldFactory worldFactory, PlayerRepository playerRepository) : IServer, IDisposable
 {
     public IWorldFactory WorldFactory => worldFactory;
 

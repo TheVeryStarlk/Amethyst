@@ -71,10 +71,7 @@ internal sealed class Player(IClient client, string unique, GameMode gameMode, s
 
             value.Decode(out var x, out var z);
 
-            var chunk = World[x, z];
-            World.Generator.Generate(World, chunk, x, z);
-
-            var result = chunk.Build();
+            var result = World[x, z].Build();
             Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
         }
     }

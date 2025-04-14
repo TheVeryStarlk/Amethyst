@@ -25,7 +25,7 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.Player!.World[(int) position.X, (int) position.Z, (int) position.Y] = Blocks.Air;
+        client.Player!.World[(int) position.X, (int) position.Y, (int) position.Z] = Blocks.Air;
         eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
     }
 }
