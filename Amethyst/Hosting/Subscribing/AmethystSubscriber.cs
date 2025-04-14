@@ -3,17 +3,15 @@ using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Entities;
 using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
 
 namespace Amethyst.Hosting.Subscribing;
 
-internal sealed class AmethystSubscriber : ISubscriber
+internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : ISubscriber
 {
-    // Turn this into an injectable player repository class.
-    private readonly Dictionary<string, IPlayer> players = [];
-
     private readonly FailurePacket failure = new(Message.Simple("Bad username!"));
 
     private DateTime last;
@@ -22,7 +20,7 @@ internal sealed class AmethystSubscriber : ISubscriber
     {
         registry.For<IClient>(consumer => consumer.On<Joining>((source, original) =>
         {
-            if (players.ContainsKey(original.Username))
+            if (playerRepository.Players.ContainsKey(original.Username))
             {
                 source.Write(failure);
             }
@@ -30,8 +28,8 @@ internal sealed class AmethystSubscriber : ISubscriber
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _) => players[source.Username] = source);
-            consumer.On<Left>((source, _) => players.Remove(source.Username));
+            consumer.On<Joined>((source, _) => playerRepository.Add(source));
+            consumer.On<Left>((source, _) => playerRepository.Remove(source));
         });
 
         // How about removing the idea of ticking?
@@ -48,7 +46,7 @@ internal sealed class AmethystSubscriber : ISubscriber
 
             var alive = new KeepAlivePacket((int) now.Ticks);
 
-            foreach (var pair in players)
+            foreach (var pair in playerRepository.Players)
             {
                 pair.Value.Client.Write(alive);
             }

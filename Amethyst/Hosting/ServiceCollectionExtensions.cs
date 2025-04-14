@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Amethyst.Abstractions.Worlds;
+using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Hosting.Subscribing;
 using Amethyst.Worlds;
@@ -15,7 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISubscriber, T>();
 
         services.AddSingleton<EventDispatcher>();
-        services.AddSingleton<IWorldFactory, WorldFactory>();
+        services.AddSingleton<WorldFactory>();
+        services.AddSingleton<PlayerRepository>();
 
         services.AddTransient<Server>();
 

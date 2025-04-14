@@ -1,3 +1,11 @@
-﻿namespace Amethyst.Abstractions;
+﻿using Amethyst.Abstractions.Entities.Player;
+using Amethyst.Abstractions.Worlds;
 
-public interface IServer;
+namespace Amethyst.Abstractions;
+
+public interface IServer
+{
+    public IWorldFactory WorldFactory { get; }
+
+    public IPlayerRepository PlayerRepository { get; }
+}
