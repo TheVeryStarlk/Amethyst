@@ -61,6 +61,7 @@ internal static class PacketExtensions
                 _ when DiggingPacket.Identifier == packet.Identifier => packet.Create<DiggingPacket>(),
                 _ when TabRequestPacket.Identifier == packet.Identifier => packet.Create<TabRequestPacket>(),
                 _ when ConfigurationPacket.Identifier == packet.Identifier => packet.Create<ConfigurationPacket>(),
+                _ when StatusPacket.Identifier == packet.Identifier => packet.Create<StatusPacket>(),
                 _ => EmptyProcessor.Instance
             },
             _ => throw new ArgumentOutOfRangeException(nameof(state))
