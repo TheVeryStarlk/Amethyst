@@ -1,12 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
 using Amethyst.Abstractions;
-using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Abstractions.Worlds;
-using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
@@ -15,11 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher, WorldFactory worldFactory, PlayerRepository playerRepository) : IServer, IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher, WorldFactory worldFactory) : IServer, IDisposable
 {
     public IWorldFactory WorldFactory => worldFactory;
-
-    public IPlayerRepository PlayerRepository => playerRepository;
 
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];

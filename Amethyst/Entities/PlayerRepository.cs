@@ -2,7 +2,7 @@
 
 namespace Amethyst.Entities;
 
-internal sealed class PlayerRepository : IPlayerRepository
+internal sealed class PlayerRepository
 {
     public IReadOnlyDictionary<string, IPlayer> Players => online;
 

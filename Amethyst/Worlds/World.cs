@@ -1,8 +1,10 @@
-﻿using Amethyst.Abstractions.Worlds;
+﻿using Amethyst.Abstractions.Entities.Player;
+using Amethyst.Abstractions.Worlds;
+using Amethyst.Entities;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
+internal sealed class World(PlayerRepository playerRepository, string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
 {
     public string Name => name;
 
@@ -13,6 +15,8 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
     public Difficulty Difficulty { get; set; } = difficulty;
 
     public IGenerator Generator => generator;
+
+    public IReadOnlyDictionary<string, IPlayer> Players => playerRepository.Players.Where(pair => pair.Value.World == this).ToDictionary();
 
     private readonly Dictionary<long, Chunk> chunks = [];
 

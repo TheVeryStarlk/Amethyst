@@ -1,16 +1,12 @@
 ﻿using Amethyst.Abstractions.Worlds;
+using Amethyst.Entities;
 
 namespace Amethyst.Worlds;
 
-internal sealed class WorldFactory : IWorldFactory
+internal sealed class WorldFactory(PlayerRepository playerRepository) : IWorldFactory
 {
-    public IWorld Create(string name, WorldType type = WorldType.Default, Dimension dimension = Dimension.OverWorld, Difficulty difficulty = Difficulty.Peaceful)
+    public IWorld Create(string name, IGenerator generator, WorldType type = WorldType.Default, Dimension dimension = Dimension.OverWorld, Difficulty difficulty = Difficulty.Peaceful)
     {
-        return new World(name, type, dimension, difficulty, EmptyGenerator.Instance);
-    }
-
-    public IWorld Create(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator)
-    {
-        return new World(name, type, dimension, difficulty, generator);
+        return new World(playerRepository, name, type, dimension, difficulty, generator);
     }
 }
