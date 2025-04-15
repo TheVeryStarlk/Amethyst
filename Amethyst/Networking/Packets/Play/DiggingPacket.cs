@@ -2,7 +2,6 @@
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
-using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -14,9 +13,9 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
     {
         var reader = new SpanReader(span);
 
-        var digging = EnumUtility.Convert<Digging>(reader.ReadByte());
+        var digging = (Digging) reader.ReadByte();
         var position = reader.ReadLong();
-        var face = EnumUtility.Convert<BlockFace>(reader.ReadByte());
+        var face = (BlockFace) reader.ReadByte();
 
         return new DiggingPacket(
             digging,

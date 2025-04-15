@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Utilities;
+﻿namespace Amethyst.Worlds;
 
 internal static class NumericUtility
 {

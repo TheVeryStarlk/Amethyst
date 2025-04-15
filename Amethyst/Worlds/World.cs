@@ -1,7 +1,6 @@
 ﻿using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities;
-using Amethyst.Utilities;
 
 namespace Amethyst.Worlds;
 

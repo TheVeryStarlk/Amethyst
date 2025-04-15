@@ -1,7 +1,6 @@
 ﻿using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
-using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Handshake;
 
@@ -17,7 +16,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             reader.ReadVariableInteger(),
             reader.ReadVariableString(),
             reader.ReadUnsignedShort(),
-            EnumUtility.Convert<State>(reader.ReadVariableInteger()));
+            (State) reader.ReadVariableInteger());
     }
 
     public void Process(Client client, EventDispatcher eventDispatcher)
