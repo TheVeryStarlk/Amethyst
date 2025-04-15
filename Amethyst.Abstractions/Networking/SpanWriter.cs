@@ -1,6 +1,7 @@
 ﻿using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Amethyst.Abstractions.Entities;
 
 namespace Amethyst.Abstractions.Networking;
 
@@ -99,6 +100,12 @@ internal ref struct SpanWriter
         WriteVariableInteger(Encoding.UTF8.GetByteCount(value));
         position += Encoding.UTF8.GetBytes(value, span[position..]);
 
+        return this;
+    }
+
+    public SpanWriter WritePosition(Position value)
+    {
+        WriteLong(((long) value.X & 0x3FFFFFF) << 38 | ((long) value.Y & 0xFFF) << 26 | (long) value.Z & 0x3FFFFFF);
         return this;
     }
 }
