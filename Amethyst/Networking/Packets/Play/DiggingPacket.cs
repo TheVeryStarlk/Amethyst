@@ -12,15 +12,7 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
     public static DiggingPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
-
-        var digging = (Digging) reader.ReadByte();
-        var position = reader.ReadLong();
-        var face = (BlockFace) reader.ReadByte();
-
-        return new DiggingPacket(
-            digging,
-            new Position((int) (position >> 38), (int) (position >> 26) & 0xFFF, (int) (position << 38 >> 38)),
-            face);
+        return new DiggingPacket((Digging) reader.ReadByte(), reader.ReadPosition(), (BlockFace) reader.ReadByte());
     }
 
     public void Process(Client client, EventDispatcher eventDispatcher)

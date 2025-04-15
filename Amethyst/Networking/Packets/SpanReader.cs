@@ -1,5 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
+using Amethyst.Abstractions.Entities;
 
 namespace Amethyst.Networking.Packets;
 
@@ -73,5 +74,11 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
     {
         var length = ReadVariableInteger();
         return Encoding.UTF8.GetString(span[position..(position += length)]);
+    }
+
+    public Position ReadPosition()
+    {
+        var value = ReadLong();
+        return new Position((int) (value >> 38), (int) (value >> 26) & 0xFFF, (int) (value << 38 >> 38));
     }
 }
