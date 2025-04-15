@@ -13,10 +13,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher, WorldFactory worldFactory) : IServer, IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher) : IServer, IDisposable
 {
-    public IWorldFactory WorldFactory => worldFactory;
-
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];
 

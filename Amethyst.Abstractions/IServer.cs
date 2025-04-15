@@ -1,8 +1,3 @@
-﻿using Amethyst.Abstractions.Worlds;
+﻿namespace Amethyst.Abstractions;
 
-namespace Amethyst.Abstractions;
-
-public interface IServer
-{
-    public IWorldFactory WorldFactory { get; }
-}
+public interface IServer;
