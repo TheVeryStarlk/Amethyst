@@ -88,7 +88,7 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
 
         if (type is -1)
         {
-            throw new InvalidOperationException("Empty item.");
+            return new Item(-1, 0, 0);
         }
 
         var amount = ReadByte();

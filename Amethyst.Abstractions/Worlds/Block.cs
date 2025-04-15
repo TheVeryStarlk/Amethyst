@@ -24,5 +24,6 @@ public enum BlockFace
     NegativeZ,
     PositiveZ,
     NegativeX,
-    PositiveX
+    PositiveX,
+    Self = byte.MaxValue
 }

@@ -1,4 +1,6 @@
-﻿namespace Amethyst.Abstractions.Entities;
+﻿using Amethyst.Abstractions.Worlds;
+
+namespace Amethyst.Abstractions.Entities;
 
 public readonly struct Item(short type, byte amount, short durability)
 {
@@ -6,5 +8,6 @@ public readonly struct Item(short type, byte amount, short durability)
 
     public byte Amount => amount;
 
+    /// <remarks>Could be referred as <see cref="Block.Metadata"/>.</remarks>
     public short Durability => durability;
 }

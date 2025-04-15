@@ -36,7 +36,7 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
             {
                 var packet = new BlockPacket(original.Position, Blocks.Air);
 
-                foreach (var pair in playerRepository.Players.Where(pair => pair.Value != source && pair.Value.World == source.World))
+                foreach (var pair in source.World.Players.Where(pair => pair.Value != source))
                 {
                     pair.Value.Client.Write(packet);
                 }

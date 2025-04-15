@@ -1,12 +1,12 @@
 ﻿namespace Amethyst.Abstractions.Entities;
 
-public readonly struct Position(double x, double y, double z)
+public struct Position(double x, double y, double z)
 {
-    public double X => x;
+    public double X { get; set; } = x;
 
-    public double Y => y;
+    public double Y { get; set; } = y;
 
-    public double Z => z;
+    public double Z { get; set; } = z;
 
     public static Position operator -(Position left, Position right)
     {
