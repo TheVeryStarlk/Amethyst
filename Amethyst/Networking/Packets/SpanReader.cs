@@ -81,4 +81,24 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
         var value = ReadLong();
         return new Position((int) (value >> 38), (int) (value >> 26) & 0xFFF, (int) (value << 38 >> 38));
     }
+
+    public Item ReadItem()
+    {
+        var type = ReadShort();
+
+        if (type is -1)
+        {
+            throw new InvalidOperationException("Empty item.");
+        }
+
+        var amount = ReadByte();
+        var durability = ReadShort();
+
+        if (ReadBoolean())
+        {
+            throw new InvalidOperationException("Has NBT.");
+        }
+
+        return new Item(type, amount, durability);
+    }
 }

@@ -59,6 +59,7 @@ internal static class PacketExtensions
                 _ when LookPacket.Identifier == packet.Identifier => packet.Create<LookPacket>(),
                 _ when PositionLookPacket.Identifier == packet.Identifier => packet.Create<PositionLookPacket>(),
                 _ when DiggingPacket.Identifier == packet.Identifier => packet.Create<DiggingPacket>(),
+                _ when PlacementPacket.Identifier == packet.Identifier => packet.Create<PlacementPacket>(),
                 _ when TabRequestPacket.Identifier == packet.Identifier => packet.Create<TabRequestPacket>(),
                 _ when ConfigurationPacket.Identifier == packet.Identifier => packet.Create<ConfigurationPacket>(),
                 _ when StatusPacket.Identifier == packet.Identifier => packet.Create<StatusPacket>(),
