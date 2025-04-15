@@ -16,7 +16,7 @@ internal sealed class HandshakePacket(int version, string address, ushort port, 
             reader.ReadVariableInteger(),
             reader.ReadVariableString(),
             reader.ReadUnsignedShort(),
-            (State) reader.ReadVariableInteger());
+            EnumUtility.Convert<State>(reader.ReadVariableInteger()));
     }
 
     public void Process(Client client, EventDispatcher eventDispatcher)

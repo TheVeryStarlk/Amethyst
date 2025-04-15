@@ -13,9 +13,9 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
     {
         var reader = new SpanReader(span);
 
-        var digging = (Digging) reader.ReadByte();
+        var digging = EnumUtility.Convert<Digging>(reader.ReadByte());
         var position = reader.ReadLong();
-        var face = (BlockFace) reader.ReadByte();
+        var face = EnumUtility.Convert<BlockFace>(reader.ReadByte());
 
         return new DiggingPacket(
             digging,

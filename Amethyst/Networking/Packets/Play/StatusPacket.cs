@@ -9,7 +9,7 @@ internal sealed class StatusPacket(Status status) : IIngoingPacket<StatusPacket>
     public static StatusPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
-        return new StatusPacket((Status) reader.ReadVariableInteger());
+        return new StatusPacket(EnumUtility.Convert<Status>(reader.ReadVariableInteger()));
     }
 
     public void Process(Client client, EventDispatcher eventDispatcher)
