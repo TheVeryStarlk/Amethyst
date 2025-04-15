@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities.Player;
+﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Entities.Player;
 
 namespace Amethyst.Abstractions.Worlds;
 
@@ -15,6 +16,8 @@ public interface IWorld
     public IGenerator Generator { get; }
 
     public IReadOnlyDictionary<string, IPlayer> Players { get; }
+
+    public Block this[Position position] { get; set; }
 
     public Block this[int x, int y, int z] { get; set; }
 

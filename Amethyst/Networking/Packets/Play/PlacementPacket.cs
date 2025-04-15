@@ -35,7 +35,7 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
 
         var block = new Block(item.Type, item.Durability);
 
-        client.Player!.World[(int) where.X, (int) where.Y, (int) where.Z] = block;
+        client.Player!.World[where] = block;
 
         var packet = new BlockPacket(where, block);
 

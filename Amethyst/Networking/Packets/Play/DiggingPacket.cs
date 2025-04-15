@@ -25,7 +25,7 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
             pair.Value.Client.Write(packet);
         }
 
-        client.Player!.World[(int) position.X, (int) position.Y, (int) position.Z] = Blocks.Air;
+        client.Player!.World[position] = Blocks.Air;
         eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
     }
 }

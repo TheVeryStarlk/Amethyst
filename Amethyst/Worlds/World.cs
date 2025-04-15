@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities.Player;
+﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities;
 
@@ -17,6 +18,12 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
     public IGenerator Generator => generator;
 
     public IReadOnlyDictionary<string, IPlayer> Players => playerRepository.Players.Where(pair => pair.Value.World == this).ToDictionary();
+
+    public Block this[Position position]
+    {
+        get => this[(int) position.X, (int) position.Y, (int) position.Z];
+        set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
+    }
 
     private readonly Dictionary<long, Chunk> chunks = [];
 
