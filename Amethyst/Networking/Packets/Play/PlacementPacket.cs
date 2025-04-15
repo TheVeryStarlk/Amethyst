@@ -2,6 +2,7 @@
 using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
+using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -15,10 +16,12 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
         return new PlacementPacket(reader.ReadPosition(), (BlockFace) reader.ReadByte(), reader.ReadItem());
     }
 
+    // This need more work.
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         if (item.Type is -1 || face is BlockFace.Self)
         {
+            eventDispatcher.Dispatch(client.Player, new Use(position, item));
             return;
         }
 
@@ -43,5 +46,7 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
         {
             pair.Value.Client.Write(packet);
         }
+
+        eventDispatcher.Dispatch(client.Player, new Placed(where, block));
     }
 }
