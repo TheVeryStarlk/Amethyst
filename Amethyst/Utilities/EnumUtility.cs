@@ -1,4 +1,4 @@
-﻿namespace Amethyst;
+﻿namespace Amethyst.Utilities;
 
 internal static class EnumUtility
 {

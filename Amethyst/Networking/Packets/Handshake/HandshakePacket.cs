@@ -1,6 +1,7 @@
 ﻿using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
+using Amethyst.Utilities;
 
 namespace Amethyst.Networking.Packets.Handshake;
 

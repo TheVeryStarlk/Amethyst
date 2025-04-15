@@ -2,19 +2,20 @@
 
 namespace Amethyst.Entities;
 
+// Think of a possibly better name.
 internal sealed class PlayerRepository
 {
-    public IReadOnlyDictionary<string, IPlayer> Players => online;
+    public IReadOnlyDictionary<string, IPlayer> Players => players;
 
-    private readonly Dictionary<string, IPlayer> online = [];
+    private readonly Dictionary<string, IPlayer> players = [];
 
     public void Add(IPlayer player)
     {
-        online[player.Username] = player;
+        players[player.Username] = player;
     }
 
     public void Remove(IPlayer player)
     {
-        online.Remove(player.Username);
+        players.Remove(player.Username);
     }
 }
