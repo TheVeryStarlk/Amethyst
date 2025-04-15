@@ -31,16 +31,6 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
         {
             consumer.On<Joined>((source, _) => playerRepository.Add(source));
             consumer.On<Left>((source, _) => playerRepository.Remove(source));
-
-            consumer.On<Dig>((source, original) =>
-            {
-                var packet = new BlockPacket(original.Position, Blocks.Air);
-
-                foreach (var pair in source.World.Players.Where(pair => pair.Value != source))
-                {
-                    pair.Value.Client.Write(packet);
-                }
-            });
         });
 
         // How about removing the idea of ticking?

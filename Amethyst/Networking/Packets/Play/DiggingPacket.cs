@@ -1,4 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Networking.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
@@ -17,6 +18,13 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
+        var packet = new BlockPacket(position, Blocks.Air);
+
+        foreach (var pair in client.Player!.World.Players.Where(pair => pair.Value != client.Player))
+        {
+            pair.Value.Client.Write(packet);
+        }
+
         client.Player!.World[(int) position.X, (int) position.Y, (int) position.Z] = Blocks.Air;
         eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
     }
