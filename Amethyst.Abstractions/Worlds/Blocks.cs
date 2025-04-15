@@ -2,5 +2,5 @@
 
 public static class Blocks
 {
-    public static Block Air { get; } = new(0, 1);
+    public static Block Air { get; } = new(0);
 }

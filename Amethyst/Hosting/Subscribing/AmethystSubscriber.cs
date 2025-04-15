@@ -34,9 +34,11 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
 
             consumer.On<Dig>((source, original) =>
             {
-                foreach (var pair in playerRepository.Players.Where(pair => pair.Value.World == source.World))
+                var packet = new BlockPacket(original.Position, Blocks.Air);
+
+                foreach (var pair in playerRepository.Players.Where(pair => pair.Value != source && pair.Value.World == source.World))
                 {
-                    pair.Value.Client.Write(new BlockPacket(original.Position, Blocks.Air));
+                    pair.Value.Client.Write(packet);
                 }
             });
         });
