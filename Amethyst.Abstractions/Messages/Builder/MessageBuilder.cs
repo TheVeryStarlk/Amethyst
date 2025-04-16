@@ -10,13 +10,13 @@ public sealed class MessageBuilder
         // Not to be used publicly.
     }
 
-    public Coloring Write(string text)
+    public Coloring Write(string text = "")
     {
         extra.Add(Message.Simple(text));
         return new Coloring(this, extra);
     }
 
-    public Coloring WriteLine(string text)
+    public Coloring WriteLine(string text = "")
     {
         extra.Add(Message.Simple(text + "\n"));
         return new Coloring(this, extra);

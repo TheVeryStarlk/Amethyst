@@ -11,13 +11,13 @@ public sealed class Formatting
         this.extra = extra;
     }
 
-    public MessageBuilder Write(string text)
+    public MessageBuilder Write(string text = "")
     {
         extra.Add(Message.Simple(text));
         return parent;
     }
 
-    public MessageBuilder WriteLine(string text)
+    public MessageBuilder WriteLine(string text = "")
     {
         extra.Add(Message.Simple(text + "\n"));
         return parent;

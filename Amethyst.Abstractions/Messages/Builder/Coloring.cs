@@ -11,16 +11,16 @@ public sealed class Coloring
         this.extra = extra;
     }
 
-    public MessageBuilder Write(string text)
+    public Coloring Write(string text = "")
     {
         extra.Add(Message.Simple(text));
-        return parent;
+        return this;
     }
 
-    public MessageBuilder WriteLine(string text)
+    public Coloring WriteLine(string text = "")
     {
         extra.Add(Message.Simple(text + "\n"));
-        return parent;
+        return this;
     }
 
     public Message Build()
