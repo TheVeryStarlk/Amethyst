@@ -4,11 +4,9 @@ using Amethyst.Abstractions;
 using Amethyst.Abstractions.Networking.Packets;
 using Amethyst.Abstractions.Networking.Packets.Login;
 using Amethyst.Abstractions.Networking.Packets.Play;
-using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
-using Amethyst.Worlds;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
