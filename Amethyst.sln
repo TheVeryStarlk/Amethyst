@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Abstractions", "Am
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst", "Amethyst\Amethyst.csproj", "{4807F344-99F4-48C5-9572-58928218D74B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Extensions.Utilities", "Amethyst.Extensions.Utilities\Amethyst.Extensions.Utilities.csproj", "{CFCB540E-0C74-401D-AC95-31DB1833EF6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amethyst.Extensions.General", "Amethyst.Extensions.General\Amethyst.Extensions.General.csproj", "{CFCB540E-0C74-401D-AC95-31DB1833EF6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
