@@ -16,10 +16,10 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
         return new PlacementPacket(reader.ReadPosition(), (BlockFace) reader.ReadByte(), reader.ReadItem());
     }
 
-    // This need more work.
+    // This needs more work.
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        if (item.Type is -1 || face is BlockFace.Self)
+        if (item.Type is -1 or >= 256 || face is BlockFace.Self && position.X is -1 && position.Y is -1 && position.Z is -1)
         {
             eventDispatcher.Dispatch(client.Player, new Use(position, item));
             return;

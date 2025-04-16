@@ -79,7 +79,7 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
     public Position ReadPosition()
     {
         var value = ReadLong();
-        return new Position(value >> 38, value >> 26 & 0xFFF, value << 38 >> 38);
+        return value is -1 ? new Position(-1, -1, -1) : new Position(value >> 38, value >> 26 & 0xFFF, value << 38 >> 38);
     }
 
     public Item ReadItem()
