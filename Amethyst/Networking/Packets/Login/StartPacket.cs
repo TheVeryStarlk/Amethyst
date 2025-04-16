@@ -23,10 +23,10 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         var joining = eventDispatcher.Dispatch(client, new Joining(username));
         var world = joining.World ?? throw new InvalidOperationException("No world was set.");
 
-        client.Player = new Player(client, Guid.NewGuid().ToString(), joining.GameMode, joining.Username, world);
+        client.Player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
 
         client.Write(
-            new SuccessPacket(client.Player.Unique, client.Player.Username),
+            new SuccessPacket(client.Player.Guid.ToString(), client.Player.Username),
             new JoinGamePacket(client.Player.Identifier, client.Player.GameMode, world.Dimension, world.Difficulty, byte.MaxValue, world.Type, false),
             new PositionLookPacket(new Position(), 0, 0));
 

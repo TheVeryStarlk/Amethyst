@@ -8,13 +8,13 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Entities;
 
-internal sealed class Player(IClient client, string unique, GameMode gameMode, string username, IWorld world) : Entity, IPlayer
+internal sealed class Player(IClient client, Guid guid, GameMode gameMode, string username, IWorld world) : Entity, IPlayer
 {
     public IClient Client => client;
 
     public IWorld World { get; set; } = world;
 
-    public string Unique => unique;
+    public Guid Guid => guid;
 
     public GameMode GameMode { get; set; } = gameMode;
 

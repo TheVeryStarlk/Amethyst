@@ -8,7 +8,7 @@ public interface IPlayer : IEntity
 
     public IWorld World { get; }
 
-    public string Unique { get; }
+    public Guid Guid { get; }
 
     public GameMode GameMode { get; }
 
