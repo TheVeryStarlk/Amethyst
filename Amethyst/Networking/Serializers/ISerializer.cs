@@ -48,6 +48,7 @@ internal static class OutgoingPacketExtensions
             ListItemPacket packet => ListItemSerializer.Create(packet),
             TabResponsePacket packet => TabResponseSerializer.Create(packet),
             DisconnectPacket packet => DisconnectSerializer.Create(packet),
+            ListHeaderFooterPacket packet => ListHeaderFooterSerializer.Create(packet),
             _ => throw new ArgumentOutOfRangeException(nameof(instance), instance, "Unknown packet.")
         };
     }
