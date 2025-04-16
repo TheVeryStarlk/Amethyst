@@ -29,8 +29,37 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
 
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Joined>((source, _) => playerRepository.Add(source));
-            consumer.On<Left>((source, _) => playerRepository.Remove(source));
+            consumer.On<Joined>((source, _) =>
+            {
+                playerRepository.Add(source);
+
+                var packet = new ListItemPacket(
+                    new AddPlayerAction(source.Username, source.GameMode, 0, Message.Simple(source.Username)),
+                    source);
+
+                foreach (var pair in playerRepository.Players)
+                {
+                    pair.Value.Client.Write(packet);
+
+                    var other = new ListItemPacket(
+                        new AddPlayerAction(pair.Value.Username, pair.Value.GameMode, 0, Message.Simple(pair.Value.Username)),
+                        pair.Value);
+
+                    source.Client.Write(other);
+                }
+            });
+
+            consumer.On<Left>((source, _) =>
+            {
+                playerRepository.Remove(source);
+
+                var packet = new ListItemPacket(new RemovePlayerAction(), source);
+
+                foreach (var pair in playerRepository.Players)
+                {
+                    pair.Value.Client.Write(packet);
+                }
+            });
         });
 
         // How about removing the idea of ticking?

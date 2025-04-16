@@ -13,6 +13,7 @@ public sealed class ListItemPacket(IListItemAction action, IPlayer player) : IOu
     public IPlayer Player => player;
 }
 
+// Could this just be an enum?
 public interface IListItemAction
 {
     public int Identifier { get; }
