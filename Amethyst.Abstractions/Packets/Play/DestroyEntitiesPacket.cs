@@ -1,6 +1,6 @@
 ﻿namespace Amethyst.Abstractions.Packets.Play;
 
-public sealed class DestroyEntitiesPacket(int[] uniques) : IOutgoingPacket
+public sealed class DestroyEntitiesPacket(params int[] uniques) : IOutgoingPacket
 {
     public int Identifier => 19;
 
