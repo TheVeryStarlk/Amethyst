@@ -4,11 +4,12 @@ using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Entities;
+using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;
 
-namespace Amethyst.Hosting.Subscribing;
+namespace Amethyst.Hosting;
 
 internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : ISubscriber
 {

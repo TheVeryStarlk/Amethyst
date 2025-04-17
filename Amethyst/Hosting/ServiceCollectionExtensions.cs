@@ -2,7 +2,6 @@
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities;
 using Amethyst.Eventing;
-using Amethyst.Hosting.Subscribing;
 using Amethyst.Worlds;
 using Microsoft.Extensions.DependencyInjection;
 

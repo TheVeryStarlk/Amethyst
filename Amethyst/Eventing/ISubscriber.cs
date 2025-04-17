@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Hosting.Subscribing;
+﻿namespace Amethyst.Eventing;
 
 public interface ISubscriber
 {

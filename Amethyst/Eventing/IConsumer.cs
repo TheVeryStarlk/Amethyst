@@ -1,6 +1,4 @@
-﻿using Amethyst.Eventing;
-
-namespace Amethyst.Hosting.Subscribing;
+﻿namespace Amethyst.Eventing;
 
 public interface IConsumer<T>
 {

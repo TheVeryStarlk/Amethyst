@@ -1,6 +1,6 @@
 ﻿using System.Collections.Frozen;
 
-namespace Amethyst.Hosting.Subscribing;
+namespace Amethyst.Eventing;
 
 public interface IRegistry
 {

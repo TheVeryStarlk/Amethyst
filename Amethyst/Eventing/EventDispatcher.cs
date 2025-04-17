@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using Amethyst.Hosting.Subscribing;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Eventing;
