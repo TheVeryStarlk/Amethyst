@@ -3,9 +3,9 @@ using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class SpawnPlayerSerializer(int unique, Guid guid, int x, int y, int z, float yaw, float pitch) : ISerializer<SpawnPlayerPacket, SpawnPlayerSerializer>
+internal sealed class SpawnPlayerSerializer(int unique, Guid guid, int x, int y, int z, byte yaw, byte pitch) : ISerializer<SpawnPlayerPacket, SpawnPlayerSerializer>
 {
-    public int Length => Variable.GetByteCount(unique) + sizeof(long) * 2 + sizeof(int) * 3 + sizeof(float) * 2 + sizeof(short) + sizeof(byte);
+    public int Length => Variable.GetByteCount(unique) + sizeof(long) * 2 + sizeof(int) * 3 + sizeof(byte) * 2 + sizeof(short) + sizeof(byte);
 
     public static SpawnPlayerSerializer Create(SpawnPlayerPacket packet)
     {
@@ -28,8 +28,8 @@ internal sealed class SpawnPlayerSerializer(int unique, Guid guid, int x, int y,
             .WriteInteger(x)
             .WriteInteger(y)
             .WriteInteger(z)
-            .WriteFloat(yaw)
-            .WriteFloat(pitch)
+            .WriteByte(yaw)
+            .WriteByte(pitch)
             .WriteShort(0)
             .WriteByte(127);
     }

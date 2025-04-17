@@ -3,7 +3,7 @@
 namespace Amethyst.Abstractions.Networking.Packets.Play;
 
 // Metadata and current item are not implemented.
-public sealed class SpawnPlayerPacket(int unique, Guid guid, Position position, float yaw, float pitch) : IOutgoingPacket
+public sealed class SpawnPlayerPacket(int unique, Guid guid, Position position, byte yaw, byte pitch) : IOutgoingPacket
 {
     public int Identifier => 12;
 
@@ -13,7 +13,7 @@ public sealed class SpawnPlayerPacket(int unique, Guid guid, Position position, 
 
     public Position Position => position;
 
-    public float Yaw => yaw;
+    public byte Yaw => yaw;
 
-    public float Pitch => pitch;
+    public byte Pitch => pitch;
 }
