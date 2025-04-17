@@ -71,6 +71,12 @@ internal ref struct SpanWriter
         return this;
     }
 
+    public SpanWriter WriteFixedDouble(double value)
+    {
+        WriteInteger((int) (value * 32D));
+        return this;
+    }
+
     public SpanWriter WriteFloat(float value)
     {
         BinaryPrimitives.WriteSingleBigEndian(span[position..(position += sizeof(float))], value);

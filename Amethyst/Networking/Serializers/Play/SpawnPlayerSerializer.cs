@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Networking.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class SpawnPlayerSerializer(int unique, Guid guid, int x, int y, int z, byte yaw, byte pitch) : ISerializer<SpawnPlayerPacket, SpawnPlayerSerializer>
+internal sealed class SpawnPlayerSerializer(int unique, Guid guid, double x, double y, double z, byte yaw, byte pitch) : ISerializer<SpawnPlayerPacket, SpawnPlayerSerializer>
 {
     public int Length => Variable.GetByteCount(unique) + sizeof(long) * 2 + sizeof(int) * 3 + sizeof(byte) * 2 + sizeof(short) + sizeof(byte);
 
@@ -12,9 +12,9 @@ internal sealed class SpawnPlayerSerializer(int unique, Guid guid, int x, int y,
         return new SpawnPlayerSerializer(
             packet.Unique,
             packet.Guid,
-            (int) packet.Position.X,
-            (int) packet.Position.Y,
-            (int) packet.Position.Z,
+            packet.Position.X,
+            packet.Position.Y,
+            packet.Position.Z,
             packet.Yaw,
             packet.Pitch);
     }
@@ -25,9 +25,9 @@ internal sealed class SpawnPlayerSerializer(int unique, Guid guid, int x, int y,
             .Create(span)
             .WriteVariableInteger(unique)
             .WriteGuid(guid)
-            .WriteInteger(x)
-            .WriteInteger(y)
-            .WriteInteger(z)
+            .WriteFixedDouble(x)
+            .WriteFixedDouble(y)
+            .WriteFixedDouble(z)
             .WriteByte(yaw)
             .WriteByte(pitch)
             .WriteShort(0)
