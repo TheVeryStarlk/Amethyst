@@ -41,6 +41,7 @@ internal static class OutgoingPacketExtensions
             MessagePacket packet => MessageSerializer.Create(packet),
             TimePacket packet => TimeSerializer.Create(packet),
             PositionLookPacket packet => PositionLookSerializer.Create(packet),
+            SpawnPlayerPacket packet => SpawnPlayerSerializer.Create(packet),
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
             BlockPacket packet => BlockSerializer.Create(packet),
             ChangeStatePacket packet => ChangeStateSerializer.Create(packet),
