@@ -32,19 +32,33 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
             {
                 playerRepository.Add(source);
 
-                var packet = new ListItemPacket(
+                var list = new ListItemPacket(
                     new AddPlayerAction(source.Username, source.GameMode, 0, Message.Simple(source.Username)),
                     source);
 
+                var spawn = new SpawnPlayerPacket(source.Unique, source.Guid, source.Position, (byte) source.Yaw, (byte) source.Pitch);
+
                 foreach (var pair in playerRepository.Players)
                 {
-                    pair.Value.Client.Write(packet);
+                    pair.Value.Client.Write(list);
 
-                    var other = new ListItemPacket(
+                    source.Client.Write(new ListItemPacket(
                         new AddPlayerAction(pair.Value.Username, pair.Value.GameMode, 0, Message.Simple(pair.Value.Username)),
-                        pair.Value);
+                        pair.Value));
 
-                    source.Client.Write(other);
+                    if (pair.Value == source || pair.Value.World != source.World)
+                    {
+                        continue;
+                    }
+
+                    pair.Value.Client.Write(spawn);
+
+                    source.Client.Write(new SpawnPlayerPacket(
+                        pair.Value.Unique,
+                        pair.Value.Guid,
+                        pair.Value.Position,
+                        (byte) pair.Value.Yaw,
+                        (byte) pair.Value.Pitch));
                 }
             });
 
