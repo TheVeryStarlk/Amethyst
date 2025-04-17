@@ -9,13 +9,13 @@ internal sealed class SpawnPlayerSerializer(int unique, Guid guid, double x, dou
     public static SpawnPlayerSerializer Create(SpawnPlayerPacket packet)
     {
         return new SpawnPlayerSerializer(
-            packet.Unique,
-            packet.Guid,
-            packet.Position.X,
-            packet.Position.Y,
-            packet.Position.Z,
-            packet.Yaw,
-            packet.Pitch);
+            packet.Player.Unique,
+            packet.Player.Guid,
+            packet.Player.Position.X,
+            packet.Player.Position.Y,
+            packet.Player.Position.Z,
+            (byte) packet.Player.Yaw,
+            (byte) packet.Player.Pitch);
     }
 
     public void Write(Span<byte> span)

@@ -36,7 +36,7 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
                     new AddPlayerAction(source.Username, source.GameMode, 0, Message.Simple(source.Username)),
                     source);
 
-                var spawn = new SpawnPlayerPacket(source.Unique, source.Guid, source.Position, (byte) source.Yaw, (byte) source.Pitch);
+                var spawn = new SpawnPlayerPacket(source);
 
                 foreach (var pair in playerRepository.Players)
                 {
@@ -52,13 +52,7 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
                     }
 
                     pair.Value.Client.Write(spawn);
-
-                    source.Client.Write(new SpawnPlayerPacket(
-                        pair.Value.Unique,
-                        pair.Value.Guid,
-                        pair.Value.Position,
-                        (byte) pair.Value.Yaw,
-                        (byte) pair.Value.Pitch));
+                    source.Client.Write(new SpawnPlayerPacket(pair.Value));
                 }
             });
 

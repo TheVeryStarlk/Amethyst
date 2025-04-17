@@ -1,19 +1,11 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using Amethyst.Abstractions.Entities.Player;
 
 namespace Amethyst.Abstractions.Packets.Play;
 
 // Metadata and current item are not implemented.
-public sealed class SpawnPlayerPacket(int unique, Guid guid, Position position, byte yaw, byte pitch) : IOutgoingPacket
+public sealed class SpawnPlayerPacket(IPlayer player) : IOutgoingPacket
 {
     public int Identifier => 12;
 
-    public int Unique => unique;
-
-    public Guid Guid => guid;
-
-    public Position Position => position;
-
-    public byte Yaw => yaw;
-
-    public byte Pitch => pitch;
+    public IPlayer Player => player;
 }

@@ -8,7 +8,7 @@ internal sealed class SuccessSerializer(string guid, string username) : ISeriali
 
     public static SuccessSerializer Create(SuccessPacket packet)
     {
-        return new SuccessSerializer(packet.Guid, packet.Username);
+        return new SuccessSerializer(packet.Player.Guid.ToString(), packet.Player.Username);
     }
 
     public void Write(Span<byte> span)

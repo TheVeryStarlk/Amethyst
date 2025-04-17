@@ -26,8 +26,8 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         client.Player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
 
         client.Write(
-            new SuccessPacket(client.Player.Guid.ToString(), client.Player.Username),
-            new JoinGamePacket(client.Player.Unique, client.Player.GameMode, world.Dimension, world.Difficulty, byte.MaxValue, world.Type, false),
+            new SuccessPacket(client.Player),
+            new JoinGamePacket(client.Player, world, byte.MaxValue, false),
             new PositionLookPacket(new Position(), 0, 0));
 
         client.State = State.Play;

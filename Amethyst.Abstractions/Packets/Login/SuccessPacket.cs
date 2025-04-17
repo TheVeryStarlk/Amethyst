@@ -1,10 +1,10 @@
-﻿namespace Amethyst.Abstractions.Packets.Login;
+﻿using Amethyst.Abstractions.Entities.Player;
 
-internal sealed class SuccessPacket(string guid, string username) : IOutgoingPacket
+namespace Amethyst.Abstractions.Packets.Login;
+
+internal sealed class SuccessPacket(IPlayer player) : IOutgoingPacket
 {
     public int Identifier => 2;
 
-    public string Guid => guid;
-
-    public string Username => username;
+    public IPlayer Player { get; } = player;
 }

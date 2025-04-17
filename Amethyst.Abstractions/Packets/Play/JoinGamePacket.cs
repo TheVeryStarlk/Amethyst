@@ -3,28 +3,15 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Abstractions.Packets.Play;
 
-public sealed class JoinGamePacket(
-    int entity,
-    GameMode gameMode,
-    Dimension dimension,
-    Difficulty difficulty,
-    byte players,
-    WorldType type,
-    bool reducedDebugInformation) : IOutgoingPacket
+public sealed class JoinGamePacket(IPlayer player, IWorld world, byte list, bool reducedDebugInformation) : IOutgoingPacket
 {
     public int Identifier => 1;
 
-    public int Entity => entity;
+    public IPlayer Player => player;
 
-    public GameMode GameMode => gameMode;
+    public IWorld World => world;
 
-    public Dimension Dimension => dimension;
-
-    public Difficulty Difficulty => difficulty;
-
-    public byte Players => players;
-
-    public WorldType Type => type;
+    public byte List => list;
 
     public bool ReducedDebugInformation => reducedDebugInformation;
 }
