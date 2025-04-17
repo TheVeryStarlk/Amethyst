@@ -2,7 +2,7 @@
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Play;
 
-namespace Amethyst.Extensions.General;
+namespace Amethyst.Extensions;
 
 public static class PlayerExtensions
 {
