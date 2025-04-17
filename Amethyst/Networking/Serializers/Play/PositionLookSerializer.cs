@@ -5,12 +5,7 @@ namespace Amethyst.Networking.Serializers.Play;
 
 internal sealed class PositionLookSerializer(Position position, float yaw, float pitch) : ISerializer<PositionLookPacket, PositionLookSerializer>
 {
-    public int Length => sizeof(double)
-                         + sizeof(double)
-                         + sizeof(double)
-                         + sizeof(float)
-                         + sizeof(float)
-                         + sizeof(bool);
+    public int Length => sizeof(double) * 3 + sizeof(float) * 2 + sizeof(bool);
 
     public static PositionLookSerializer Create(PositionLookPacket packet)
     {

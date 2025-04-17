@@ -3,6 +3,7 @@ using Amethyst.Abstractions.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
+// Rewrite this to look less ugly.
 internal sealed class ListItemSerializer(IListItemAction action, IPlayer player) : ISerializer<ListItemPacket, ListItemSerializer>
 {
     public int Length

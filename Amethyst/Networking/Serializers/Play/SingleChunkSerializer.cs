@@ -4,12 +4,7 @@ namespace Amethyst.Networking.Serializers.Play;
 
 internal sealed class SingleChunkSerializer(int x, int z, byte[] sections, ushort bitmask) : ISerializer<SingleChunkPacket, SingleChunkSerializer>
 {
-    public int Length => sizeof(int)
-                         + sizeof(int)
-                         + sizeof(bool)
-                         + sizeof(ushort)
-                         + Variable.GetByteCount(sections.Length)
-                         + sections.Length;
+    public int Length => sizeof(int) * 2 + sizeof(bool) + sizeof(ushort) + Variable.GetByteCount(sections.Length) + sections.Length;
 
     public static SingleChunkSerializer Create(SingleChunkPacket packet)
     {

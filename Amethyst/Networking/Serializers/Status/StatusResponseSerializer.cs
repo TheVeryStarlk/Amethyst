@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using Amethyst.Abstractions.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;
@@ -7,6 +8,7 @@ internal sealed class StatusResponseSerializer(string status) : ISerializer<Stat
 {
     public int Length => Variable.GetByteCount(status);
 
+    // Use JSON writer instead of making objects like this.
     public static StatusResponseSerializer Create(StatusResponsePacket packet)
     {
         var version = new JsonObject

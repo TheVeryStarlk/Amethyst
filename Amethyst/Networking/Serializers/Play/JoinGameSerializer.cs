@@ -11,13 +11,7 @@ internal sealed class JoinGameSerializer(
     string type,
     bool reducedDebugInformation) : ISerializer<JoinGamePacket, JoinGameSerializer>
 {
-    public int Length => sizeof(int)
-                         + sizeof(byte)
-                         + sizeof(sbyte)
-                         + sizeof(byte)
-                         + sizeof(byte)
-                         + Variable.GetByteCount(type)
-                         + sizeof(bool);
+    public int Length => sizeof(int) + sizeof(byte) * 4 + Variable.GetByteCount(type) + sizeof(bool);
 
     public static JoinGameSerializer Create(JoinGamePacket packet)
     {
