@@ -29,7 +29,7 @@ public sealed class AddPlayerAction(string username, GameMode gameMode, int late
 
     public int Latency => latency;
 
-    public string Tag => tag.Serialize();
+    public string Tag { get; } = tag.Serialize();
 }
 
 public sealed class RemovePlayerAction : IListItemAction
