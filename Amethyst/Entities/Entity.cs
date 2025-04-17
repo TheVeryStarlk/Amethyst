@@ -4,7 +4,7 @@ namespace Amethyst.Entities;
 
 internal abstract class Entity : IEntity
 {
-    public int Identifier { get; } = Track.Instance.Next();
+    public int Unique { get; } = Track.Instance.Next();
 
     public Position Position { get; set; }
 

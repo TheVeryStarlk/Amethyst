@@ -3,17 +3,17 @@ using Amethyst.Abstractions.Networking.Packets.Login;
 
 namespace Amethyst.Networking.Serializers.Login;
 
-internal sealed class SuccessSerializer(string unique, string username) : ISerializer<SuccessPacket, SuccessSerializer>
+internal sealed class SuccessSerializer(string guid, string username) : ISerializer<SuccessPacket, SuccessSerializer>
 {
-    public int Length => Variable.GetByteCount(unique) + Variable.GetByteCount(username);
+    public int Length => Variable.GetByteCount(guid) + Variable.GetByteCount(username);
 
     public static SuccessSerializer Create(SuccessPacket packet)
     {
-        return new SuccessSerializer(packet.Unique, packet.Username);
+        return new SuccessSerializer(packet.Guid, packet.Username);
     }
 
     public void Write(Span<byte> span)
     {
-        SpanWriter.Create(span).WriteVariableString(unique).WriteVariableString(username);
+        SpanWriter.Create(span).WriteVariableString(guid).WriteVariableString(username);
     }
 }

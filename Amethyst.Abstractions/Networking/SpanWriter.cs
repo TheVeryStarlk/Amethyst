@@ -1,4 +1,6 @@
 ﻿using System.Buffers.Binary;
+using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Amethyst.Abstractions.Entities;
@@ -106,6 +108,12 @@ internal ref struct SpanWriter
     public SpanWriter WritePosition(Position value)
     {
         WriteLong(((long) value.X & 0x3FFFFFF) << 38 | ((long) value.Y & 0xFFF) << 26 | (long) value.Z & 0x3FFFFFF);
+        return this;
+    }
+
+    public SpanWriter WriteGuid(Guid value)
+    {
+        Write(BigInteger.Parse(value.ToString().Replace("-", ""), NumberStyles.HexNumber).ToByteArray(isBigEndian: true));
         return this;
     }
 }

@@ -2,7 +2,7 @@
 
 public interface IEntity
 {
-    public int Identifier { get; }
+    public int Unique { get; }
 
     public Position Position { get; }
 

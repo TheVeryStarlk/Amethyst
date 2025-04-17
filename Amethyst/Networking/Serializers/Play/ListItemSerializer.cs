@@ -42,7 +42,7 @@ internal sealed class ListItemSerializer(IListItemAction action, IPlayer player)
             .Create(span)
             .WriteVariableInteger(action.Identifier)
             .WriteVariableInteger(1)
-            .Write(BigInteger.Parse(player.Guid.ToString().Replace("-", ""), NumberStyles.HexNumber).ToByteArray(isBigEndian: true));
+            .WriteGuid(player.Guid);
 
         switch (action)
         {
