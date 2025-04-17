@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
-using Amethyst.Abstractions.Networking.Packets;
+using Amethyst.Abstractions.Packets;
 using Amethyst.Entities;
 using Amethyst.Eventing;
 using Amethyst.Networking;

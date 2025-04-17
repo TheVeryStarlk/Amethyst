@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Messages;
 
-namespace Amethyst.Abstractions.Networking.Packets.Play;
+namespace Amethyst.Abstractions.Packets.Play;
 
 public sealed class ListHeaderFooterPacket(Message header, Message footer) : IOutgoingPacket
 {

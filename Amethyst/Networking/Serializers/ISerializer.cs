@@ -1,7 +1,7 @@
-﻿using Amethyst.Abstractions.Networking.Packets;
-using Amethyst.Abstractions.Networking.Packets.Login;
-using Amethyst.Abstractions.Networking.Packets.Play;
-using Amethyst.Abstractions.Networking.Packets.Status;
+﻿using Amethyst.Abstractions.Packets;
+using Amethyst.Abstractions.Packets.Login;
+using Amethyst.Abstractions.Packets.Play;
+using Amethyst.Abstractions.Packets.Status;
 using Amethyst.Networking.Serializers.Login;
 using Amethyst.Networking.Serializers.Play;
 using Amethyst.Networking.Serializers.Status;

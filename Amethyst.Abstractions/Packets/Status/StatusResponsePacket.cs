@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Messages;
 
-namespace Amethyst.Abstractions.Networking.Packets.Status;
+namespace Amethyst.Abstractions.Packets.Status;
 
 internal sealed class StatusResponsePacket(
     string name,

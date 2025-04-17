@@ -1,5 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;

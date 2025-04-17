@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Entities.Player;
 
-namespace Amethyst.Abstractions.Networking.Packets.Play;
+namespace Amethyst.Abstractions.Packets.Play;
 
 public sealed class ChangeStatePacket(IState state) : IOutgoingPacket
 {

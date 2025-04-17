@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Abstractions.Networking.Packets.Play;
+namespace Amethyst.Abstractions.Packets.Play;
 
 public sealed class BlockPacket(Position position, Block block) : IOutgoingPacket
 {

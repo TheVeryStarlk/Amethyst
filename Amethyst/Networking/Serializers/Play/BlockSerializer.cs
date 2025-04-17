@@ -1,6 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Networking;
-using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Abstractions.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 

@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
-using Amethyst.Abstractions.Networking;
-using Amethyst.Abstractions.Networking.Packets;
+using Amethyst.Abstractions.Packets;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Serializers;
 

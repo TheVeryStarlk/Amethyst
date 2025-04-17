@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Networking.Packets.Login;
+﻿namespace Amethyst.Abstractions.Packets.Login;
 
 internal sealed class SuccessPacket(string guid, string username) : IOutgoingPacket
 {

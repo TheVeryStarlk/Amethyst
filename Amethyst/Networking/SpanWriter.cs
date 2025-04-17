@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Amethyst.Abstractions.Entities;
 
-namespace Amethyst.Abstractions.Networking;
+namespace Amethyst.Networking;
 
 internal ref struct SpanWriter
 {

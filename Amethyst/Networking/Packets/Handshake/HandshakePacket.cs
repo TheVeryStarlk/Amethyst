@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Networking.Packets.Login;
+﻿using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
 

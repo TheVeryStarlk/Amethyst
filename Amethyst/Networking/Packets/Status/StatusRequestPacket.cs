@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Networking.Packets.Status;
+﻿using Amethyst.Abstractions.Packets.Status;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
 

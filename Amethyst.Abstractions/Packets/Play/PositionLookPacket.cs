@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Entities;
 
-namespace Amethyst.Abstractions.Networking.Packets.Play;
+namespace Amethyst.Abstractions.Packets.Play;
 
 public sealed class PositionLookPacket(Position position, float yaw, float pitch) : IOutgoingPacket
 {

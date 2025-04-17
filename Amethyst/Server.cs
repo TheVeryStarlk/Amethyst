@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
 using Amethyst.Abstractions;
-using Amethyst.Abstractions.Networking.Packets;
-using Amethyst.Abstractions.Networking.Packets.Login;
-using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Abstractions.Packets;
+using Amethyst.Abstractions.Packets.Login;
+using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 using Amethyst.Eventing.Server;

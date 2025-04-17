@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Abstractions.Networking.Packets.Play;
+namespace Amethyst.Abstractions.Packets.Play;
 
 public sealed class JoinGamePacket(
     int entity,

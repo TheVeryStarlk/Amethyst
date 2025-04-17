@@ -1,5 +1,4 @@
-﻿using Amethyst.Abstractions.Networking;
-using Amethyst.Abstractions.Networking.Packets.Login;
+﻿using Amethyst.Abstractions.Packets.Login;
 
 namespace Amethyst.Networking.Serializers.Login;
 

@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Messages;
 
-namespace Amethyst.Abstractions.Networking.Packets.Login;
+namespace Amethyst.Abstractions.Packets.Login;
 
 internal sealed class FailurePacket(Message message) : IOutgoingPacket
 {

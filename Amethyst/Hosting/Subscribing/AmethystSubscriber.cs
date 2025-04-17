@@ -1,8 +1,8 @@
 ﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Messages;
-using Amethyst.Abstractions.Networking.Packets.Login;
-using Amethyst.Abstractions.Networking.Packets.Play;
+using Amethyst.Abstractions.Packets.Login;
+using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Entities;
 using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;

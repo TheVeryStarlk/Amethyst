@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Abstractions.Networking.Packets.Play;
+﻿namespace Amethyst.Abstractions.Packets.Play;
 
 public sealed class TabResponsePacket(string[] matches) : IOutgoingPacket
 {

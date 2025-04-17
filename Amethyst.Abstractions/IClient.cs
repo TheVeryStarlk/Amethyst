@@ -1,4 +1,4 @@
-﻿using Amethyst.Abstractions.Networking.Packets;
+﻿using Amethyst.Abstractions.Packets;
 
 namespace Amethyst.Abstractions;
 
