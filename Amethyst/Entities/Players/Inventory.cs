@@ -5,7 +5,9 @@ namespace Amethyst.Entities.Players;
 
 internal sealed class Inventory : IInventory
 {
+    public short Index { get; set; }
+
     public Item[] Slots { get; } = new Item[9];
 
-    public Item Holding { get; set; }
+    public Item Holding => Slots[Index];
 }
