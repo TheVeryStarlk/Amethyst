@@ -7,5 +7,5 @@ internal sealed class Inventory : IInventory
 {
     public Item[] Slots { get; } = new Item[8];
 
-    public Item Holding { get; } = new(0, 0, 0);
+    public Item Holding { get; set; } = new();
 }
