@@ -2,7 +2,7 @@
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class HeldItemChangePacket(short slot) : IIngoingPacket<HeldItemChangePacket>, IProcessor
+internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldItemChangePacket>, IProcessor
 {
     public static int Identifier => 9;
 
@@ -15,9 +15,11 @@ internal sealed class HeldItemChangePacket(short slot) : IIngoingPacket<HeldItem
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         // Why is it even a short?
-        if (slot is < 0 or >= 8)
+        if (index is < 0 or >= 8)
         {
             return;
         }
+
+        client.Player!.Inventory.Holding = client.Player.Inventory.Slots[index];
     }
 }

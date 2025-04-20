@@ -24,6 +24,8 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
 
     public byte ViewDistance { get; set; }
 
+    public Inventory Inventory { get; } = new();
+
     private readonly HashSet<long> chunks = [];
 
     public void Synchronize(Position position, float yaw, float pitch, bool ground)
