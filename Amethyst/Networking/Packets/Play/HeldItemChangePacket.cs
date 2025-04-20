@@ -14,12 +14,6 @@ internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldIte
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        // Why is it even a short?
-        if (index is < 0 or >= 8)
-        {
-            return;
-        }
-
         client.Player!.Inventory.Holding = client.Player.Inventory.Slots[index];
     }
 }
