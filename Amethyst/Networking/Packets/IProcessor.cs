@@ -11,16 +11,12 @@ internal interface IProcessor
     public void Process(Client client, EventDispatcher eventDispatcher);
 }
 
-internal sealed class EmptyProcessor(Packet packet) : IProcessor
+internal sealed class EmptyProcessor : IProcessor
 {
+    public static EmptyProcessor Instance { get; } = new();
+
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        if (packet.Identifier is 0)
-        {
-            return;
-        }
-
-        Console.WriteLine($"0x{packet.Identifier:X2}");
         // Will remove this later.
     }
 }
@@ -69,7 +65,7 @@ internal static class PacketExtensions
                 _ when TabRequestPacket.Identifier == packet.Identifier => packet.Create<TabRequestPacket>(),
                 _ when ConfigurationPacket.Identifier == packet.Identifier => packet.Create<ConfigurationPacket>(),
                 _ when StatusPacket.Identifier == packet.Identifier => packet.Create<StatusPacket>(),
-                _ => new EmptyProcessor(packet)
+                _ => EmptyProcessor.Instance
             },
             _ => throw new ArgumentOutOfRangeException(nameof(state))
         };
