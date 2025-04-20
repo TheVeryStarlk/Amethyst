@@ -6,7 +6,7 @@ using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Worlds;
 
-namespace Amethyst.Entities;
+namespace Amethyst.Entities.Players;
 
 internal sealed class Player(IClient client, Guid guid, GameMode gameMode, string username, IWorld world) : Entity, IPlayer
 {

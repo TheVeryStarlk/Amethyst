@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Amethyst.Abstractions.Worlds;
-using Amethyst.Entities;
+using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Worlds;
 using Microsoft.Extensions.DependencyInjection;

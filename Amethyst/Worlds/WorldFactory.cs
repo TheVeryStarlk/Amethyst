@@ -1,5 +1,5 @@
 ﻿using Amethyst.Abstractions.Worlds;
-using Amethyst.Entities;
+using Amethyst.Entities.Players;
 
 namespace Amethyst.Worlds;
 

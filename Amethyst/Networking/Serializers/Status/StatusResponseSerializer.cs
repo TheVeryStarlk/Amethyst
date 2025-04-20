@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Amethyst.Abstractions.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;

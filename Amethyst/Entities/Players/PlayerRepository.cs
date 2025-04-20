@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Entities.Player;
 
-namespace Amethyst.Entities;
+namespace Amethyst.Entities.Players;
 
 // Think of a possibly better name.
 internal sealed class PlayerRepository
