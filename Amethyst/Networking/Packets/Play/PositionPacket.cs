@@ -1,4 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Player;
 
@@ -22,6 +23,14 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
+        var difference = position - client.Player!.Position;
+        var packet = new EntityRelativePositionPacket(client.Player.Unique, difference, ground);
+
+        foreach (var pair in client.Player.World.Players.Where(pair => pair.Value != client.Player))
+        {
+            pair.Value.Client.Write(packet);
+        }
+
         eventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
         client.Player!.Synchronize(position, client.Player.Yaw, client.Player.Pitch, ground);
     }

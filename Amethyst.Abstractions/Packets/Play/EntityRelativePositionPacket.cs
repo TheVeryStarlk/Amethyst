@@ -2,6 +2,7 @@
 
 namespace Amethyst.Abstractions.Packets.Play;
 
+// Create the other look and position versions as well.
 public sealed class EntityRelativePositionPacket(int unique, Position position, bool ground) : IOutgoingPacket
 {
     public int Identifier => 21;

@@ -35,7 +35,7 @@ internal ref struct SpanWriter
         return this;
     }
 
-    public SpanWriter WriteFixedByte(byte value)
+    public SpanWriter WriteFixedByte(double value)
     {
         WriteByte((byte) (value * 32D));
         return this;
