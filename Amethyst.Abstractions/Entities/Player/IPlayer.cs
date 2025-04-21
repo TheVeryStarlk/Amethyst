@@ -17,4 +17,6 @@ public interface IPlayer : IEntity
     public string? Locale { get; }
 
     public byte ViewDistance { get; }
+
+    public void Teleport(Position position);
 }

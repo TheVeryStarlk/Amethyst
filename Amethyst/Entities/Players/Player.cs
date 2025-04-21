@@ -28,6 +28,12 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
 
     private readonly HashSet<long> chunks = [];
 
+    public void Teleport(Position position)
+    {
+        Position = position;
+        Client.Write(new PositionLookPacket(position, Yaw, Pitch));
+    }
+
     public void Synchronize(Position position, float yaw, float pitch, bool ground)
     {
         Position = position;
