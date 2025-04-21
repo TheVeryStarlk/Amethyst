@@ -24,11 +24,15 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         var difference = position - client.Player!.Position;
-        var packet = new EntityRelativePositionLookPacket(client.Player.Unique, difference, (byte) client.Player.Yaw, (byte) client.Player.Pitch, ground);
 
-        foreach (var pair in client.Player.World.Players.Where(pair => pair.Value != client.Player))
+        if (difference is not { X: 0, Y: 0, Z: 0 })
         {
-            pair.Value.Client.Write(packet);
+            var packet = new EntityRelativePositionLookPacket(client.Player.Unique, difference, client.Player.Yaw, client.Player.Pitch, ground);
+
+            foreach (var pair in client.Player.World.Players.Where(pair => pair.Value != client.Player))
+            {
+                pair.Value.Client.Write(packet);
+            }
         }
 
         eventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));

@@ -3,7 +3,7 @@ using Amethyst.Abstractions.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class EntityRelativePositionLookSerializer(int unique, Position position, byte yaw, byte pitch, bool ground) : ISerializer<EntityRelativePositionLookPacket, EntityRelativePositionLookSerializer>
+internal sealed class EntityRelativePositionLookSerializer(int unique, Position position, float yaw, float pitch, bool ground) : ISerializer<EntityRelativePositionLookPacket, EntityRelativePositionLookSerializer>
 {
     public int Length => Variable.GetByteCount(unique) + sizeof(byte) * 3 + sizeof(byte) * 2 + sizeof(bool);
 
@@ -20,8 +20,8 @@ internal sealed class EntityRelativePositionLookSerializer(int unique, Position 
             .WriteFixedByte(position.X)
             .WriteFixedByte(position.Y)
             .WriteFixedByte(position.Z)
-            .WriteByte(yaw)
-            .WriteByte(pitch)
+            .WriteAngle(yaw)
+            .WriteAngle(pitch)
             .WriteBoolean(ground);
     }
 }

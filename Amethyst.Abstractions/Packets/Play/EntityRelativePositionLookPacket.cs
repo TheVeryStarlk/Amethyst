@@ -2,7 +2,7 @@
 
 namespace Amethyst.Abstractions.Packets.Play;
 
-public sealed class EntityRelativePositionLookPacket(int unique, Position position, byte yaw, byte pitch, bool ground) : IOutgoingPacket
+public sealed class EntityRelativePositionLookPacket(int unique, Position position, float yaw, float pitch, bool ground) : IOutgoingPacket
 {
     public int Identifier => 23;
 
@@ -10,9 +10,9 @@ public sealed class EntityRelativePositionLookPacket(int unique, Position positi
 
     public Position Position => position;
 
-    public byte Yaw => yaw;
+    public float Yaw => yaw;
 
-    public byte Pitch => pitch;
+    public float Pitch => pitch;
 
     public bool Ground => ground;
 }
