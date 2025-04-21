@@ -35,6 +35,12 @@ internal ref struct SpanWriter
         return this;
     }
 
+    public SpanWriter WriteFixedByte(byte value)
+    {
+        WriteByte((byte) (value * 32D));
+        return this;
+    }
+
     public SpanWriter WriteBoolean(bool value)
     {
         WriteByte(Unsafe.BitCast<bool, byte>(value));
