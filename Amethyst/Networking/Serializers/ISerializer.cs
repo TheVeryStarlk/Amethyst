@@ -43,7 +43,7 @@ internal static class OutgoingPacketExtensions
             PositionLookPacket packet => PositionLookSerializer.Create(packet),
             SpawnPlayerPacket packet => SpawnPlayerSerializer.Create(packet),
             DestroyEntitiesPacket packet => DestroyEntitiesSerializer.Create(packet),
-            EntityRelativePositionPacket packet => EntityRelativePositionSerializer.Create(packet),
+            EntityRelativePositionLookPacket packet => EntityRelativePositionLookSerializer.Create(packet),
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
             BlockPacket packet => BlockSerializer.Create(packet),
             ChangeStatePacket packet => ChangeStateSerializer.Create(packet),
