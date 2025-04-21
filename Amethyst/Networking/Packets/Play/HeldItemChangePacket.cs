@@ -1,4 +1,5 @@
 ﻿using Amethyst.Eventing;
+using Amethyst.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -15,5 +16,6 @@ internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldIte
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         client.Player!.Inventory.Index = index;
+        eventDispatcher.Dispatch(new Inventory(), client.Player);
     }
 }
