@@ -25,18 +25,6 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var difference = position - client.Player!.Position;
-
-        if (difference is not { X: 0, Y: 0, Z: 0 })
-        {
-            var packet = new EntityRelativePositionLookPacket(client.Player.Unique, difference, client.Player.Yaw, client.Player.Pitch, ground);
-
-            foreach (var pair in client.Player.World.Players.Where(pair => pair.Value != client.Player))
-            {
-                pair.Value.Client.Write(packet);
-            }
-        }
-
         eventDispatcher.Dispatch(client.Player!, new Moved(position, yaw, pitch));
         client.Player!.Synchronize(position, yaw, pitch, ground);
     }

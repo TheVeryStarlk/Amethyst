@@ -82,5 +82,13 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
             var result = World[x, z].Build();
             Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
         }
+
+        // Use relative movement packets.
+        var packet = new EntityTeleportPacket(this);
+
+        foreach (var pair in World.Players.Where(pair => pair.Value != this))
+        {
+            pair.Value.Client.Write(packet);
+        }
     }
 }
