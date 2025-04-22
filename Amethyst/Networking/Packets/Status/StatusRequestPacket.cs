@@ -1,37 +1,21 @@
-﻿using Amethyst.Api.Components;
-using Amethyst.Api.Events.Minecraft;
+﻿using Amethyst.Abstractions.Packets.Status;
+using Amethyst.Eventing;
+using Amethyst.Eventing.Client;
 
 namespace Amethyst.Networking.Packets.Status;
 
-internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
+internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>, IProcessor
 {
-    public static int Identifier => 0x00;
+    public static int Identifier => 0;
 
-    public static StatusRequestPacket Read(MemoryReader reader)
+    public static StatusRequestPacket Create(ReadOnlySpan<byte> span)
     {
         return new StatusRequestPacket();
     }
 
-    public async Task HandleAsync(Client client)
+    public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var eventArgs = await client.Server.EventService.ExecuteAsync(
-            new DescriptionRequestedEventArgs
-            {
-                Server = client.Server,
-                Description = client.Server.Description
-            });
-
-        client.Server.Description = eventArgs.Description;
-
-        await client.Transport.WriteAsync(
-            new StatusResponsePacket
-            {
-                Status = ServerStatus.Create(
-                    nameof(Amethyst),
-                    Server.ProtocolVersion,
-                    client.Server.Configuration.MaximumPlayerCount,
-                    client.Server.Players.Count(),
-                    client.Server.Description)
-            });
+        var request = eventDispatcher.Dispatch(client, new Request());
+        client.Write(new StatusResponsePacket(request.Name, request.Numerical, request.Maximum, request.Online, request.Description, request.Favicon));
     }
 }

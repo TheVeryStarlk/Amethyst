@@ -1,193 +1,138 @@
-﻿using Amethyst.Api.Components;
-using Amethyst.Api.Entities;
-using Amethyst.Api.Events.Minecraft.Player;
-using Amethyst.Entities;
+﻿using System.IO.Pipelines;
+using System.Net.Sockets;
+using System.Threading.Channels;
+using Amethyst.Abstractions;
+using Amethyst.Abstractions.Packets;
+using Amethyst.Entities.Players;
+using Amethyst.Eventing;
 using Amethyst.Networking;
-using Amethyst.Networking.Packets.Handshaking;
-using Amethyst.Networking.Packets.Login;
-using Amethyst.Networking.Packets.Playing;
-using Amethyst.Networking.Packets.Status;
-using Microsoft.AspNetCore.Connections;
+using Amethyst.Networking.Packets;
+using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(
-    ILogger<Client> logger,
-    Server server,
-    ConnectionContext connection,
-    int identifier) : IAsyncDisposable
+internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispatcher, Socket socket) : IClient, IDisposable
 {
-    public int Identifier => identifier;
+    public Player? Player { get; set; }
 
-    public Server Server => server;
+    public State State { get; set; }
 
-    public Transport Transport { get; } = new Transport(connection.Transport);
-
-    public ClientState State { get; private set; }
-
-    public Player? Player { get; private set; }
-
-    public int MissedKeepAliveCount { get; set; }
-
-    private readonly CancellationTokenSource source = new CancellationTokenSource();
+    private readonly NetworkStream stream = new(socket);
+    private readonly CancellationTokenSource source = new();
+    private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
     public async Task StartAsync()
     {
+        var reading = ReadingAsync();
+        var writing = WritingAsync();
+
+        if (await Task.WhenAny(reading, writing).ConfigureAwait(false) == reading)
+        {
+            outgoing.Writer.Complete();
+            await writing.ConfigureAwait(false);
+        }
+
+        source.Cancel();
+    }
+
+    public void Write(params ReadOnlySpan<IOutgoingPacket> packets)
+    {
+        if (source.IsCancellationRequested)
+        {
+            return;
+        }
+
+        foreach (var packet in packets)
+        {
+            if (!outgoing.Writer.TryWrite(packet))
+            {
+                break;
+            }
+        }
+    }
+
+    public void Stop()
+    {
+        source.Cancel();
+    }
+
+    public void Dispose()
+    {
+        source.Dispose();
+        socket.Dispose();
+    }
+
+    private async Task ReadingAsync()
+    {
+        var input = PipeReader.Create(stream);
+
         while (true)
         {
             try
             {
-                var message = await Transport.ReadAsync(source.Token);
+                var result = await input.ReadAsync(source.Token).ConfigureAwait(false);
+                var sequence = result.Buffer;
 
-                if (message is null)
+                var consumed = sequence.Start;
+                var examined = sequence.End;
+
+                if (Protocol.TryRead(ref sequence, out var packet))
                 {
-                    State = ClientState.Disconnected;
+                    packet.Create(State).Process(this, eventDispatcher);
+                    examined = consumed = sequence.Start;
+                }
+
+                if (result.IsCompleted)
+                {
                     break;
                 }
 
-                var task = State switch
-                {
-                    ClientState.Handshaking => HandleHandshakingAsync(message),
-                    ClientState.Status => HandleStatusAsync(message),
-                    ClientState.Login => HandleLoginAsync(message),
-                    ClientState.Playing => HandlePlayingAsync(message),
-                    ClientState.Disconnected => Task.CompletedTask,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-
-                await task;
+                input.AdvanceTo(consumed, examined);
             }
-            catch (Exception exception) when (exception is OperationCanceledException or ConnectionResetException)
+            catch (OperationCanceledException)
             {
                 break;
             }
             catch (Exception exception)
             {
-                if (Player is not null)
-                {
-                    await Player.DisconnectAsync(ChatMessage.Create("Internal server error.", Color.Red));
-                }
-
-                logger.LogError(
-                    "Unexpected exception while handling packets: \"{Message}\"",
-                    exception);
-
+                logger.LogError(exception, "Unexpected exception while reading from client");
                 break;
             }
         }
-
-        await HandleDisconnectedAsync();
-
-        connection.Abort();
-        logger.LogDebug("Client stopped {Identifier}", identifier);
     }
 
-    public async Task StopAsync()
+    private async Task WritingAsync()
     {
-        if (State is ClientState.Disconnected)
+        var output = PipeWriter.Create(stream);
+
+        // Serializers return the packet's length without accounting for the identifier and the total packet length,
+        // which are both encoded as variable integers that take at most five bytes.
+        const int extra = sizeof(int) + sizeof(int) + sizeof(short);
+
+        await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
         {
-            return;
-        }
-
-        State = ClientState.Disconnected;
-        await source.CancelAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        source.Dispose();
-        await connection.DisposeAsync();
-    }
-
-    private async Task HandleHandshakingAsync(Message message)
-    {
-        var handshake = message.As<HandshakePacket>();
-        await handshake.HandleAsync(this);
-
-        State = handshake.NextState;
-        logger.LogDebug("Client switched state to {State}", State);
-    }
-
-    private async Task HandleStatusAsync(Message message)
-    {
-        var task = message.Identifier switch
-        {
-            0x00 => message.As<StatusRequestPacket>().HandleAsync(this),
-            0x01 => message.As<PingRequestPacket>().HandleAsync(this),
-            _ => throw new InvalidOperationException("Unknown packet.")
-        };
-
-        await task;
-
-        if (message.Identifier == 0x01)
-        {
-            await StopAsync();
-        }
-    }
-
-    private async Task HandleLoginAsync(Message message)
-    {
-        var loginStart = message.As<LoginStartPacket>();
-
-        Player = new Player(this, loginStart.Username)
-        {
-            Position = new VectorF(0, 8, 0),
-            GameMode = GameMode.Creative
-        };
-
-        await loginStart.HandleAsync(this);
-
-        State = ClientState.Playing;
-        logger.LogDebug("Login success with username: \"{Username}\"", Player.Username);
-    }
-
-    private async Task HandlePlayingAsync(Message message)
-    {
-        var task = message.Identifier switch
-        {
-            0x00 => message.As<KeepAlivePacket>().HandleAsync(this),
-            0x01 => message.As<ChatMessagePacket>().HandleAsync(this),
-            0x03 => message.As<OnGroundPacket>().HandleAsync(this),
-            0x04 => message.As<PlayerPositionPacket>().HandleAsync(this),
-            0x05 => message.As<PlayerLookPacket>().HandleAsync(this),
-            0x06 => message.As<PlayerPositionAndLookPacket>().HandleAsync(this),
-            0x07 => message.As<PlayerDiggingPacket>().HandleAsync(this),
-            0x08 => message.As<PlayerBlockPlacementPacket>().HandleAsync(this),
-            0x14 => message.As<TabCompletePacket>().HandleAsync(this),
-            0x15 => message.As<ClientSettingsPacket>().HandleAsync(this),
-            _ => Task.CompletedTask
-        };
-
-        await task;
-    }
-
-    private async Task HandleDisconnectedAsync()
-    {
-        if (Player is null)
-        {
-            return;
-        }
-
-        await Player.World!.RemovePlayerAsync(Player);
-
-        var eventArgs = await Server.EventService.ExecuteAsync(
-            new PlayerLeftEventArgs
+            try
             {
-                Server = Server,
-                Player = Player,
-                Message = ChatMessage.Create($"{Player.Username} has left the server.", Color.Yellow)
-            });
+                var serializer = packet.Create();
+                var span = output.GetSpan(serializer.Length + extra);
 
-        await Server.BroadcastChatMessageAsync(eventArgs.Message);
+                output.Advance(Protocol.Write(span, packet, serializer));
+                await output.FlushAsync().ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "An exception occurred while writing");
+                break;
+            }
+        }
     }
 }
 
-internal enum ClientState
+internal enum State
 {
-    Handshaking,
+    Handshake,
     Status,
     Login,
-    Playing,
-    Disconnected
+    Play
 }

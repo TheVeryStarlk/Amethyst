@@ -3,15 +3,40 @@
 </p>
 
 # Amethyst
-A fast light-weight implementation of the Minecraft: Java edition protocol.
 
-## Introduction
-Amethyst is an extensible, customizable and easy to use Minecraft server software that is designed for mini-games servers, it sacrifices many of the vanilla mechanics in favor of performance and memory usage.
+A light-weight library targeting a [specific protocol version](https://minecraft.wiki/w/Java_Edition_1.8.9) for developing Minecraft servers.
+Amethyst is customizable and sacrifices many of the vanilla features in favor of performance and memory usage.
+
+## Getting Started
+
+Implementing [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst/Eventing/ISubscriber.cs) and registering Amethyst by `services.AddAmethyst<FooSubscriber>();` is all you need to get a running Amethyst server.
+However, you need to create/specify a world for players to join to.
+
+```cs
+public void Subscribe(IRegistry registry)
+{
+    // Create an empty over world named default and assign it to a variable.
+    registry.For<IServer>(consumer => consumer.On<Starting>((server, _) => server.Create("Default", WorldType.Default, Dimension.OverWorld, Difficulty.Peaceful, EmptyGenerator.Instance)));
+   
+    // When a client attempts to join, assign the joining world to the world we created.
+    registry.For<IClient>(consumer => consumer.On<Login>((_, login) => login.World = world!));
+}
+```
 
 ## Usage
-An example of Amethyst's plugin API is available [here](https://github.com/TheVeryStarlk/Amethyst/tree/master/Amethyst.Plugin). 
-Be careful that the current [API](https://github.com/TheVeryStarlk/Amethyst/tree/master/Amethyst.Api) is subject to change as Amethyst develops.
+
+Amethyst by nature has very little built-in logic, the way you implement logic is by subscribing to events.
+The following example sends a welcome message when a player joins.
+
+```csharp
+registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
+{
+    var message = Message.Simple($"Welcome {player.Username}!");
+    player.Send(message);
+}));
+```
 
 ## Credits
-* [The Minecraft Coalition](https://wiki.vg/) for the amazing documentations about the game's internal technical details.
-* [Obsidian](https://github.com/ObsidianMC/Obsidian) for being an awesome code reference.
+
+* [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.
+* [Obsidian](https://github.com/ObsidianMC/Obsidian) for being an awesome reference.

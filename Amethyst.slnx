@@ -1,0 +1,5 @@
+﻿<Solution>
+	<Project Path="Amethyst.Abstractions\Amethyst.Abstractions.csproj" Type="Classic C#"/>
+	<Project Path="Amethyst.Extensions\Amethyst.Extensions.csproj" Type="Classic C#"/>
+	<Project Path="Amethyst\Amethyst.csproj" Type="Classic C#"/>
+</Solution>
