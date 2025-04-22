@@ -8,7 +8,7 @@ internal sealed class DestroyEntitiesSerializer(int[] uniques) : ISerializer<Des
 
     public static DestroyEntitiesSerializer Create(DestroyEntitiesPacket packet)
     {
-        return new DestroyEntitiesSerializer(packet.Uniques);
+        return new DestroyEntitiesSerializer(packet.Entities.Select(entity => entity.Unique).ToArray());
     }
 
     public void Write(Span<byte> span)

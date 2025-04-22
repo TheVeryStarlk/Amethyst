@@ -62,7 +62,7 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
                 playerRepository.Remove(source);
 
                 var list = new ListItemPacket(new RemovePlayerAction(), source);
-                var destroy = new DestroyEntitiesPacket(source.Unique);
+                var destroy = new DestroyEntitiesPacket(source);
 
                 foreach (var pair in playerRepository.Players)
                 {

@@ -7,6 +7,7 @@ public sealed class StatisticsPacket(IDictionary<string, int> values) : IOutgoin
     public IDictionary<string, int> Values => values;
 }
 
+// Achievements are not added yet.
 public static class Statistic
 {
     public static string Leaving => "stat.leaveGame";
