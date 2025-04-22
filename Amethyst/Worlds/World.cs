@@ -25,7 +25,7 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
         set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
     }
 
-    private readonly Dictionary<long, Chunk> chunks = [];
+    private readonly Dictionary<long, IChunk> chunks = [];
 
     public Block this[int x, int y, int z]
     {
@@ -37,19 +37,28 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
     {
         get
         {
-            var value = NumericUtility.Encode(x, z);
+            var key = NumericUtility.Encode(x, z);
 
-            if (chunks.TryGetValue(value, out var chunk))
+            if (chunks.TryGetValue(key, out var chunk))
             {
                 return chunk;
             }
 
             chunk = new Chunk(x, z);
-            chunks[value] = chunk;
+            chunks[key] = chunk;
 
             Generator.Generate(this, chunk, x, z);
 
             return chunk;
+        }
+        set
+        {
+            var key = NumericUtility.Encode(x, z);
+
+            if (!chunks.TryAdd(key, value))
+            {
+                throw new InvalidOperationException("Chunk already exists");
+            }
         }
     }
 }

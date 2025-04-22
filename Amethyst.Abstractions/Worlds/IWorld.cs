@@ -29,5 +29,5 @@ public interface IWorld
     /// <remarks>
     /// The returned <see cref="IChunk"/> is not generated. Use <see cref="Generator"/> to generate it.
     /// </remarks>
-    public IChunk this[int x, int z] { get; }
+    public IChunk this[int x, int z] { get; set; }
 }
