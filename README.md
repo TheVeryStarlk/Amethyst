@@ -15,17 +15,14 @@ However, you need to create/specify a world for players to join to.
 ```cs
 public void Subscribe(IRegistry registry)
 {
-    // Create an empty over world named default and assign it to a variable.
-    registry.For<IServer>(consumer => consumer.On<Starting>((server, _) => server.Create("Default", WorldType.Default, Dimension.OverWorld, Difficulty.Peaceful, EmptyGenerator.Instance)));
-   
-    // When a client attempts to join, assign the joining world to the world we created.
-    registry.For<IClient>(consumer => consumer.On<Login>((_, login) => login.World = world!));
+    // World factory is an interface that is injected to the subscriber.
+    registry.For<IClient>(consumer => consumer.On<Joining>((_, joining) => joining.World = worldFactory.Create("Empty", EmptyGenerator.Instance)));
 }
 ```
 
 ## Usage
 
-Amethyst by nature has very little built-in logic, the way you implement logic is by subscribing to events.
+Amethyst by default has very little built-in logic, the way you implement logic is by subscribing to events.
 The following example sends a welcome message when a player joins.
 
 ```csharp
