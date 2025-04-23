@@ -28,6 +28,27 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
 
     private readonly HashSet<long> chunks = [];
 
+    private bool respawning;
+
+    public void Spawn(IWorld world, Position position)
+    {
+        if (World == world)
+        {
+            return;
+        }
+
+        respawning = true;
+
+        World = world;
+
+        // The client clears the chunks as well.
+        chunks.Clear();
+
+        Client.Write(new RespawnPacket(this, World), new PositionLookPacket(position, Yaw, Pitch));
+
+        respawning = false;
+    }
+
     public void Teleport(Position position)
     {
         Position = position;
@@ -40,6 +61,11 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
         Yaw = yaw;
         Pitch = pitch;
         Ground = ground;
+
+        if (respawning)
+        {
+            return;
+        }
 
         var alive = new long[ViewDistance * ViewDistance * 4];
         var index = 0;

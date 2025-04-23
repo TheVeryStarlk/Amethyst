@@ -40,6 +40,7 @@ internal static class OutgoingPacketExtensions
             JoinGamePacket packet => JoinGameSerializer.Create(packet),
             MessagePacket packet => MessageSerializer.Create(packet),
             TimePacket packet => TimeSerializer.Create(packet),
+            RespawnPacket packet => RespawnSerializer.Create(packet),
             PositionLookPacket packet => PositionLookSerializer.Create(packet),
             SpawnPlayerPacket packet => SpawnPlayerSerializer.Create(packet),
             DestroyEntitiesPacket packet => DestroyEntitiesSerializer.Create(packet),
