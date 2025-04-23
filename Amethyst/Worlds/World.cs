@@ -51,14 +51,5 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
 
             return chunk;
         }
-        set
-        {
-            var key = NumericUtility.Encode(x, z);
-
-            if (!chunks.TryAdd(key, value))
-            {
-                throw new InvalidOperationException("Chunk already exists");
-            }
-        }
     }
 }
