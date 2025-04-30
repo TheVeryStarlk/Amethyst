@@ -51,7 +51,11 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                 original.Favicon = Favicon;
             });
 
-            consumer.On<Joining>((_, original) => original.World = world);
+            consumer.On<Joining>((_, original) =>
+            {
+                original.GameMode = GameMode.Adventure;
+                original.World = world;
+            });
         });
 
         registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) =>
@@ -75,10 +79,12 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
             {
                 if (world.Players.Count > 1)
                 {
+                    source.Send(Message.Simple("a"));
                     // Start!
                 }
 
                 source.Send(Message.Create().Write("Need at least two players...").Yellow().Build());
+                return;
             }
 
             if (state is State.Started)

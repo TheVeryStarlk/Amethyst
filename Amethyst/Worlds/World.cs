@@ -46,7 +46,11 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
             }
 
             chunk = new Chunk(x, z);
-            chunks[key] = chunk;
+
+            if (!chunks.TryAdd(key, chunk))
+            {
+                return chunk;
+            }
 
             Generator.Generate(this, chunk, x, z);
 
