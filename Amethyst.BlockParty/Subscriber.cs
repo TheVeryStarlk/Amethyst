@@ -31,35 +31,6 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
 
         logger.LogInformation("Converted {Count} regions in {Milliseconds} milliseconds", count, watch.ElapsedMilliseconds);
 
-        registry.For<IClient>(consumer =>
-        {
-            consumer.On<Request>((_, original) =>
-            {
-                original.Name = "Sloth";
-                original.Maximum = 5;
-                original.Online = world.Players.Count;
-
-                var description = Message
-                    .Create()
-                    .Write("     ")
-                    .Write("   ").White().Obfuscated()
-                    .Write(" This is Sloth's server ").DarkGreen().Bold()
-                    .Write("   ").White().Obfuscated()
-                    .WriteLine()
-                    .Write("Do not believe anything Sloth says").Red().Bold()
-                    .Build();
-
-                original.Description = description;
-                original.Favicon = Favicon;
-            });
-
-            consumer.On<Joining>((_, original) =>
-            {
-                original.GameMode = GameMode.Creative;
-                original.World = world;
-            });
-        });
-
         registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) =>
         {
             source.Teleport(new Position(0, 16, 0));
@@ -96,6 +67,35 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                 return;
             }
         }));
+
+        registry.For<IClient>(consumer =>
+        {
+            consumer.On<Request>((_, original) =>
+            {
+                original.Name = "Sloth";
+                original.Maximum = 5;
+                original.Online = world.Players.Count;
+
+                var description = Message
+                    .Create()
+                    .Write("     ")
+                    .Write("   ").White().Obfuscated()
+                    .Write(" This is Sloth's server ").DarkGreen().Bold()
+                    .Write("   ").White().Obfuscated()
+                    .WriteLine()
+                    .Write("Do not believe anything Sloth says").Red().Bold()
+                    .Build();
+
+                original.Description = description;
+                original.Favicon = Favicon;
+            });
+
+            consumer.On<Joining>((_, original) =>
+            {
+                original.GameMode = GameMode.Creative;
+                original.World = world;
+            });
+        });
     }
 
     private void Start()
