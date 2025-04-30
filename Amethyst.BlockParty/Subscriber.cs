@@ -126,11 +126,8 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                 switch (state)
                 {
                     case State.Starting:
-                        if (DateTime.Now - last > TimeSpan.FromSeconds(1))
+                        if (Wait())
                         {
-                            count--;
-                            last = DateTime.Now;
-
                             foreach (var pair in world.Players)
                             {
                                 pair.Value.Send(Message.Simple($"{count} seconds left"), MessagePosition.HotBar);
@@ -146,11 +143,8 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                         break;
 
                     case State.Playing:
-                        if (DateTime.Now - last > TimeSpan.FromSeconds(1))
+                        if (Wait())
                         {
-                            count--;
-                            last = DateTime.Now;
-
                             Broadcast(Message.Simple($"Placing blocks in {count} seconds!"));
                         }
 
@@ -193,11 +187,8 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
 
                     case State.Clearing:
                     {
-                        if (DateTime.Now - last > TimeSpan.FromSeconds(1))
+                        if (Wait())
                         {
-                            count--;
-                            last = DateTime.Now;
-
                             Broadcast(Message.Simple($"Clearing in {count} seconds!"));
                         }
 
@@ -237,6 +228,19 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
         {
             pair.Value.Send(message, MessagePosition.HotBar);
         }
+    }
+
+    private bool Wait()
+    {
+        if (DateTime.Now - last <= TimeSpan.FromSeconds(1))
+        {
+            return false;
+        }
+
+        count--;
+        last = DateTime.Now;
+
+        return true;
     }
 }
 
