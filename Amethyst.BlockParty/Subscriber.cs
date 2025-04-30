@@ -31,7 +31,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
         var watch = Stopwatch.StartNew();
         var regions = Anvil.Load("Regions", world);
 
-        logger.LogInformation("Converted {Count} regions in {Milliseconds} milliseconds", regions, watch.ElapsedMilliseconds);
+        logger.LogInformation("Converted {Regions} regions in {Milliseconds} milliseconds", regions, watch.ElapsedMilliseconds);
 
         registry.For<IClient>(consumer =>
         {
@@ -81,22 +81,19 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                     return;
                 }
 
-                if (state is State.Waiting)
+                switch (state)
                 {
-                    if (world.Players.Count > 1)
-                    {
+                    case State.Waiting when world.Players.Count > 1:
                         state = State.Starting;
                         return;
-                    }
 
-                    source.Send(Message.Create().Write("Need at least two players...").Yellow().Build());
-                    return;
-                }
+                    case State.Waiting:
+                        source.Send(Message.Simple("Need at least two players..."));
+                        return;
 
-                if (state is State.Playing)
-                {
-                    source.Send(Message.Create().Write("Match has already started.").Yellow().Build());
-                    return;
+                    case State.Playing:
+                        source.Send(Message.Simple("Match has already started."));
+                        break;
                 }
             });
 
@@ -107,10 +104,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                     return;
                 }
 
-                var message = Message.Simple("You lost!");
-
-                source.Client.Write(new DisconnectPacket(message));
-                source.Client.Stop();
+                source.Disconnect(Message.Simple("You lost!"));
             });
 
             consumer.On<Left>((source, _) =>
@@ -120,11 +114,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                     return;
                 }
 
-                var pair = source.World.Players.First();
-
-                pair.Value.Client.Write(new DisconnectPacket(Message.Simple("You won!")));
-                pair.Value.Client.Stop();
-
+                source.World.Players.First().Value.Disconnect(Message.Simple("You won!"));
                 state = State.Waiting;
             });
         });

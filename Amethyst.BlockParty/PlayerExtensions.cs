@@ -10,4 +10,10 @@ internal static class PlayerExtensions
     {
         player.Client.Write(new MessagePacket(message, position));
     }
+
+    public static void Disconnect(this IPlayer player, Message message)
+    {
+        player.Client.Write(new DisconnectPacket(message));
+        player.Client.Stop();
+    }
 }
