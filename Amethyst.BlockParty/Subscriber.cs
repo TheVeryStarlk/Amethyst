@@ -62,41 +62,72 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
             });
         });
 
-        registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) =>
+        registry.For<IPlayer>(consumer =>
         {
-            source.Teleport(new Position(0, 16, 0));
-
-            if (world.Players.Count > 5)
+            consumer.On<Joined>((source, _) =>
             {
-                var message = Message
-                    .Create()
-                    .Write("Full!").Red()
-                    .Build();
+                source.Teleport(new Position(0, 16, 0));
 
-                source.Client.Write(new DisconnectPacket(message));
-                source.Client.Stop();
-
-                return;
-            }
-
-            if (state is State.Waiting)
-            {
-                if (world.Players.Count > 1)
+                if (world.Players.Count > 5)
                 {
-                    state = State.Starting;
+                    var message = Message
+                        .Create()
+                        .Write("Full!").Red()
+                        .Build();
+
+                    source.Client.Write(new DisconnectPacket(message));
+                    source.Client.Stop();
+
                     return;
                 }
 
-                source.Send(Message.Create().Write("Need at least two players...").Yellow().Build());
-                return;
-            }
+                if (state is State.Waiting)
+                {
+                    if (world.Players.Count > 1)
+                    {
+                        state = State.Starting;
+                        return;
+                    }
 
-            if (state is State.Playing)
+                    source.Send(Message.Create().Write("Need at least two players...").Yellow().Build());
+                    return;
+                }
+
+                if (state is State.Playing)
+                {
+                    source.Send(Message.Create().Write("Match has already started.").Yellow().Build());
+                    return;
+                }
+            });
+
+            consumer.On<Moved>((source, original) =>
             {
-                source.Send(Message.Create().Write("Match has already started.").Yellow().Build());
-                return;
-            }
-        }));
+                if (original.Position.Y > -8)
+                {
+                    return;
+                }
+
+                var message = Message.Simple("You lost!");
+
+                source.Client.Write(new DisconnectPacket(message));
+                source.Client.Stop();
+            });
+
+            consumer.On<Left>((source, _) =>
+            {
+                if (source.World.Players.Count != 1)
+                {
+                    return;
+                }
+
+                var pair = source.World.Players.First();
+
+                pair.Value.Client.Write(new DisconnectPacket(Message.Simple("You won!")));
+                pair.Value.Client.Stop();
+
+                state = State.Waiting;
+            });
+        });
 
         registry.For<IServer>(consumer =>
         {
@@ -130,7 +161,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                             count--;
                             last = DateTime.Now;
 
-                            Broadcast(Message.Simple(count.ToString()));
+                            Broadcast(Message.Simple($"Placing blocks in {count} seconds!"));
                         }
 
                         if (count > 0)
@@ -157,6 +188,8 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
 
                         foreach (var pair in world.Players)
                         {
+                            pair.Value.Teleport(new Position(0, 4, 0));
+
                             for (short slot = 36; slot <= 44; slot++)
                             {
                                 pair.Value.Client.Write(new SetSlotPacket(slot, new Item((short) block.Type, 1, (short) block.Metadata)));
@@ -175,7 +208,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                             count--;
                             last = DateTime.Now;
 
-                            Broadcast(Message.Simple(count.ToString()));
+                            Broadcast(Message.Simple($"Clearing in {count} seconds!"));
                         }
 
                         if (count > 0)
