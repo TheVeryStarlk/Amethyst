@@ -153,20 +153,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                             return;
                         }
 
-                        for (var x = -10; x <= 10; x++)
-                        {
-                            for (var z = -10; z <= 10; z++)
-                            {
-                                block = new Block(159, Random.Shared.Next(15));
-                                world[x, 0, z] = block;
-
-                                foreach (var pair in world.Players)
-                                {
-                                    var packet = new BlockPacket(new Position(x, 0, z), block);
-                                    pair.Value.Client.Write(packet);
-                                }
-                            }
-                        }
+                        Update(false);
 
                         logger.LogInformation("Built the floor. Chosen block is {Number}", block.Metadata);
 
@@ -197,20 +184,7 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                             return;
                         }
 
-                        for (var x = -10; x <= 10; x++)
-                        {
-                            for (var z = -10; z <= 10; z++)
-                            {
-                                var clear = world[x, 0, z].Metadata == block.Metadata ? block : Blocks.Air;
-                                world[x, 0, z] = clear;
-
-                                foreach (var pair in world.Players)
-                                {
-                                    var packet = new BlockPacket(new Position(x, 0, z), clear);
-                                    pair.Value.Client.Write(packet);
-                                }
-                            }
-                        }
+                        Update(true);
 
                         count = 5;
                         state = State.Playing;
@@ -241,6 +215,36 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
         last = DateTime.Now;
 
         return true;
+    }
+
+    private void Update(bool clear)
+    {
+        for (var x = -10; x <= 10; x++)
+        {
+            for (var z = -10; z <= 10; z++)
+            {
+                Block temporary;
+
+                if (clear)
+                {
+                    temporary = world[x, 0, z].Metadata == block.Metadata ? block : Blocks.Air;
+                }
+                else
+                {
+                    temporary = new Block(159, Random.Shared.Next(15));
+                }
+
+                world[x, 0, z] = temporary;
+
+                foreach (var pair in world.Players)
+                {
+                    var packet = new BlockPacket(new Position(x, 0, z), temporary);
+                    pair.Value.Client.Write(packet);
+                }
+            }
+        }
+
+        block = world[Random.Shared.Next(-10, 10), 0, Random.Shared.Next(-10, 10)];
     }
 }
 
