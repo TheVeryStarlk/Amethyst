@@ -113,6 +113,8 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
                 }
             }
         }
+
+        logger.LogInformation("Built the floor. Chosen block is {Number}", block.Metadata);
     }
 }
 
