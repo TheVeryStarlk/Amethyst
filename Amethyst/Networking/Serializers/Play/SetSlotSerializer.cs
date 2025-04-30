@@ -5,7 +5,7 @@ namespace Amethyst.Networking.Serializers.Play;
 
 internal sealed class SetSlotSerializer(short slot, Item item) : ISerializer<SetSlotPacket, SetSlotSerializer>
 {
-    public int Length => sizeof(byte) + sizeof(short) + sizeof(short) + sizeof(byte) + sizeof(short);
+    public int Length => sizeof(byte) + sizeof(short) + sizeof(short) + sizeof(byte) + sizeof(short) + sizeof(bool);
 
     public static SetSlotSerializer Create(SetSlotPacket packet)
     {
@@ -20,6 +20,7 @@ internal sealed class SetSlotSerializer(short slot, Item item) : ISerializer<Set
             .WriteShort(slot)
             .WriteShort(item.Type)
             .WriteByte(item.Amount)
-            .WriteShort(item.Durability);
+            .WriteShort(item.Durability)
+            .WriteBoolean(false);
     }
 }
