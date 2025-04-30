@@ -8,6 +8,7 @@ using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Eventing.Client;
 using Amethyst.Eventing.Player;
+using Amethyst.Eventing.Server;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst.BlockParty;
@@ -27,46 +28,9 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
         logger.LogInformation("Started converting the Anvil world");
 
         var watch = Stopwatch.StartNew();
-        var count = Anvil.Load("Regions", world);
+        var regions = Anvil.Load("Regions", world);
 
-        logger.LogInformation("Converted {Count} regions in {Milliseconds} milliseconds", count, watch.ElapsedMilliseconds);
-
-        registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) =>
-        {
-            source.Teleport(new Position(0, 16, 0));
-
-            Start();
-
-            if (world.Players.Count > 5)
-            {
-                var message = Message
-                    .Create()
-                    .Write("Come later!").Red()
-                    .Build();
-
-                source.Client.Write(new DisconnectPacket(message));
-                source.Client.Stop();
-
-                return;
-            }
-
-            if (state is State.Waiting)
-            {
-                if (world.Players.Count > 1)
-                {
-                    state = State.Started;
-                }
-
-                source.Send(Message.Create().Write("Need at least two players...").Yellow().Build());
-                return;
-            }
-
-            if (state is State.Started)
-            {
-                source.Send(Message.Create().Write("Match has already started.").Yellow().Build());
-                return;
-            }
-        }));
+        logger.LogInformation("Converted {Count} regions in {Milliseconds} milliseconds", regions, watch.ElapsedMilliseconds);
 
         registry.For<IClient>(consumer =>
         {
@@ -92,44 +56,115 @@ internal sealed class Subscriber(ILogger<Subscriber> logger, IWorldFactory world
 
             consumer.On<Joining>((_, original) =>
             {
-                original.GameMode = GameMode.Creative;
+                original.GameMode = GameMode.Adventure;
                 original.World = world;
             });
         });
-    }
 
-    private void Start()
-    {
-        for (var x = -10; x <= 10; x++)
+        registry.For<IPlayer>(consumer => consumer.On<Joined>((source, _) =>
         {
-            for (var z = -10; z <= 10; z++)
+            source.Teleport(new Position(0, 16, 0));
+
+            if (world.Players.Count > 5)
             {
-                block = new Block(159, Random.Shared.Next(15));
-                world[x, 0, z] = block;
+                var message = Message
+                    .Create()
+                    .Write("Full!").Red()
+                    .Build();
+
+                source.Client.Write(new DisconnectPacket(message));
+                source.Client.Stop();
+
+                return;
+            }
+
+            if (state is State.Waiting)
+            {
+                if (world.Players.Count > 1)
+                {
+                    state = State.Starting;
+                    return;
+                }
+
+                source.Send(Message.Create().Write("Need at least two players...").Yellow().Build());
+                return;
+            }
+
+            if (state is State.Playing)
+            {
+                source.Send(Message.Create().Write("Match has already started.").Yellow().Build());
+                return;
+            }
+        }));
+
+        registry.For<IServer>(consumer =>
+        {
+            var last = DateTime.Now;
+            var count = 10;
+
+            consumer.On<Tick>((_, _) =>
+            {
+                if (state is not State.Starting)
+                {
+                    return;
+                }
+
+                if (DateTime.Now - last > TimeSpan.FromSeconds(1))
+                {
+                    count--;
+
+                    foreach (var pair in world.Players)
+                    {
+                        pair.Value.Send(Message.Simple($"{count} seconds left"), MessagePosition.HotBar);
+                    }
+
+                    last = DateTime.Now;
+                }
+
+                if (count > 0)
+                {
+                    return;
+                }
+
+                if (state is State.Playing)
+                {
+                    return;
+                }
+
+                state = State.Playing;
+
+                for (var x = -10; x <= 10; x++)
+                {
+                    for (var z = -10; z <= 10; z++)
+                    {
+                        block = new Block(159, Random.Shared.Next(15));
+                        world[x, 0, z] = block;
+
+                        foreach (var pair in world.Players)
+                        {
+                            var packet = new BlockPacket(new Position(x, 0, z), block);
+                            pair.Value.Client.Write(packet);
+                        }
+                    }
+                }
+
+                logger.LogInformation("Built the floor. Chosen block is {Number}", block.Metadata);
 
                 foreach (var pair in world.Players)
                 {
-                    var packet = new BlockPacket(new Position(x, 0, z), block);
-                    pair.Value.Client.Write(packet);
+                    for (short slot = 36; slot <= 44; slot++)
+                    {
+                        pair.Value.Client.Write(new SetSlotPacket(slot, new Item((short) block.Type, 1, (short) block.Metadata)));
+                    }
                 }
-            }
-        }
-
-        logger.LogInformation("Built the floor. Chosen block is {Number}", block.Metadata);
-
-        foreach (var pair in world.Players)
-        {
-            for (short slot = 36; slot <= 44; slot++)
-            {
-                pair.Value.Client.Write(new SetSlotPacket(slot, new Item((short) block.Type, 1, (short) block.Metadata)));
-            }
-        }
+            });
+        });
     }
 }
 
 internal enum State
 {
     Waiting,
-    Started,
+    Starting,
     Playing
 }
