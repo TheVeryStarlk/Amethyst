@@ -17,4 +17,30 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4"/>
 	</ItemGroup>
 
+	<ItemGroup>
+		<None Update="Regions\r.-1.-1.mca">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+
+		<None Update="Regions\r.-1.0.mca">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+
+		<None Update="Regions\r.0.-1.mca">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+
+		<None Update="Regions\r.0.0.mca">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+
+		<None Update="Regions\r.0.2.mca">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+
+		<None Update="Regions\r.0.3.mca">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 </Project>

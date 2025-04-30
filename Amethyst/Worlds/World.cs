@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Collections.Concurrent;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities.Players;
@@ -25,7 +26,7 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
         set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
     }
 
-    private readonly Dictionary<long, IChunk> chunks = [];
+    private readonly ConcurrentDictionary<long, IChunk> chunks = [];
 
     public Block this[int x, int y, int z]
     {
