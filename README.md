@@ -2,6 +2,9 @@
   <img width="100" height="100" align="center" src="https://i.imgur.com/BkTfea4.png">
 </p>
 
+> This branch is solely for showing Sloth what Amethyst is currently capable of doing. 
+There still is quite a lot of work to be done, but here's a small block-party game written completely in Amethyst.
+
 # Amethyst
 
 A light-weight library targeting a [specific protocol version](https://minecraft.wiki/w/Java_Edition_1.8.9) for developing Minecraft servers.
