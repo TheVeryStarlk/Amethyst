@@ -26,6 +26,6 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
         var temporary = index - 36;
 
         client.Player!.Inventory.Slots[temporary] = item;
-        eventDispatcher.Dispatch(client.Player, new Eventing.Player.Inventory());
+        eventDispatcher.Dispatch(client.Player, new Abstractions.Eventing.Player.Inventory());
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
 
-namespace Amethyst.Eventing.Player;
+namespace Amethyst.Abstractions.Eventing.Player;
 
 public sealed class Moved(Position position, float yaw, float pitch) : IEvent<IPlayer>
 {

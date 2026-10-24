@@ -2,7 +2,7 @@
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Worlds;
 
-namespace Amethyst.Eventing.Client;
+namespace Amethyst.Abstractions.Eventing.Client;
 
 public sealed class Joining(string username) : IEvent<IClient>
 {

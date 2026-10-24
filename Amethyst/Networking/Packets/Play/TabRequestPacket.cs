@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Player;
+using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 

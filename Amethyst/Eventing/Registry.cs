@@ -1,11 +1,7 @@
-﻿using System.Collections.Frozen;
+using System.Collections.Frozen;
+using Amethyst.Abstractions.Eventing;
 
 namespace Amethyst.Eventing;
-
-public interface IRegistry
-{
-    public void For<T>(Action<IConsumer<T>> configure);
-}
 
 internal sealed class Registry(Dictionary<Type, List<Delegate>> events) : IRegistry
 {

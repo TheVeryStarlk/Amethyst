@@ -1,6 +1,6 @@
 ﻿using Amethyst.Abstractions.Entities.Player;
 
-namespace Amethyst.Eventing.Player;
+namespace Amethyst.Abstractions.Eventing.Player;
 
 public sealed class Tab(string behind) : IEvent<IPlayer>
 {

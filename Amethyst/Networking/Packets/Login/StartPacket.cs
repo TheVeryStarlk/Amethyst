@@ -3,8 +3,8 @@ using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Client;
-using Amethyst.Eventing.Player;
+using Amethyst.Abstractions.Eventing.Client;
+using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Login;
 

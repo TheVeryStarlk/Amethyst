@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Amethyst.Abstractions.Entities.Player;
+using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;

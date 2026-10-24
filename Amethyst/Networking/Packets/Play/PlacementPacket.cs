@@ -2,7 +2,7 @@
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Player;
+using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 

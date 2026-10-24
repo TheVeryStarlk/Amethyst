@@ -1,4 +1,4 @@
-﻿namespace Amethyst.Eventing;
+﻿namespace Amethyst.Abstractions.Eventing;
 
 public interface ISubscriber
 {

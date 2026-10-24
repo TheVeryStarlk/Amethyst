@@ -1,9 +1,6 @@
-﻿namespace Amethyst.Eventing;
+using Amethyst.Abstractions.Eventing;
 
-public interface IConsumer<T>
-{
-    public void On<TEvent>(Action<T, TEvent> callback) where TEvent : IEvent<T>;
-}
+namespace Amethyst.Eventing;
 
 internal sealed class Consumer<T>(Dictionary<Type, List<Delegate>> events) : IConsumer<T>
 {
