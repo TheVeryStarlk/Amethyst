@@ -53,9 +53,10 @@ Amethyst's core only handles what the protocol requires. Gameplay behavior is op
 Without `ChunkSubscriber`, players receive no chunks.
 
 ```csharp
-services.AddAmethyst<FooSubscriber>()
+services
+    .AddAmethyst<FooSubscriber>()
     .AddSubscriber<ChunkSubscriber>()       // Streams chunks around players.
-    .AddSubscriber<TabListSubscriber>()     // Keeps the tab list in sync.
+    .AddSubscriber<ListSubscriber>()     // Keeps the tab list in sync.
     .AddSubscriber<VisibilitySubscriber>(); // Spawns and moves players for each other.
 ```
 
