@@ -59,7 +59,6 @@ services
     .AddSubscriber<ChunkSubscriber>() // Streams chunks around players.
     .AddSubscriber<ListSubscriber>() // Keeps the tab list in sync.
     .AddSubscriber<VisibilitySubscriber>() // Spawns and moves players for each other.
-    .AddSubscriber<InventorySubscriber>() // Tracks players' inventories, creative mode only.
     .AddSubscriber<BlockSubscriber>(); // Applies broken and placed blocks to the world.
 ```
 
