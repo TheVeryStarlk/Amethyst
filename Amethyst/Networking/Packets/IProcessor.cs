@@ -1,4 +1,5 @@
-﻿using Amethyst.Eventing;
+﻿using System.Collections.Frozen;
+using Amethyst.Eventing;
 using Amethyst.Networking.Packets.Handshake;
 using Amethyst.Networking.Packets.Login;
 using Amethyst.Networking.Packets.Play;
@@ -23,51 +24,50 @@ internal sealed class EmptyProcessor : IProcessor
 
 internal static class PacketExtensions
 {
-    public static IProcessor Create(this Packet packet, State state)
+    private static readonly FrozenDictionary<(State State, int Identifier), Func<Packet, IProcessor>> creators;
+
+    static PacketExtensions()
     {
-        // Rewrite this when switch expressions get better.
-        return state switch
+        var dictionary = new Dictionary<(State State, int Identifier), Func<Packet, IProcessor>>
         {
             // Handshake.
-            State.Handshake => packet switch
-            {
-                _ when HandshakePacket.Identifier == packet.Identifier => packet.Create<HandshakePacket>(),
-                _ => throw new ArgumentOutOfRangeException(nameof(packet.Identifier))
-            },
-
+            { (State.Handshake, HandshakePacket.Identifier), static packet => packet.Create<HandshakePacket>() },
+            
             // Status.
-            State.Status => packet switch
-            {
-                _ when StatusRequestPacket.Identifier == packet.Identifier => packet.Create<StatusRequestPacket>(),
-                _ when PingPacket.Identifier == packet.Identifier => packet.Create<PingPacket>(),
-                _ => throw new ArgumentOutOfRangeException(nameof(packet.Identifier))
-            },
-
+            { (State.Status, StatusRequestPacket.Identifier), static packet => packet.Create<StatusRequestPacket>() },
+            { (State.Status, PingPacket.Identifier), static packet => packet.Create<PingPacket>() },
+            
             // Login.
-            State.Login => packet switch
-            {
-                _ when StartPacket.Identifier == packet.Identifier => packet.Create<StartPacket>(),
-                _ => throw new ArgumentOutOfRangeException(nameof(packet.Identifier))
-            },
-
+            { (State.Login, StartPacket.Identifier), static packet => packet.Create<StartPacket>() },
+            
             // Play.
-            State.Play => packet switch
-            {
-                _ when MessagePacket.Identifier == packet.Identifier => packet.Create<MessagePacket>(),
-                _ when GroundPacket.Identifier == packet.Identifier => packet.Create<GroundPacket>(),
-                _ when PositionPacket.Identifier == packet.Identifier => packet.Create<PositionPacket>(),
-                _ when LookPacket.Identifier == packet.Identifier => packet.Create<LookPacket>(),
-                _ when PositionLookPacket.Identifier == packet.Identifier => packet.Create<PositionLookPacket>(),
-                _ when DiggingPacket.Identifier == packet.Identifier => packet.Create<DiggingPacket>(),
-                _ when PlacementPacket.Identifier == packet.Identifier => packet.Create<PlacementPacket>(),
-                _ when HeldItemChangePacket.Identifier == packet.Identifier => packet.Create<HeldItemChangePacket>(),
-                _ when InventoryActionPacket.Identifier == packet.Identifier => packet.Create<InventoryActionPacket>(),
-                _ when TabRequestPacket.Identifier == packet.Identifier => packet.Create<TabRequestPacket>(),
-                _ when ConfigurationPacket.Identifier == packet.Identifier => packet.Create<ConfigurationPacket>(),
-                _ when StatusPacket.Identifier == packet.Identifier => packet.Create<StatusPacket>(),
-                _ => EmptyProcessor.Instance
-            },
-            _ => throw new ArgumentOutOfRangeException(nameof(state))
+            { (State.Play, MessagePacket.Identifier), static packet => packet.Create<MessagePacket>() },
+            { (State.Play, GroundPacket.Identifier), static packet => packet.Create<GroundPacket>() },
+            { (State.Play, PositionPacket.Identifier), static packet => packet.Create<PositionPacket>() },
+            { (State.Play, LookPacket.Identifier), static packet => packet.Create<LookPacket>() },
+            { (State.Play, PositionLookPacket.Identifier), static packet => packet.Create<PositionLookPacket>() },
+            { (State.Play, DiggingPacket.Identifier), static packet => packet.Create<DiggingPacket>() },
+            { (State.Play, PlacementPacket.Identifier), static packet => packet.Create<PlacementPacket>() },
+            { (State.Play, HeldItemChangePacket.Identifier), static packet => packet.Create<HeldItemChangePacket>() },
+            { (State.Play, InventoryActionPacket.Identifier), static packet => packet.Create<InventoryActionPacket>() },
+            { (State.Play, TabRequestPacket.Identifier), static packet => packet.Create<TabRequestPacket>() },
+            { (State.Play, ConfigurationPacket.Identifier), static packet => packet.Create<ConfigurationPacket>() },
+            { (State.Play, StatusPacket.Identifier), static packet => packet.Create<StatusPacket>() }
         };
+
+        creators = dictionary.ToFrozenDictionary();
+    }
+
+    public static IProcessor Create(this Packet packet, State state)
+    {
+        if (creators.TryGetValue((state, packet.Identifier), out var create))
+        {
+            return create(packet);
+        }
+
+        // Unhandled play packets are ignored for now.
+        return state is State.Play
+            ? EmptyProcessor.Instance
+            : throw new ArgumentOutOfRangeException(nameof(packet), packet.Identifier, "Unknown packet identifier.");
     }
 }
