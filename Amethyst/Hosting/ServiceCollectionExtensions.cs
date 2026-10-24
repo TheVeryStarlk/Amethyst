@@ -13,14 +13,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
     {
-        services.AddTransient<ISubscriber, AmethystSubscriber>();
         services.AddSubscriber<T>();
 
         services.AddSingleton<EventDispatcher>();
 
         services.AddSingleton<IWorldFactory, WorldFactory>();
         services.AddSingleton<IInventoryViewer, InventoryViewer>();
-
 
         services.AddTransient<Server>();
 

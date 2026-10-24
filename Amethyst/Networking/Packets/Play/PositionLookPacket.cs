@@ -24,7 +24,13 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        eventDispatcher.Dispatch(client.Player!, new Moved(position, yaw, pitch));
-        client.Player!.Synchronize(position, yaw, pitch, ground);
+        var player = client.Player!;
+
+        player.Position = position;
+        player.Yaw = yaw;
+        player.Pitch = pitch;
+        player.Ground = ground;
+
+        eventDispatcher.Dispatch(player, new Moved(position, yaw, pitch));
     }
 }

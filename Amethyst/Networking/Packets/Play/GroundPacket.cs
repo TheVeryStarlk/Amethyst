@@ -14,6 +14,6 @@ internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, I
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.Player!.Synchronize(client.Player.Position, client.Player.Yaw, client.Player.Pitch, value);
+        client.Player!.Ground = value;
     }
 }

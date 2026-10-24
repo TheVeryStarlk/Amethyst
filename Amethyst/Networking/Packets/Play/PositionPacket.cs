@@ -22,7 +22,11 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        eventDispatcher.Dispatch(client.Player!, new Moved(position, client.Player!.Yaw, client.Player.Pitch));
-        client.Player!.Synchronize(position, client.Player.Yaw, client.Player.Pitch, ground);
+        var player = client.Player!;
+
+        player.Position = position;
+        player.Ground = ground;
+
+        eventDispatcher.Dispatch(player, new Moved(position, player.Yaw, player.Pitch));
     }
 }

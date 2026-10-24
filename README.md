@@ -47,6 +47,18 @@ registry.For<IPlayer>(consumer => consumer.On<Dig>((_, dig) =>
 
 Amethyst has no built-in tick loop, if you need one, run your own (for example, a hosted service with a `PeriodicTimer`).
 
+### Subscribers
+
+Amethyst's core only handles what the protocol requires. Gameplay behavior is opt-in through the subscribers in `Amethyst.Extensions`.
+Without `ChunkSubscriber`, players receive no chunks.
+
+```csharp
+services.AddAmethyst<FooSubscriber>()
+    .AddSubscriber<ChunkSubscriber>()       // Streams chunks around players.
+    .AddSubscriber<TabListSubscriber>()     // Keeps the tab list in sync.
+    .AddSubscriber<VisibilitySubscriber>(); // Spawns and moves players for each other.
+```
+
 ## Credits
 
 * [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.
