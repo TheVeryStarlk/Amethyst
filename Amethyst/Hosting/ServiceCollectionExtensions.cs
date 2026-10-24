@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<Server>();
 
         services.AddHostedService<AmethystService>();
+        services.AddHostedService<KeepAliveService>();
 
         return services;
     }

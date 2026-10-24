@@ -8,15 +8,12 @@ using Amethyst.Eventing;
 using Amethyst.Abstractions.Eventing.Client;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Player;
-using Amethyst.Abstractions.Eventing.Server;
 
 namespace Amethyst.Hosting;
 
 internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : ISubscriber
 {
     private readonly FailurePacket failure = new(Message.Simple("Bad username!"));
-
-    private DateTime last;
 
     public void Subscribe(IRegistry registry)
     {
@@ -76,25 +73,5 @@ internal sealed class AmethystSubscriber(PlayerRepository playerRepository) : IS
                 }
             });
         });
-
-        // How about removing the idea of ticking?
-        registry.For<IServer>(consumer => consumer.On<Tick>((_, _) =>
-        {
-            var now = DateTime.Now;
-
-            if (now - last < TimeSpan.FromSeconds(5))
-            {
-                return;
-            }
-
-            last = now;
-
-            var alive = new KeepAlivePacket((int) now.Ticks);
-
-            foreach (var pair in playerRepository.Players)
-            {
-                pair.Value.Client.Write(alive);
-            }
-        }));
     }
 }

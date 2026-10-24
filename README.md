@@ -43,6 +43,8 @@ registry.For<IPlayer>(consumer => consumer.On<Dig>((_, dig) =>
 }));
 ```
 
+Amethyst has no built-in tick loop, if you need one, run your own (for example, a hosted service with a `PeriodicTimer`).
+
 ## Credits
 
 * [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.

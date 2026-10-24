@@ -21,7 +21,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
     public Task StartAsync(CancellationToken cancellationToken)
     {
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        return Task.WhenAll(ListeningAsync(), TickingAsync());
+        return ListeningAsync();
     }
 
     public void Dispose()
@@ -99,34 +99,6 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             if (!clients.TryRemove(client, out _))
             {
                 logger.LogWarning("Failed to remove client");
-            }
-        }
-    }
-
-    private async Task TickingAsync()
-    {
-        var tick = new Tick();
-        var timer = new BalancingTimer(TimeSpan.FromSeconds(0.05));
-
-        while (true)
-        {
-            try
-            {
-                if (!await timer.WaitForNextTickAsync(source!.Token).ConfigureAwait(false))
-                {
-                    break;
-                }
-
-                eventDispatcher.Dispatch(this, tick);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Unexpected exception while ticking");
-                break;
             }
         }
     }
