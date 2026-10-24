@@ -14,20 +14,22 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 {
     public static int Identifier => 0;
 
+    private readonly Message taken = Message.Simple("Username already taken!");
+    
     public static StartPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new StartPacket(reader.ReadVariableString());
     }
 
-    private static readonly Message taken = Message.Simple("Username already taken!");
-
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         // Usernames are unique across the whole server, so subscribers never see a duplicate join.
         if (client.WorldFactory.Worlds.Any(world => world.Players.ContainsKey(username)))
         {
-            Reject(taken);
+            client.Write(new FailurePacket(taken));
+            client.Stop();
+
             return;
         }
 
@@ -35,20 +37,11 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 
         if (joining.IsCancelled)
         {
-            Reject(joining.Message);
             return;
         }
 
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
         var player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
-
-        // Catches a concurrent join with the same username that slipped past the check above.
-        // The player is only assigned to the client once added, so a rejected player never dispatches a left event.
-        if (!world.TryAdd(player))
-        {
-            Reject(taken);
-            return;
-        }
 
         client.Player = player;
 
@@ -59,13 +52,5 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 
         client.State = State.Play;
         eventDispatcher.Dispatch(player, new Joined());
-
-        return;
-
-        void Reject(Message message)
-        {
-            client.Write(new FailurePacket(message));
-            client.Stop();
-        }
     }
 }
