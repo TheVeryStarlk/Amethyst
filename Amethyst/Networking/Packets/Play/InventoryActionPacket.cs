@@ -11,7 +11,23 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
     public static InventoryActionPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
-        return new InventoryActionPacket(reader.ReadShort(), reader.ReadItem());
+
+        var index = reader.ReadShort();
+        var type = reader.ReadShort();
+
+        if (type is -1)
+        {
+            return new InventoryActionPacket(index, new Item(-1, 0, 0));
+        }
+
+        var item = new Item(type, reader.ReadByte(), reader.ReadShort());
+
+        if (reader.ReadBoolean())
+        {
+            throw new InvalidOperationException("Has NBT.");
+        }
+
+        return new InventoryActionPacket(index, item);
     }
 
     public void Process(Client client, EventDispatcher eventDispatcher)

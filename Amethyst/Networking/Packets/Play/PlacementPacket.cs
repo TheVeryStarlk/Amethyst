@@ -13,7 +13,24 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
     public static PlacementPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
-        return new PlacementPacket(reader.ReadPosition(), (BlockFace) reader.ReadByte(), reader.ReadItem());
+
+        var position = reader.ReadPosition();
+        var face = (BlockFace) reader.ReadByte();
+        var type = reader.ReadShort();
+
+        if (type is -1)
+        {
+            return new PlacementPacket(position, face, new Item(-1, 0, 0));
+        }
+
+        var item = new Item(type, reader.ReadByte(), reader.ReadShort());
+
+        if (reader.ReadBoolean())
+        {
+            throw new InvalidOperationException("Has NBT.");
+        }
+
+        return new PlacementPacket(position, face, item);
     }
 
     // This needs more work.
