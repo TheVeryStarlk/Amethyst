@@ -48,6 +48,7 @@ internal static class OutgoingPacketExtensions
             EntityHeadLookPacket packet => EntityHeadLookSerializer.Create(packet),
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
             BlockPacket packet => BlockSerializer.Create(packet),
+            SoundPacket packet => SoundSerializer.Create(packet),
             ChangeStatePacket packet => ChangeStateSerializer.Create(packet),
             SetSlotPacket packet => SetSlotSerializer.Create(packet),
             WindowItemsPacket packet => WindowItemsSerializer.Create(packet),
