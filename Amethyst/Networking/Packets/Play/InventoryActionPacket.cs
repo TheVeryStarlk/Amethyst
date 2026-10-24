@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Diagnostics;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Eventing;
 
@@ -32,12 +33,14 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
+        Debug.Assert(client.Player is not null);
+
         // A slot of -1 means the item was dropped outside the window, which is not handled yet.
         if (index is < 0 or > 44)
         {
             return;
         }
 
-        eventDispatcher.Dispatch(client.Player!, new SlotChanged(index, item));
+        eventDispatcher.Dispatch(client.Player, new SlotChanged(index, item));
     }
 }

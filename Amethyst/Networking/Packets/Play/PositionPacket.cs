@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Diagnostics;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Eventing;
 using Amethyst.Abstractions.Eventing.Player;
 
@@ -22,7 +23,9 @@ internal sealed class PositionPacket(Position position, bool ground) : IIngoingP
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var player = client.Player!;
+        Debug.Assert(client.Player is not null);
+
+        var player = client.Player;
 
         player.Position = position;
         player.Ground = ground;
