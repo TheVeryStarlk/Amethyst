@@ -35,18 +35,18 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
             return;
         }
 
-        if (world is not World next)
+        if (world is not World destination)
         {
             throw new ArgumentException("The world was not created by an IWorldFactory.", nameof(world));
         }
 
-        if (!next.TryAdd(this))
+        if (!destination.TryAdd(this))
         {
-            throw new InvalidOperationException($"A player named '{Username}' is already in that world.");
+            throw new InvalidOperationException("The player is already in that world.");
         }
 
         current.Remove(this);
-        current = next;
+        current = destination;
 
         Client.Write(new RespawnPacket(this, World), new PositionLookPacket(position, Yaw, Pitch));
     }
