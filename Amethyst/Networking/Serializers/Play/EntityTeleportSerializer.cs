@@ -2,19 +2,21 @@
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class EntityTeleportSerializer(int unique, double x, double y, double z, float yaw, float pitch, bool ground) : ISerializer<EntityTeleportPacket, EntityTeleportSerializer>
+internal sealed class EntityTeleportSerializer(int unique, int x, int y, int z, byte yaw, byte pitch, bool ground) : ISerializer<EntityTeleportPacket, EntityTeleportSerializer>
 {
     public int Length => Variable.GetByteCount(unique) + sizeof(int) * 3 + sizeof(byte) * 2 + sizeof(bool);
 
     public static EntityTeleportSerializer Create(EntityTeleportPacket packet)
     {
+        // Positions are fixed-point with 5 fractional bits, angles are in 1/256 of a full turn.
+        // Angles go through an integer first so negative ones wrap instead of saturating.
         return new EntityTeleportSerializer(
             packet.Entity.Unique,
-            packet.Entity.Position.X,
-            packet.Entity.Position.Y,
-            packet.Entity.Position.Z,
-            packet.Entity.Yaw,
-            packet.Entity.Pitch,
+            (int) (packet.Entity.Position.X * 32D),
+            (int) (packet.Entity.Position.Y * 32D),
+            (int) (packet.Entity.Position.Z * 32D),
+            (byte) (int) (packet.Entity.Yaw / 360F * 256F),
+            (byte) (int) (packet.Entity.Pitch / 360F * 256F),
             packet.Entity.Ground);
     }
 
@@ -23,11 +25,11 @@ internal sealed class EntityTeleportSerializer(int unique, double x, double y, d
         SpanWriter
             .Create(span)
             .WriteVariableInteger(unique)
-            .WriteFixedDouble(x)
-            .WriteFixedDouble(y)
-            .WriteFixedDouble(z)
-            .WriteAngle(yaw)
-            .WriteAngle(pitch)
+            .WriteInteger(x)
+            .WriteInteger(y)
+            .WriteInteger(z)
+            .WriteByte(yaw)
+            .WriteByte(pitch)
             .WriteBoolean(ground);
     }
 }
