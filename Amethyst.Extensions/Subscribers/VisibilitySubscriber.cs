@@ -17,6 +17,7 @@ public sealed class VisibilitySubscriber : ISubscriber
             consumer.On<Joined>((source, _) =>
             {
                 var spawn = new SpawnPlayerPacket(source);
+                var look = new EntityHeadLookPacket(source);
 
                 foreach (var pair in source.World.Players)
                 {
@@ -25,21 +26,23 @@ public sealed class VisibilitySubscriber : ISubscriber
                         continue;
                     }
 
-                    pair.Value.Client.Write(spawn);
-                    source.Client.Write(new SpawnPlayerPacket(pair.Value));
+                    // Spawning only rotates the body, the head has to be turned separately.
+                    pair.Value.Client.Write(spawn, look);
+                    source.Client.Write(new SpawnPlayerPacket(pair.Value), new EntityHeadLookPacket(pair.Value));
                 }
             });
 
             consumer.On<Moved>((source, _) =>
             {
                 // Use relative movement packets.
-                var packet = new EntityTeleportPacket(source);
+                var teleport = new EntityTeleportPacket(source);
+                var look = new EntityHeadLookPacket(source);
 
                 foreach (var pair in source.World.Players)
                 {
                     if (pair.Value != source)
                     {
-                        pair.Value.Client.Write(packet);
+                        pair.Value.Client.Write(teleport, look);
                     }
                 }
             });
