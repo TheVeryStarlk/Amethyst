@@ -18,6 +18,15 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
+        var dig = eventDispatcher.Dispatch(client.Player!, new Dig(digging, position, face));
+
+        if (dig.IsCancelled)
+        {
+            // The client has already removed the block on its side.
+            client.Write(new BlockPacket(position, client.Player!.World[position]));
+            return;
+        }
+
         var packet = new BlockPacket(position, Blocks.Air);
 
         foreach (var pair in client.Player!.World.Players.Where(pair => pair.Value != client.Player))
@@ -25,7 +34,6 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
             pair.Value.Client.Write(packet);
         }
 
-        client.Player!.World[position] = Blocks.Air;
-        eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
+        client.Player.World[position] = Blocks.Air;
     }
 }

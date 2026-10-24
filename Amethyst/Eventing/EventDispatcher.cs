@@ -6,27 +6,31 @@ namespace Amethyst.Eventing;
 
 internal sealed class EventDispatcher(ILogger<EventDispatcher> logger, IEnumerable<ISubscriber> subscribers)
 {
-    private readonly FrozenDictionary<Type, FrozenSet<Delegate>> events = Registry.Create(subscribers);
+    private readonly FrozenDictionary<Type, Delegate[]> events = Registry.Create(subscribers);
 
-    // Could use some better constraints.
-    public TEvent Dispatch<TSource, TEvent>(TSource source, TEvent original)
+    public TEvent Dispatch<TSource, TEvent>(TSource source, TEvent original) where TEvent : IEvent<TSource>
     {
         if (!events.TryGetValue(typeof(TEvent), out var callbacks))
         {
             return original;
         }
 
-        // Maybe catch exceptions inside the loop?
-        try
+        // Callbacks are registered as Action<TAbstraction, TEvent>, which is contravariant in the source.
+        foreach (var callback in callbacks)
         {
-            foreach (var callback in callbacks.Cast<Action<TSource, TEvent>>())
+            try
             {
-                callback(source, original);
+                ((Action<TSource, TEvent>) callback)(source, original);
             }
-        }
-        catch (Exception exception)
-        {
-            logger.LogError(exception, "An exception occurred while running event: '{Name}'", typeof(TEvent).Name);
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "An exception occurred while running event: '{Name}'", typeof(TEvent).Name);
+            }
+
+            if (original is ICancellable { IsCancelled: true })
+            {
+                break;
+            }
         }
 
         return original;

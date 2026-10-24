@@ -1,4 +1,5 @@
 ﻿namespace Amethyst.Abstractions.Eventing;
 
 // Create an ISource and constraint the T to it.
-public interface IEvent<T>;
+// Contravariant so an event declared for an abstraction (e.g. IClient) can be dispatched from its implementation.
+public interface IEvent<in T>;

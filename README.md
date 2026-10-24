@@ -33,6 +33,16 @@ registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
 }));
 ```
 
+Subscribers run in the order they were registered. Some events implement `ICancellable`, cancelling them skips the remaining subscribers and prevents the action.
+The following example stops players from breaking blocks below `Y = 64`.
+
+```csharp
+registry.For<IPlayer>(consumer => consumer.On<Dig>((_, dig) =>
+{
+    dig.IsCancelled = dig.Position.Y < 64;
+}));
+```
+
 ## Credits
 
 * [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.

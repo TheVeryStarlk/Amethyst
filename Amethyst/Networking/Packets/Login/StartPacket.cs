@@ -21,6 +21,14 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         var joining = eventDispatcher.Dispatch(client, new Joining(username));
+
+        if (joining.IsCancelled)
+        {
+            client.Write(new FailurePacket(joining.Message));
+            client.Stop();
+            return;
+        }
+
         var world = joining.World ?? throw new InvalidOperationException("No world was set.");
 
         client.Player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
