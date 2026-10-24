@@ -18,6 +18,6 @@ internal sealed class ConfigurationPacket(string locale, byte viewDistance) : II
         var configuration = eventDispatcher.Dispatch(client.Player!, new Configuration(locale, viewDistance));
 
         client.Player!.Locale = configuration.Locale;
-        client.Player.ViewDistance = byte.Max(configuration.ViewDistance, 32);
+        client.Player.ViewDistance = byte.Min(configuration.ViewDistance, 32);
     }
 }

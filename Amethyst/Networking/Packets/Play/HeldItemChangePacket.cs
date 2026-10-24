@@ -16,6 +16,6 @@ internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldIte
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
         client.Player!.Inventory.Index = index;
-        eventDispatcher.Dispatch(new Inventory(), client.Player);
+        eventDispatcher.Dispatch(client.Player, new Inventory());
     }
 }
