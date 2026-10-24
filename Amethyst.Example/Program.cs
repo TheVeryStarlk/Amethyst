@@ -7,6 +7,7 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services
     .AddAmethyst<ExampleSubscriber>()
+    .AddSubscriber<UsernameSubscriber>()
     .AddSubscriber<ChunkSubscriber>()
     .AddSubscriber<ListSubscriber>()
     .AddSubscriber<VisibilitySubscriber>()

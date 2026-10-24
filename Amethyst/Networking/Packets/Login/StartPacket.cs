@@ -24,26 +24,20 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        // Usernames are unique across the whole server, so subscribers never see a duplicate join.
-        if (client.WorldFactory.Worlds.Any(world => world.Players.ContainsKey(username)))
-        {
-            client.Write(new FailurePacket(taken));
-            client.Stop();
-
-            return;
-        }
-
         var joining = eventDispatcher.Dispatch(client, new Joining(username));
 
         if (joining.IsCancelled)
         {
+            client.Write(new FailurePacket(joining.Message));
+            client.Stop();
+
             return;
         }
 
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
         var player = new Player(client, world, Guid.NewGuid(), joining.GameMode, joining.Username);
 
-        // Catches a concurrent join with the same username that slipped past the check above.
+        // Usernames are only unique within a world, unless UsernameSubscriber is registered.
         // The player is only assigned to the client once added, so a rejected player never dispatches a left event.
         if (!world.TryAdd(player))
         {

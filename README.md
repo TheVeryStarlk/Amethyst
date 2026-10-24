@@ -55,6 +55,7 @@ Without `ChunkSubscriber`, players receive no chunks. Without `BlockSubscriber`,
 ```csharp
 services
     .AddAmethyst<FooSubscriber>()
+    .AddSubscriber<UsernameSubscriber>()    // Keeps usernames unique across worlds.
     .AddSubscriber<ChunkSubscriber>()       // Streams chunks around players.
     .AddSubscriber<ListSubscriber>()     // Keeps the tab list in sync.
     .AddSubscriber<VisibilitySubscriber>()  // Spawns and moves players for each other.

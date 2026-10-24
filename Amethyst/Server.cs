@@ -7,13 +7,12 @@ using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Abstractions.Eventing.Server;
-using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher, IWorldFactory worldFactory) : IServer, IDisposable
+internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher eventDispatcher) : IServer, IDisposable
 {
     private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];
@@ -49,7 +48,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             try
             {
                 var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
-                var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, worldFactory, socket);
+                var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, socket);
 
                 clients[client] = ExecuteAsync(client);
                 logger.LogDebug("Started client");
