@@ -22,8 +22,11 @@ internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabReques
         var tab = eventDispatcher.Dispatch(client.Player, new Tab(behind));
 
         // This is not a complete implementation of the tab feature.
-        client.Write(tab.Behind.Contains(' ')
-            ? new TabResponsePacket(tab.Matches)
-            : new TabResponsePacket(tab.Matches.Select(match => $"/{match}").ToArray()));
+        // Only command names get their slash back, chat words are completed as they are.
+        var command = tab.Behind.StartsWith('/') && !tab.Behind.Contains(' ');
+
+        client.Write(command
+            ? new TabResponsePacket(tab.Matches.Select(match => $"/{match}").ToArray())
+            : new TabResponsePacket(tab.Matches));
     }
 }
