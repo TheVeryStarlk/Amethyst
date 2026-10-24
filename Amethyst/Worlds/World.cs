@@ -26,7 +26,11 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
     }
 
     private readonly ConcurrentDictionary<string, IPlayer> players = [];
-    private readonly Dictionary<long, IChunk> chunks = [];
+    private readonly ConcurrentDictionary<long, IChunk> chunks = [];
+
+    // Chunks still being generated, only touched while holding the gate.
+    private readonly Dictionary<long, IChunk> pending = [];
+    private readonly Lock gate = new();
 
     /// <returns>False if a player with the same username is already in this world.</returns>
     public bool TryAdd(IPlayer player)
@@ -57,12 +61,32 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
                 return chunk;
             }
 
-            chunk = new Chunk(x, z);
-            chunks[key] = chunk;
+            // Players load chunks from their own threads, so each chunk must only be generated once.
+            lock (gate)
+            {
+                // The generator may read the chunk it is generating back through the world, the gate allows re-entry.
+                if (chunks.TryGetValue(key, out chunk) || pending.TryGetValue(key, out chunk))
+                {
+                    return chunk;
+                }
 
-            Generator.Generate(this, chunk, x, z);
+                chunk = new Chunk(x, z);
+                pending[key] = chunk;
 
-            return chunk;
+                try
+                {
+                    Generator.Generate(this, chunk, x, z);
+                }
+                finally
+                {
+                    pending.Remove(key);
+                }
+
+                // Only published once fully generated, so other players never see a half-generated chunk.
+                chunks[key] = chunk;
+
+                return chunk;
+            }
         }
     }
 }
