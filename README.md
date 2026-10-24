@@ -63,6 +63,17 @@ services
     .AddSubscriber<BlockSubscriber>(); // Applies broken and placed blocks to the world.
 ```
 
+## Example
+
+`Amethyst.Example` is a small creative server built on top of Amethyst. It generates an endless overworld with oceans, rivers, beaches, plains, forests, deserts, savannas, taigas and snowy mountains, decorated with ores, flowers and trees.
+Players join with a hotbar of wands that grow trees, blast craters, blink forward and cover meadows in flowers, and can use `/help` to find their way around.
+
+```
+dotnet run --project Amethyst.Example -- --seed 1234 --port 25565
+```
+
+Both arguments are optional, then connect with a 1.8.9 client.
+
 ## Credits
 
 * [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.
