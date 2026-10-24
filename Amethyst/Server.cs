@@ -1,12 +1,13 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.Sockets;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Packets;
 using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
+using Amethyst.Abstractions.Eventing.Player;
+using Amethyst.Abstractions.Eventing.Server;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Player;
-using Amethyst.Eventing.Server;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -21,7 +22,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
     public Task StartAsync(CancellationToken cancellationToken)
     {
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        return Task.WhenAll(ListeningAsync(), TickingAsync());
+        return ListeningAsync();
     }
 
     public void Dispose()
@@ -40,11 +41,13 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
         logger.LogInformation("Started listening");
 
+        Debug.Assert(source is not null);
+
         while (true)
         {
             try
             {
-                var socket = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
+                var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
                 var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, socket);
 
                 clients[client] = ExecuteAsync(client);
@@ -91,6 +94,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
             if (client.Player is { } player)
             {
+                player.Leave();
                 eventDispatcher.Dispatch(player, new Left());
             }
 
@@ -99,34 +103,6 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
             if (!clients.TryRemove(client, out _))
             {
                 logger.LogWarning("Failed to remove client");
-            }
-        }
-    }
-
-    private async Task TickingAsync()
-    {
-        var tick = new Tick();
-        var timer = new BalancingTimer(TimeSpan.FromSeconds(0.05));
-
-        while (true)
-        {
-            try
-            {
-                if (!await timer.WaitForNextTickAsync(source!.Token).ConfigureAwait(false))
-                {
-                    break;
-                }
-
-                eventDispatcher.Dispatch(this, tick);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Unexpected exception while ticking");
-                break;
             }
         }
     }

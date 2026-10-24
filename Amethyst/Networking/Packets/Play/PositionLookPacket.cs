@@ -1,6 +1,7 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Diagnostics;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Player;
+using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -24,7 +25,15 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        eventDispatcher.Dispatch(client.Player!, new Moved(position, yaw, pitch));
-        client.Player!.Synchronize(position, yaw, pitch, ground);
+        Debug.Assert(client.Player is not null);
+
+        var player = client.Player;
+
+        player.Position = position;
+        player.Yaw = yaw;
+        player.Pitch = pitch;
+        player.Ground = ground;
+
+        eventDispatcher.Dispatch(player, new Moved(position, yaw, pitch));
     }
 }

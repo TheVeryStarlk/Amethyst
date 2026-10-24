@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Amethyst.Abstractions;
+﻿using Amethyst.Abstractions;
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Packets.Play;
@@ -8,11 +7,11 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Entities.Players;
 
-internal sealed class Player(IClient client, Guid guid, GameMode gameMode, string username, IWorld world) : Entity, IPlayer
+internal sealed class Player(IClient client, World world, Guid guid, GameMode gameMode, string username) : Entity, IPlayer
 {
     public IClient Client => client;
 
-    public IWorld World { get; set; } = world;
+    public IWorld World => world;
 
     public Guid Guid => guid;
 
@@ -24,29 +23,30 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
 
     public byte ViewDistance { get; set; }
 
-    public Inventory Inventory { get; } = new();
+    private World world = world;
 
-    private readonly HashSet<long> chunks = [];
-
-    private bool respawning;
-
-    public void Spawn(IWorld world, Position position)
+    public void Spawn(IWorld destination, Position position)
     {
-        if (World == world)
+        if (World == destination)
         {
             return;
         }
 
-        respawning = true;
+        if (destination is not World instance)
+        {
+            throw new ArgumentException("The world was not created by an IWorldFactory.", nameof(destination));
+        }
 
-        World = world;
+        if (!instance.TryAdd(this))
+        {
+            throw new InvalidOperationException("The player is already in that world.");
+        }
 
-        // The client clears the chunks as well.
-        chunks.Clear();
+        
+        world.Remove(this);
+        world = instance;
 
         Client.Write(new RespawnPacket(this, World), new PositionLookPacket(position, Yaw, Pitch));
-
-        respawning = false;
     }
 
     public void Teleport(Position position)
@@ -55,66 +55,11 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
         Client.Write(new PositionLookPacket(position, Yaw, Pitch));
     }
 
-    public void Synchronize(Position position, float yaw, float pitch, bool ground)
+    /// <summary>
+    /// Stops the player's world from tracking it.
+    /// </summary>
+    public void Leave()
     {
-        Position = position;
-        Yaw = yaw;
-        Pitch = pitch;
-        Ground = ground;
-
-        if (respawning)
-        {
-            return;
-        }
-
-        var alive = new long[ViewDistance * ViewDistance * 4];
-        var index = 0;
-
-        var current = (X: ((int) Position.X).ToChunk(), Z: ((int) Position.Z).ToChunk());
-
-        for (var x = current.X - ViewDistance; x < current.X + ViewDistance; x++)
-        {
-            for (var z = current.Z - ViewDistance; z < current.Z + ViewDistance; z++)
-            {
-                alive[index++] = NumericUtility.Encode(x, z);
-            }
-        }
-
-        var dead = chunks.Except(alive).ToArray();
-
-        foreach (var value in dead)
-        {
-            value.Decode(out var x, out var z);
-
-            Client.Write(new SingleChunkPacket(x, z, [], 0));
-            chunks.Remove(value);
-        }
-
-        var closest = alive.OrderBy(value =>
-        {
-            value.Decode(out var x, out var z);
-            return Vector2.Distance(new Vector2(current.X, current.Z), new Vector2(x, z));
-        });
-
-        foreach (var value in closest)
-        {
-            if (!chunks.Add(value))
-            {
-                continue;
-            }
-
-            value.Decode(out var x, out var z);
-
-            var result = World[x, z].Build();
-            Client.Write(new SingleChunkPacket(x, z, result.Sections, result.Bitmask));
-        }
-
-        // Use relative movement packets.
-        var packet = new EntityTeleportPacket(this);
-
-        foreach (var pair in World.Players.Where(pair => pair.Value != this))
-        {
-            pair.Value.Client.Write(packet);
-        }
+        world.Remove(this);
     }
 }

@@ -10,6 +10,9 @@ public readonly struct Item(short type, byte amount, short durability)
 
     /// <remarks>Could be referred as <see cref="Block.Metadata"/>.</remarks>
     public short Durability => durability;
+
+    /// <remarks>The protocol uses a type of -1 for empty slots, while <see langword="default"/> items have a type of 0.</remarks>
+    public bool IsEmpty => type is -1 or 0 || amount is 0;
 }
 
 public enum ItemType

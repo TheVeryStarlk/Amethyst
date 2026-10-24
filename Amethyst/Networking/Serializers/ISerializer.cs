@@ -49,6 +49,8 @@ internal static class OutgoingPacketExtensions
             BlockPacket packet => BlockSerializer.Create(packet),
             ChangeStatePacket packet => ChangeStateSerializer.Create(packet),
             SetSlotPacket packet => SetSlotSerializer.Create(packet),
+            WindowItemsPacket packet => WindowItemsSerializer.Create(packet),
+            HeldSlotPacket packet => HeldSlotSerializer.Create(packet),
             StatisticsPacket packet => StatisticSerializer.Create(packet),
             ListItemPacket packet => ListItemSerializer.Create(packet),
             TabResponsePacket packet => TabResponseSerializer.Create(packet),

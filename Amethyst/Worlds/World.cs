@@ -1,11 +1,11 @@
 ﻿using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
+using System.Collections.Concurrent;
 using Amethyst.Abstractions.Worlds;
-using Amethyst.Entities.Players;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(PlayerRepository playerRepository, string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
+internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
 {
     public string Name => name;
 
@@ -17,7 +17,7 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
 
     public IGenerator Generator => generator;
 
-    public IReadOnlyDictionary<string, IPlayer> Players => playerRepository.Players.Where(pair => pair.Value.World == this).ToDictionary();
+    public IReadOnlyDictionary<string, IPlayer> Players => players;
 
     public Block this[Position position]
     {
@@ -25,7 +25,20 @@ internal sealed class World(PlayerRepository playerRepository, string name, Worl
         set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
     }
 
+    private readonly ConcurrentDictionary<string, IPlayer> players = [];
     private readonly Dictionary<long, IChunk> chunks = [];
+
+    /// <returns>False if a player with the same username is already in this world.</returns>
+    public bool TryAdd(IPlayer player)
+    {
+        return players.TryAdd(player.Username, player);
+    }
+
+    public void Remove(IPlayer player)
+    {
+        // Only remove this exact player, not another one sharing the username.
+        players.TryRemove(new KeyValuePair<string, IPlayer>(player.Username, player));
+    }
 
     public Block this[int x, int y, int z]
     {

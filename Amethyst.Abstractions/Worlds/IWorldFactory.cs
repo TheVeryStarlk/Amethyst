@@ -6,6 +6,11 @@
 public interface IWorldFactory
 {
     /// <summary>
+    /// Every <see cref="IWorld"/> created by this factory.
+    /// </summary>
+    public IReadOnlyCollection<IWorld> Worlds { get; }
+
+    /// <summary>
     /// Creates a new <see cref="IWorld"/> instance.
     /// </summary>
     /// <param name="name">The <see cref="IWorld"/>'s name.</param>

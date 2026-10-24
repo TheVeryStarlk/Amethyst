@@ -1,8 +1,9 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Diagnostics;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
-using Amethyst.Eventing.Player;
+using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -18,14 +19,20 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var packet = new BlockPacket(position, Blocks.Air);
+        Debug.Assert(client.Player is not null);
 
-        foreach (var pair in client.Player!.World.Players.Where(pair => pair.Value != client.Player))
+        // Dropping items and shooting arrows share this packet, but are not related to blocks.
+        if (digging is not (Digging.Started or Digging.Cancelled or Digging.Finished))
         {
-            pair.Value.Client.Write(packet);
+            return;
         }
 
-        client.Player!.World[position] = Blocks.Air;
-        eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
+        var dig = eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
+
+        if (dig.IsCancelled)
+        {
+            // The client might have already removed the block on its side.
+            client.Write(new BlockPacket(position, client.Player.World[position]));
+        }
     }
 }
