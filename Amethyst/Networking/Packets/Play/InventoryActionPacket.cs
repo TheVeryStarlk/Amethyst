@@ -1,5 +1,5 @@
 ﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Entities.Players;
+using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Eventing;
 
 namespace Amethyst.Networking.Packets.Play;
@@ -32,16 +32,12 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        // To throw the item, or to move it.
-        if (item.Type is -1)
+        // A slot of -1 means the item was dropped outside the window, which is not handled yet.
+        if (index is < 0 or > 44)
         {
             return;
         }
 
-        // Inventories are not fully implemented yet...
-        var temporary = index - 36;
-
-        client.Player!.Inventory.Slots[temporary] = item;
-        eventDispatcher.Dispatch(client.Player, new Abstractions.Eventing.Player.Inventory());
+        eventDispatcher.Dispatch(client.Player!, new SlotChanged(index, item));
     }
 }

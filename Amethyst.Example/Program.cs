@@ -9,7 +9,8 @@ builder.Services
     .AddAmethyst<ExampleSubscriber>()
     .AddSubscriber<ChunkSubscriber>()
     .AddSubscriber<ListSubscriber>()
-    .AddSubscriber<VisibilitySubscriber>();
+    .AddSubscriber<VisibilitySubscriber>()
+    .AddSubscriber<InventorySubscriber>();
 
 var host = builder.Build();
 await host.RunAsync();

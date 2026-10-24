@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Worlds;
-using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Worlds;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +16,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<EventDispatcher>();
 
         services.AddSingleton<IWorldFactory, WorldFactory>();
-        services.AddSingleton<IInventoryViewer, InventoryViewer>();
 
         services.AddTransient<Server>();
 

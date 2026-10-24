@@ -84,10 +84,13 @@ internal sealed class ExampleSubscriber(ILogger<ExampleSubscriber> logger, IWorl
         });
     }
 
-    private static readonly string[] commands = ["/help", "/spawn", "/list"];
+    private static readonly string[] commands = ["/help", "/spawn", "/list", "/give", "/clear"];
 
-    private static void Execute(IPlayer player, string command)
+    private static void Execute(IPlayer player, string input)
     {
+        var arguments = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var command = arguments.Length > 0 ? arguments[0] : string.Empty;
+
         switch (command.ToLowerInvariant())
         {
             case "help":
@@ -103,10 +106,36 @@ internal sealed class ExampleSubscriber(ILogger<ExampleSubscriber> logger, IWorl
                 player.Send(Message.Simple($"Online ({player.World.Players.Count}): {string.Join(", ", player.World.Players.Keys)}"));
                 break;
 
+            case "give":
+                Give(player, arguments[1..]);
+                break;
+
+            case "clear":
+                player.Inventory.Clear();
+                player.Send(Message.Create().Write("Cleared your inventory.").Green().Build());
+                break;
+
             default:
                 player.Send(Message.Create().Write($"Unknown command \"/{command}\".").Red().Build());
                 break;
         }
+    }
+
+    private static void Give(IPlayer player, string[] arguments)
+    {
+        if (arguments.Length is 0 or > 2
+            || !short.TryParse(arguments[0], out var type) || type <= 0
+            || !byte.TryParse(arguments.ElementAtOrDefault(1) ?? "1", out var amount) || amount is 0 or > 64)
+        {
+            player.Send(Message.Create().Write("Usage: /give <id> [amount]").Red().Build());
+            return;
+        }
+
+        // Put the item in the hand the player is holding.
+        var inventory = player.Inventory;
+        inventory.Set(Inventory.Hotbar + inventory.Selected, new Item(type, amount, 0));
+
+        player.Send(Message.Create().Write($"Gave {amount} of {(ItemType) type}.").Green().Build());
     }
 
     private static void Broadcast(IWorld world, Message message)

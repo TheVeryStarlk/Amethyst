@@ -57,7 +57,18 @@ services
     .AddAmethyst<FooSubscriber>()
     .AddSubscriber<ChunkSubscriber>()       // Streams chunks around players.
     .AddSubscriber<ListSubscriber>()     // Keeps the tab list in sync.
-    .AddSubscriber<VisibilitySubscriber>(); // Spawns and moves players for each other.
+    .AddSubscriber<VisibilitySubscriber>()  // Spawns and moves players for each other.
+    .AddSubscriber<InventorySubscriber>();  // Tracks players' inventories, creative mode only.
+```
+
+Use `player.Inventory` to read or change a player's inventory, changes are sent to the player.
+Subscribers registered before `InventorySubscriber` see the inventory before a `Selected` or `SlotChanged` event is applied, so use the event's data in those handlers.
+
+```csharp
+registry.For<IPlayer>(consumer => consumer.On<Joined>((player, _) =>
+{
+    player.Inventory.Set(Inventory.Hotbar, new Item((short) ItemType.DiamondPickaxe, 1, 0));
+}));
 ```
 
 ## Credits
