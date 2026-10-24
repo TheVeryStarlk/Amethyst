@@ -41,7 +41,7 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         }
 
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
-        var player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
+        var player = new Player(client, world, Guid.NewGuid(), joining.GameMode, joining.Username);
 
         // Catches a concurrent join with the same username that slipped past the check above.
         // The player is only assigned to the client once added, so a rejected player never dispatches a left event.

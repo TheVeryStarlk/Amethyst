@@ -7,11 +7,11 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Entities.Players;
 
-internal sealed class Player(IClient client, Guid guid, GameMode gameMode, string username, World world) : Entity, IPlayer
+internal sealed class Player(IClient client, World world, Guid guid, GameMode gameMode, string username) : Entity, IPlayer
 {
     public IClient Client => client;
 
-    public IWorld World => current;
+    public IWorld World => world;
 
     public Guid Guid => guid;
 
@@ -25,28 +25,28 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
 
     public Inventory Inventory { get; } = new();
 
-    // The world this player is tracked by.
-    private World current = world;
+    private World world = world;
 
-    public void Spawn(IWorld world, Position position)
+    public void Spawn(IWorld destination, Position position)
     {
-        if (World == world)
+        if (World == destination)
         {
             return;
         }
 
-        if (world is not World destination)
+        if (destination is not World instance)
         {
-            throw new ArgumentException("The world was not created by an IWorldFactory.", nameof(world));
+            throw new ArgumentException("The world was not created by an IWorldFactory.", nameof(destination));
         }
 
-        if (!destination.TryAdd(this))
+        if (!instance.TryAdd(this))
         {
             throw new InvalidOperationException("The player is already in that world.");
         }
 
-        current.Remove(this);
-        current = destination;
+        
+        world.Remove(this);
+        world = instance;
 
         Client.Write(new RespawnPacket(this, World), new PositionLookPacket(position, Yaw, Pitch));
     }
@@ -62,6 +62,6 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
     /// </summary>
     public void Leave()
     {
-        current.Remove(this);
+        world.Remove(this);
     }
 }

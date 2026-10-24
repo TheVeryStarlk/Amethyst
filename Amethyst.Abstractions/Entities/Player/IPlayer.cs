@@ -18,7 +18,7 @@ public interface IPlayer : IEntity
 
     public byte ViewDistance { get; }
 
-    public void Spawn(IWorld world, Position position);
+    public void Spawn(IWorld destination, Position position);
 
     public void Teleport(Position position);
 }
