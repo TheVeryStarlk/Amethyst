@@ -23,10 +23,23 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
 
     public SingleChunkPacket Build()
     {
-        var parts = sections.OfType<Section>().Select(section => section.Build()).ToArray();
+        var parts = new List<byte[]>();
+        var bitmask = 0;
+
+        // Sections can have gaps between them, the bitmask tells the client which heights are present.
+        for (var index = 0; index < sections.Length; index++)
+        {
+            if (sections[index] is not { } section)
+            {
+                continue;
+            }
+
+            parts.Add(section.Build());
+            bitmask |= 1 << index;
+        }
 
         // Use array pools for this.
-        var final = Enumerable.Repeat<byte>(255, (8192 + 2048 + 2048) * parts.Length + 256).ToArray();
+        var final = Enumerable.Repeat<byte>(255, (8192 + 2048 + 2048) * parts.Count + 256).ToArray();
 
         var offset = 0;
 
@@ -36,7 +49,7 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
             offset += 8192;
         }
 
-        return new SingleChunkPacket(horizontal, vertical, final, (ushort) ((1 << parts.Length) - 1));
+        return new SingleChunkPacket(horizontal, vertical, final, (ushort) bitmask);
     }
 
     private Section Section(int y)
