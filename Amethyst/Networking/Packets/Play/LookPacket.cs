@@ -1,4 +1,5 @@
-﻿using Amethyst.Eventing;
+﻿using System.Diagnostics;
+using Amethyst.Eventing;
 using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
@@ -15,7 +16,9 @@ internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoing
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var player = client.Player!;
+        Debug.Assert(client.Player is not null);
+
+        var player = client.Player;
 
         player.Yaw = yaw;
         player.Pitch = pitch;

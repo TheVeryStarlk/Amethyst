@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net.Sockets;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Packets;
@@ -41,11 +42,13 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
         logger.LogInformation("Started listening");
 
+        Debug.Assert(source is not null);
+
         while (true)
         {
             try
             {
-                var socket = await listener.AcceptAsync(source!.Token).ConfigureAwait(false);
+                var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
                 var client = new Client(loggerFactory.CreateLogger<Client>(), eventDispatcher, worldFactory, socket);
 
                 clients[client] = ExecuteAsync(client);

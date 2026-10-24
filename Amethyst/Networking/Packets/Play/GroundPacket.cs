@@ -1,4 +1,5 @@
-﻿using Amethyst.Eventing;
+﻿using System.Diagnostics;
+using Amethyst.Eventing;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -14,6 +15,8 @@ internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>, I
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        client.Player!.Ground = value;
+        Debug.Assert(client.Player is not null);
+
+        client.Player.Ground = value;
     }
 }

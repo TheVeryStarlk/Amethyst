@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Diagnostics;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Eventing;
 using Amethyst.Abstractions.Eventing.Player;
 
@@ -24,7 +25,9 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
-        var player = client.Player!;
+        Debug.Assert(client.Player is not null);
+
+        var player = client.Player;
 
         player.Position = position;
         player.Yaw = yaw;

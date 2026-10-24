@@ -23,8 +23,6 @@ internal sealed class Player(IClient client, World world, Guid guid, GameMode ga
 
     public byte ViewDistance { get; set; }
 
-    public Inventory Inventory { get; } = new();
-
     private World world = world;
 
     public void Spawn(IWorld destination, Position position)
