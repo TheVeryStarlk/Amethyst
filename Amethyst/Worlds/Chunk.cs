@@ -11,7 +11,8 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
 
     public Block this[int x, int y, int z]
     {
-        get => Section(y)[x, y, z];
+        // Reading must not allocate, otherwise every empty section read would be sent to clients.
+        get => sections[y.ToChunk()]?[x, y, z] ?? Blocks.Air;
         set => Section(y)[x, y, z] = value;
     }
 
