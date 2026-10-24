@@ -8,11 +8,11 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Entities.Players;
 
-internal sealed class Player(IClient client, Guid guid, GameMode gameMode, string username, IWorld world) : Entity, IPlayer
+internal sealed class Player(IClient client, Guid guid, GameMode gameMode, string username, World world) : Entity, IPlayer
 {
     public IClient Client => client;
 
-    public IWorld World { get; set; } = world;
+    public IWorld World => current;
 
     public Guid Guid => guid;
 
@@ -30,6 +30,9 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
 
     private bool respawning;
 
+    // The world this player is tracked by.
+    private World current = world;
+
     public void Spawn(IWorld world, Position position)
     {
         if (World == world)
@@ -37,9 +40,20 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
             return;
         }
 
+        if (world is not World next)
+        {
+            throw new ArgumentException("The world was not created by an IWorldFactory.", nameof(world));
+        }
+
+        if (!next.TryAdd(this))
+        {
+            throw new InvalidOperationException($"A player named '{Username}' is already in that world.");
+        }
+
         respawning = true;
 
-        World = world;
+        current.Remove(this);
+        current = next;
 
         // The client clears the chunks as well.
         chunks.Clear();
@@ -116,5 +130,13 @@ internal sealed class Player(IClient client, Guid guid, GameMode gameMode, strin
         {
             pair.Value.Client.Write(packet);
         }
+    }
+
+    /// <summary>
+    /// Stops the player's world from tracking it.
+    /// </summary>
+    public void Leave()
+    {
+        current.Remove(this);
     }
 }

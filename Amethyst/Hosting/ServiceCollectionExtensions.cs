@@ -17,7 +17,6 @@ public static class ServiceCollectionExtensions
         services.AddSubscriber<T>();
 
         services.AddSingleton<EventDispatcher>();
-        services.AddSingleton<PlayerRepository>();
 
         services.AddSingleton<IWorldFactory, WorldFactory>();
         services.AddSingleton<IInventoryViewer, InventoryViewer>();

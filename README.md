@@ -13,9 +13,11 @@ Implementing [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrit
 However, you need to create/specify a world for players to join to.
 
 ```cs
+// Create the world once, players are tracked by the world they are in.
+var world = worldFactory.Create("Empty", EmptyGenerator.Instance);
+
 registry.For<IClient>(consumer => consumer.On<Joining>((_, joining) =>
 {
-    var world = worldFactory.Create("Empty", EmptyGenerator.Instance);
     joining.World = world;
 }));
 ```

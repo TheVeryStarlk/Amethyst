@@ -91,6 +91,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
             if (client.Player is { } player)
             {
+                player.Leave();
                 eventDispatcher.Dispatch(player, new Left());
             }
 

@@ -1,11 +1,11 @@
 using Amethyst.Abstractions.Packets.Play;
-using Amethyst.Entities.Players;
+using Amethyst.Abstractions.Worlds;
 using Microsoft.Extensions.Hosting;
 
 namespace Amethyst.Hosting;
 
 // Clients disconnect if they do not receive a keep alive in time.
-internal sealed class KeepAliveService(PlayerRepository playerRepository) : BackgroundService
+internal sealed class KeepAliveService(IWorldFactory worldFactory) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -17,9 +17,13 @@ internal sealed class KeepAliveService(PlayerRepository playerRepository) : Back
             {
                 var alive = new KeepAlivePacket(Environment.TickCount);
 
-                foreach (var pair in playerRepository.Players)
+                // Every player in the play state is tracked by a world.
+                foreach (var world in worldFactory.Worlds)
                 {
-                    pair.Value.Client.Write(alive);
+                    foreach (var pair in world.Players)
+                    {
+                        pair.Value.Client.Write(alive);
+                    }
                 }
             }
         }

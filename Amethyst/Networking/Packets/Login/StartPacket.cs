@@ -1,7 +1,9 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Entities.Players;
+using Amethyst.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Abstractions.Eventing.Client;
 using Amethyst.Abstractions.Eventing.Player;
@@ -29,16 +31,25 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
             return;
         }
 
-        var world = joining.World ?? throw new InvalidOperationException("No world was set.");
+        var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
+        var player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
 
-        client.Player = new Player(client, Guid.NewGuid(), joining.GameMode, joining.Username, world);
+        // The player is only assigned to the client once added, so a rejected player never dispatches a left event.
+        if (!world.TryAdd(player))
+        {
+            client.Write(new FailurePacket(Message.Simple("Username already taken!")));
+            client.Stop();
+            return;
+        }
+
+        client.Player = player;
 
         client.Write(
-            new SuccessPacket(client.Player),
-            new JoinGamePacket(client.Player, world, byte.MaxValue, false),
+            new SuccessPacket(player),
+            new JoinGamePacket(player, world, byte.MaxValue, false),
             new PositionLookPacket(new Position(), 0, 0));
 
         client.State = State.Play;
-        eventDispatcher.Dispatch(client.Player, new Joined());
+        eventDispatcher.Dispatch(player, new Joined());
     }
 }
