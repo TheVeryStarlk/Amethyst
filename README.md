@@ -50,7 +50,7 @@ Amethyst has no built-in tick loop, if you need one, run your own (for example, 
 ### Subscribers
 
 Amethyst's core only handles what the protocol requires. Gameplay behavior is opt-in through the subscribers in `Amethyst.Extensions`.
-Without `ChunkSubscriber`, players receive no chunks.
+Without `ChunkSubscriber`, players receive no chunks. Without `BlockSubscriber`, blocks players break or place only change on their own client.
 
 ```csharp
 services
@@ -58,7 +58,8 @@ services
     .AddSubscriber<ChunkSubscriber>()       // Streams chunks around players.
     .AddSubscriber<ListSubscriber>()     // Keeps the tab list in sync.
     .AddSubscriber<VisibilitySubscriber>()  // Spawns and moves players for each other.
-    .AddSubscriber<InventorySubscriber>();  // Tracks players' inventories, creative mode only.
+    .AddSubscriber<InventorySubscriber>()   // Tracks players' inventories, creative mode only.
+    .AddSubscriber<BlockSubscriber>();      // Applies broken and placed blocks to the world.
 ```
 
 Use `player.Inventory` to read or change a player's inventory, changes are sent to the player.

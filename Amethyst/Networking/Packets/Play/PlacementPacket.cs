@@ -60,16 +60,6 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
         {
             // The client has already placed the block on its side.
             client.Write(new BlockPacket(where, client.Player!.World[where]));
-            return;
-        }
-
-        client.Player!.World[where] = block;
-
-        var packet = new BlockPacket(where, block);
-
-        foreach (var pair in client.Player.World.Players.Where(pair => pair.Value != client.Player))
-        {
-            pair.Value.Client.Write(packet);
         }
     }
 }

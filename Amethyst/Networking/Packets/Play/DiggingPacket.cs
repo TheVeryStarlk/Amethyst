@@ -18,22 +18,18 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
 
     public void Process(Client client, EventDispatcher eventDispatcher)
     {
+        // Dropping items and shooting arrows share this packet, but are not related to blocks.
+        if (digging is not (Digging.Started or Digging.Cancelled or Digging.Finished))
+        {
+            return;
+        }
+
         var dig = eventDispatcher.Dispatch(client.Player!, new Dig(digging, position, face));
 
         if (dig.IsCancelled)
         {
-            // The client has already removed the block on its side.
+            // The client might have already removed the block on its side.
             client.Write(new BlockPacket(position, client.Player!.World[position]));
-            return;
         }
-
-        var packet = new BlockPacket(position, Blocks.Air);
-
-        foreach (var pair in client.Player!.World.Players.Where(pair => pair.Value != client.Player))
-        {
-            pair.Value.Client.Write(packet);
-        }
-
-        client.Player.World[position] = Blocks.Air;
     }
 }

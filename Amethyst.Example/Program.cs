@@ -10,7 +10,8 @@ builder.Services
     .AddSubscriber<ChunkSubscriber>()
     .AddSubscriber<ListSubscriber>()
     .AddSubscriber<VisibilitySubscriber>()
-    .AddSubscriber<InventorySubscriber>();
+    .AddSubscriber<InventorySubscriber>()
+    .AddSubscriber<BlockSubscriber>();
 
 var host = builder.Build();
 await host.RunAsync();
