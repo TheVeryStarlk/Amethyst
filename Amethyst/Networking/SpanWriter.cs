@@ -35,18 +35,6 @@ internal ref struct SpanWriter
         return this;
     }
 
-    public SpanWriter WriteFixedByte(double value)
-    {
-        WriteByte((byte) (value * 32D));
-        return this;
-    }
-
-    public SpanWriter WriteAngle(float value)
-    {
-        WriteByte((byte) (value % 360 / 360 * 256));
-        return this;
-    }
-
     public SpanWriter WriteBoolean(bool value)
     {
         WriteByte(Unsafe.BitCast<bool, byte>(value));
@@ -80,12 +68,6 @@ internal ref struct SpanWriter
     public SpanWriter WriteDouble(double value)
     {
         BinaryPrimitives.WriteDoubleBigEndian(span[position..(position += sizeof(double))], value);
-        return this;
-    }
-
-    public SpanWriter WriteFixedDouble(double value)
-    {
-        WriteInteger((int) (value * 32D));
         return this;
     }
 

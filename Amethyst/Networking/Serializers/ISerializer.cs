@@ -45,6 +45,7 @@ internal static class OutgoingPacketExtensions
             SpawnPlayerPacket packet => SpawnPlayerSerializer.Create(packet),
             DestroyEntitiesPacket packet => DestroyEntitiesSerializer.Create(packet),
             EntityTeleportPacket packet => EntityTeleportSerializer.Create(packet),
+            EntityHeadLookPacket packet => EntityHeadLookSerializer.Create(packet),
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
             BlockPacket packet => BlockSerializer.Create(packet),
             ChangeStatePacket packet => ChangeStateSerializer.Create(packet),
