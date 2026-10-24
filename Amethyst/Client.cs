@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Packets;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking;
@@ -12,8 +13,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispatcher, Socket socket) : IClient, IDisposable
+internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispatcher, IWorldFactory worldFactory, Socket socket) : IClient, IDisposable
 {
+    public IWorldFactory WorldFactory => worldFactory;
+
     public Player? Player { get; set; }
 
     public State State { get; set; }
