@@ -10,7 +10,7 @@ namespace Amethyst.Extensions.Subscribers;
 /// <summary>
 /// Keeps every player's tab list in sync with the players in the server.
 /// </summary>
-public sealed class TabListSubscriber(IWorldFactory worldFactory) : ISubscriber
+public sealed class ListSubscriber(IWorldFactory worldFactory) : ISubscriber
 {
     public void Subscribe(IRegistry registry)
     {
@@ -19,10 +19,14 @@ public sealed class TabListSubscriber(IWorldFactory worldFactory) : ISubscriber
             consumer.On<Joined>((source, _) =>
             {
                 var list = new ListItemPacket(
-                    new AddPlayerAction(source.Username, source.GameMode, 0, Message.Simple(source.Username)),
+                    new AddPlayerAction(
+                        source.Username,
+                        source.GameMode, 
+                        0, 
+                        Message.Simple(source.Username)),
                     source);
 
-                foreach (var player in Players())
+                foreach (var player in worldFactory.Worlds.SelectMany(world => world.Players.Values))
                 {
                     player.Client.Write(list);
 
@@ -32,7 +36,11 @@ public sealed class TabListSubscriber(IWorldFactory worldFactory) : ISubscriber
                     }
 
                     source.Client.Write(new ListItemPacket(
-                        new AddPlayerAction(player.Username, player.GameMode, 0, Message.Simple(player.Username)),
+                        new AddPlayerAction(
+                            player.Username,
+                            player.GameMode, 
+                            0, 
+                            Message.Simple(player.Username)),
                         player));
                 }
             });
@@ -41,16 +49,11 @@ public sealed class TabListSubscriber(IWorldFactory worldFactory) : ISubscriber
             {
                 var list = new ListItemPacket(new RemovePlayerAction(), source);
 
-                foreach (var player in Players())
+                foreach (var player in worldFactory.Worlds.SelectMany(world => world.Players.Values))
                 {
                     player.Client.Write(list);
                 }
             });
         });
-    }
-
-    private IEnumerable<IPlayer> Players()
-    {
-        return worldFactory.Worlds.SelectMany(world => world.Players.Values);
     }
 }

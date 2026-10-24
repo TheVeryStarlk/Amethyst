@@ -18,60 +18,54 @@ public sealed class ChunkSubscriber : ISubscriber
     {
         registry.For<IPlayer>(consumer =>
         {
-            consumer.On<Moved>((source, _) => Stream(source));
+            consumer.On<Moved>((source, _) =>
+            {
+                var tracker = trackers.GetOrAdd(source, _ => new Tracker());
+                var center = (X: (int)Math.Floor(source.Position.X) >> 4, Z: (int)Math.Floor(source.Position.Z) >> 4);
+
+                if (tracker.World != source.World)
+                {
+                    // The client clears its chunks when changing worlds.
+                    tracker.World = source.World;
+                    tracker.Loaded.Clear();
+                }
+                else if (tracker.Center == center && tracker.Distance == source.ViewDistance)
+                {
+                    return;
+                }
+
+                tracker.Center = center;
+                tracker.Distance = source.ViewDistance;
+
+                var alive = new HashSet<(int X, int Z)>();
+
+                for (var x = center.X - source.ViewDistance; x <= center.X + source.ViewDistance; x++)
+                {
+                    for (var z = center.Z - source.ViewDistance; z <= center.Z + source.ViewDistance; z++)
+                    {
+                        alive.Add((x, z));
+                    }
+                }
+
+                foreach (var dead in tracker.Loaded.Where(chunk => !alive.Contains(chunk)).ToArray())
+                {
+                    source.Client.Write(new SingleChunkPacket(dead.X, dead.Z, [], 0));
+                    tracker.Loaded.Remove(dead);
+                }
+
+                var closest = alive.OrderBy(chunk => (chunk.X - center.X) * (chunk.X - center.X) + (chunk.Z - center.Z) * (chunk.Z - center.Z));
+
+                foreach (var chunk in closest)
+                {
+                    if (tracker.Loaded.Add(chunk))
+                    {
+                        source.Client.Write(source.World[chunk.X, chunk.Z].Build());
+                    }
+                }
+            });
+
             consumer.On<Left>((source, _) => trackers.TryRemove(source, out var tracker));
         });
-    }
-
-    private void Stream(IPlayer player)
-    {
-        var tracker = trackers.GetOrAdd(player, _ => new Tracker());
-        var center = (X: ToChunk(player.Position.X), Z: ToChunk(player.Position.Z));
-
-        if (tracker.World != player.World)
-        {
-            // The client clears its chunks when changing worlds.
-            tracker.World = player.World;
-            tracker.Loaded.Clear();
-        }
-        else if (tracker.Center == center && tracker.Distance == player.ViewDistance)
-        {
-            return;
-        }
-
-        tracker.Center = center;
-        tracker.Distance = player.ViewDistance;
-
-        var alive = new HashSet<(int X, int Z)>();
-
-        for (var x = center.X - player.ViewDistance; x <= center.X + player.ViewDistance; x++)
-        {
-            for (var z = center.Z - player.ViewDistance; z <= center.Z + player.ViewDistance; z++)
-            {
-                alive.Add((x, z));
-            }
-        }
-
-        foreach (var dead in tracker.Loaded.Where(chunk => !alive.Contains(chunk)).ToArray())
-        {
-            player.Client.Write(new SingleChunkPacket(dead.X, dead.Z, [], 0));
-            tracker.Loaded.Remove(dead);
-        }
-
-        var closest = alive.OrderBy(chunk => (chunk.X - center.X) * (chunk.X - center.X) + (chunk.Z - center.Z) * (chunk.Z - center.Z));
-
-        foreach (var chunk in closest)
-        {
-            if (tracker.Loaded.Add(chunk))
-            {
-                player.Client.Write(player.World[chunk.X, chunk.Z].Build());
-            }
-        }
-    }
-
-    private static int ToChunk(double value)
-    {
-        return (int) Math.Floor(value) >> 4;
     }
 
     // Only ever touched by the player's own client, so it does not need to be thread-safe.
