@@ -2,6 +2,8 @@
 using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Eventing;
+using Raspite;
+using Raspite.Tags;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -21,14 +23,22 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
             return new InventoryActionPacket(index, new Item(-1, 0, 0));
         }
 
-        var item = new Item(type, reader.ReadByte(), reader.ReadShort());
+        var amount = reader.ReadByte();
+        var durability = reader.ReadShort();
+        var remaining = span[reader.Position..];
 
-        if (reader.ReadBoolean())
+        // Items without NBT only have a single end tag.
+        if (remaining[0] is Tag.End)
         {
-            throw new InvalidOperationException("Has NBT.");
+            return new InventoryActionPacket(index, new Item(type, amount, durability));
         }
 
-        return new InventoryActionPacket(index, item);
+        if (!TagSerializer.TryParse<CompoundTag>(remaining, out var tag))
+        {
+            throw new InvalidOperationException("Invalid NBT.");
+        }
+
+        return new InventoryActionPacket(index, new Item(type, amount, durability, tag));
     }
 
     public void Process(Client client, EventDispatcher eventDispatcher)

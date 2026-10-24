@@ -4,6 +4,8 @@ using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
 using Amethyst.Abstractions.Eventing.Player;
+using Raspite;
+using Raspite.Tags;
 
 namespace Amethyst.Networking.Packets.Play;
 
@@ -24,14 +26,24 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
             return new PlacementPacket(position, face, new Item(-1, 0, 0));
         }
 
-        var item = new Item(type, reader.ReadByte(), reader.ReadShort());
+        var amount = reader.ReadByte();
+        var durability = reader.ReadShort();
 
-        if (reader.ReadBoolean())
+        // The cursor position that follows the NBT is not read.
+        var remaining = span[reader.Position..];
+
+        // Items without NBT only have a single end tag.
+        if (remaining[0] is Tag.End)
         {
-            throw new InvalidOperationException("Has NBT.");
+            return new PlacementPacket(position, face, new Item(type, amount, durability));
         }
 
-        return new PlacementPacket(position, face, item);
+        if (!TagSerializer.TryParse<CompoundTag>(remaining, out var tag))
+        {
+            throw new InvalidOperationException("Invalid NBT.");
+        }
+
+        return new PlacementPacket(position, face, new Item(type, amount, durability, tag));
     }
 
     // This needs more work.
