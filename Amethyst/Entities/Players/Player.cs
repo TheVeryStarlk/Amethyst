@@ -39,7 +39,7 @@ internal sealed class Player(IClient client, World world, Guid guid, GameMode ga
 
         if (!instance.TryAdd(this))
         {
-            throw new InvalidOperationException("The player is already in that world.");
+            throw new InvalidOperationException("A player with the same username is already in that world.");
         }
 
         
