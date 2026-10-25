@@ -59,17 +59,21 @@ internal sealed class WandSubscriber(Realm realm) : ISubscriber
         player.Send(Chat.Of(article.Paint(Color.Gray), name.Paint(Color.Green), " tree sprouted!".Paint(Color.Gray)), MessagePosition.HotBar);
     }
 
-    private static void Blast(IWorld world, int x, int y, int z)
+    /// <summary>
+    /// Blows a smouldering crater into the world, also used by fireballs and TNT.
+    /// </summary>
+    public static void Blast(IWorld world, int x, int y, int z, double radius = 3.5)
     {
-        const double radius = 3.5;
-
         var random = Random.Shared;
 
-        for (var offsetX = -5; offsetX <= 5; offsetX++)
+        // The noise and the scorched rim reach a bit beyond the radius.
+        var reach = (int) Math.Ceiling(radius + 1.5);
+
+        for (var offsetX = -reach; offsetX <= reach; offsetX++)
         {
-            for (var offsetY = -5; offsetY <= 5; offsetY++)
+            for (var offsetY = -reach; offsetY <= reach; offsetY++)
             {
-                for (var offsetZ = -5; offsetZ <= 5; offsetZ++)
+                for (var offsetZ = -reach; offsetZ <= reach; offsetZ++)
                 {
                     var current = (X: x + offsetX, Y: y + offsetY, Z: z + offsetZ);
 

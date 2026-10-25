@@ -18,6 +18,8 @@ builder.Services
 // Amethyst runs no AI or physics, so the example animates its own entities.
 builder.Services
     .AddSingleton<Animator>()
+    .AddSingleton<Ballistics>()
+    .AddSingleton<Bestiary>()
     .AddHostedService<AnimatorService>();
 
 // Subscribers run in the order they were registered, so the bedrock protection in ServerSubscriber
