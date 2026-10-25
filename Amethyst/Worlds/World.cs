@@ -5,7 +5,7 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
+internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator, WorldFactory factory) : IWorld
 {
     public string Name => name;
 
@@ -43,6 +43,37 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
     {
         // Only remove this exact player, not another one sharing the username.
         players.TryRemove(new KeyValuePair<string, IPlayer>(player.Username, player));
+    }
+
+    /// <summary>
+    /// Adds a player joining the server, claiming its username across every world first.
+    /// </summary>
+    /// <returns>False if a player with the same username, ignoring case, is already in any world.</returns>
+    public bool TryJoin(IPlayer player)
+    {
+        if (!factory.TryAdd(player))
+        {
+            return false;
+        }
+
+        if (players.TryAdd(player.Username, player))
+        {
+            return true;
+        }
+
+        // Cannot happen while the claim is held, but the username must never stay claimed by a player that did not join.
+        factory.Remove(player);
+        return false;
+    }
+
+    /// <summary>
+    /// Removes a player leaving the server and releases its username.
+    /// </summary>
+    public void Leave(IPlayer player)
+    {
+        // Released last, so a new player with the same username never finds this one still in a world.
+        Remove(player);
+        factory.Remove(player);
     }
 
     public Block this[int x, int y, int z]

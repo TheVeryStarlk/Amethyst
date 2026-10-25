@@ -26,7 +26,7 @@ public sealed class ListSubscriber(IWorldFactory worldFactory) : ISubscriber
                         Message.Simple(source.Username)),
                     source);
 
-                foreach (var player in worldFactory.Worlds.SelectMany(world => world.Players.Values))
+                foreach (var player in worldFactory.Players.Values)
                 {
                     player.Client.Write(list);
 
@@ -49,7 +49,7 @@ public sealed class ListSubscriber(IWorldFactory worldFactory) : ISubscriber
             {
                 var list = new ListItemPacket(new RemovePlayerAction(), source);
 
-                foreach (var player in worldFactory.Worlds.SelectMany(world => world.Players.Values))
+                foreach (var player in worldFactory.Players.Values)
                 {
                     player.Client.Write(list);
                 }
