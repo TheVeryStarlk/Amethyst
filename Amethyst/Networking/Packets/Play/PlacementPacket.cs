@@ -47,13 +47,13 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
     }
 
     // This needs more work.
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
         if (item.Type is -1 or >= 256 || face is BlockFace.Self && position.X is -1 && position.Y is -1 && position.Z is -1)
         {
-            eventDispatcher.Dispatch(client.Player, new Use(position, item));
+            dispatcher.Dispatch(client.Player, new Use(position, item));
             return;
         }
 
@@ -69,7 +69,7 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
         };
 
         var block = new Block(item.Type, item.Durability);
-        var placed = eventDispatcher.Dispatch(client.Player, new Placed(where, block));
+        var placed = dispatcher.Dispatch(client.Player, new Placed(where, block));
 
         if (placed.IsCancelled)
         {

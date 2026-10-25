@@ -15,11 +15,11 @@ internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabReques
         return new TabRequestPacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
-        var tab = eventDispatcher.Dispatch(client.Player, new Tab(behind));
+        var tab = dispatcher.Dispatch(client.Player, new Tab(behind));
 
         // This is not a complete implementation of the tab feature.
         // Only command names get their slash back, chat words are completed as they are.

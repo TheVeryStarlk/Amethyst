@@ -23,7 +23,7 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
             reader.ReadBoolean());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
@@ -34,6 +34,6 @@ internal sealed class PositionLookPacket(Position position, float yaw, float pit
         player.Pitch = pitch;
         player.Ground = ground;
 
-        eventDispatcher.Dispatch(player, new Moved(position, yaw, pitch));
+        dispatcher.Dispatch(player, new Moved(position, yaw, pitch));
     }
 }

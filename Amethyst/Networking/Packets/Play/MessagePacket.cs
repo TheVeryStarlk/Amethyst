@@ -14,10 +14,10 @@ internal sealed class MessagePacket(string message) : IIngoingPacket<MessagePack
         return new MessagePacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
-        eventDispatcher.Dispatch(client.Player, new Sent(message));
+        dispatcher.Dispatch(client.Player, new Sent(message));
     }
 }

@@ -12,7 +12,7 @@ internal sealed class StatusPacket(Status status) : IIngoingPacket<StatusPacket>
         return new StatusPacket((Status) reader.ReadVariableInteger());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
     }
 }
