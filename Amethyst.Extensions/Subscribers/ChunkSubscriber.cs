@@ -21,11 +21,11 @@ public sealed class ChunkSubscriber : ISubscriber
             consumer.On<Moved>((source, _) =>
             {
                 var tracker = trackers.GetOrAdd(source, _ => new Tracker());
-                var center = (X: (int)Math.Floor(source.Position.X) >> 4, Z: (int)Math.Floor(source.Position.Z) >> 4);
+                var center = (X: (int) Math.Floor(source.Position.X) >> 4, Z: (int) Math.Floor(source.Position.Z) >> 4);
 
                 if (tracker.World != source.World)
                 {
-                    // The client clears its chunks when changing worlds.
+                    // The client clears its chunks when changing worlds, so they must all be sent again.
                     tracker.World = source.World;
                     tracker.Loaded.Clear();
                 }
