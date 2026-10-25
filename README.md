@@ -47,12 +47,14 @@ registry.For<IPlayer>(consumer => consumer.On<Dig>((_, dig) =>
 
 Amethyst has no built-in tick loop, if you need one, run your own (for example, a hosted service with a `PeriodicTimer`).
 
-Compression is disabled by default and enabled per client when joining.
+Compression and encryption are disabled by default and enabled per client when joining.
+Encrypted clients authenticate their session with Mojang before joining, so offline clients cannot join, but Amethyst does not verify that session.
 
 ```csharp
 registry.For<IClient>(consumer => consumer.On<Joining>((_, joining) =>
 {
     joining.Threshold = 256; // Compresses packets at least 256 bytes long.
+    joining.Encrypted = true;
 }));
 ```
 

@@ -10,6 +10,11 @@ internal ref struct SpanReader(ReadOnlySpan<byte> span)
 
     public int Position { get; private set; }
 
+    public ReadOnlySpan<byte> Read(int length)
+    {
+        return span[Position..(Position += length)];
+    }
+
     public byte ReadByte()
     {
         return span[Position++];

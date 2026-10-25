@@ -1,4 +1,5 @@
-﻿using Amethyst.Abstractions.Entities;
+﻿using System.Security.Cryptography;
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
@@ -14,8 +15,8 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 {
     public static int Identifier => 0;
 
-    private readonly Message taken = Message.Simple("Username already taken!");
-    
+    private static readonly Message taken = Message.Simple("Username already taken!");
+
     public static StartPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
@@ -34,6 +35,21 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
             return;
         }
 
+        if (!joining.Encrypted)
+        {
+            Join(client, eventDispatcher, joining);
+            return;
+        }
+
+        // The login continues once the client responds with the shared secret and the same token.
+        var token = RandomNumberGenerator.GetBytes(4);
+
+        client.Verification = new Verification(joining, token);
+        client.Write(new EncryptionRequestPacket(KeyPair.Public, token));
+    }
+
+    public static void Join(Client client, EventDispatcher eventDispatcher, Joining joining)
+    {
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
         var player = new Player(client, world, Guid.NewGuid(), joining.GameMode, joining.Username);
 
