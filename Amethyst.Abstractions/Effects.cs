@@ -36,7 +36,7 @@ public static class Effects
 
     public const int WitherShoot = 1014;
 
-    public const int BatTakeoff = 1015;
+    public const int BatTakeOff = 1015;
 
     public const int ZombieInfect = 1016;
 
