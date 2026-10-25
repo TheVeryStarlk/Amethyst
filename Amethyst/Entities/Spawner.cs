@@ -1,7 +1,9 @@
 ﻿using System.Collections.Frozen;
 using Amethyst.Abstractions.Entities.Mobs;
+using Amethyst.Abstractions.Entities.Objects;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities.Mobs;
+using Amethyst.Entities.Objects;
 
 namespace Amethyst.Entities;
 
@@ -42,7 +44,39 @@ internal static class Spawner
         [typeof(IWither)] = world => new Wither(world),
         [typeof(IWolf)] = world => new Wolf(world),
         [typeof(IZombie)] = world => new Zombie(world),
-        [typeof(IZombiePigman)] = world => new ZombiePigman(world)
+        [typeof(IZombiePigman)] = world => new ZombiePigman(world),
+
+        // Objects.
+        [typeof(IArmorStand)] = world => new ArmorStand(world),
+        [typeof(IArrow)] = world => new Arrow(world),
+        [typeof(IBoat)] = world => new Boat(world),
+        [typeof(IChestMinecart)] = world => new ChestMinecart(world),
+        [typeof(ICommandBlockMinecart)] = world => new CommandBlockMinecart(world),
+        [typeof(IDroppedItem)] = world => new DroppedItem(world),
+        [typeof(IEgg)] = world => new Egg(world),
+        [typeof(IEnderCrystal)] = world => new EnderCrystal(world),
+        [typeof(IEnderPearl)] = world => new EnderPearl(world),
+        [typeof(IExperienceBottle)] = world => new ExperienceBottle(world),
+        [typeof(IExperienceOrb)] = world => new ExperienceOrb(world),
+        [typeof(IEyeOfEnder)] = world => new EyeOfEnder(world),
+        [typeof(IFallingBlock)] = world => new FallingBlock(world),
+        [typeof(IFirework)] = world => new Firework(world),
+        [typeof(IFishingHook)] = world => new FishingHook(world),
+        [typeof(IFurnaceMinecart)] = world => new FurnaceMinecart(world),
+        [typeof(IHopperMinecart)] = world => new HopperMinecart(world),
+        [typeof(IItemFrame)] = world => new ItemFrame(world),
+        [typeof(ILargeFireball)] = world => new LargeFireball(world),
+        [typeof(ILeashKnot)] = world => new LeashKnot(world),
+        [typeof(ILightning)] = world => new Lightning(world),
+        [typeof(IPainting)] = world => new Painting(world),
+        [typeof(IPrimedTnt)] = world => new PrimedTnt(world),
+        [typeof(IRideableMinecart)] = world => new RideableMinecart(world),
+        [typeof(ISmallFireball)] = world => new SmallFireball(world),
+        [typeof(ISnowball)] = world => new Snowball(world),
+        [typeof(ISpawnerMinecart)] = world => new SpawnerMinecart(world),
+        [typeof(IThrownPotion)] = world => new ThrownPotion(world),
+        [typeof(ITntMinecart)] = world => new TntMinecart(world),
+        [typeof(IWitherSkull)] = world => new WitherSkull(world)
     }.ToFrozenDictionary();
 
     public static Spawnable Create(Type type, IWorld world)
