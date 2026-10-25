@@ -71,7 +71,7 @@ public static class Sounds
 
     public const string LiquidLava = "liquid.lava";
 
-    public const string LiquidLavapop = "liquid.lavapop";
+    public const string LiquidLavaPop = "liquid.lavapop";
 
     public const string GameNeutralSwimSplash = "game.neutral.swim.splash";
 
@@ -99,7 +99,7 @@ public static class Sounds
 
     public const string MobBatLoop = "mob.bat.loop";
 
-    public const string MobBatTakeoff = "mob.bat.takeoff";
+    public const string MobBatTakeOff = "mob.bat.takeoff";
 
     public const string MobBlazeBreathe = "mob.blaze.breathe";
 
@@ -159,13 +159,13 @@ public static class Sounds
 
     public const string MobCreeperSay = "mob.creeper.say";
 
-    public const string MobEnderdragonEnd = "mob.enderdragon.end";
+    public const string MobEnderDragonEnd = "mob.enderdragon.end";
 
-    public const string MobEnderdragonGrowl = "mob.enderdragon.growl";
+    public const string MobEnderDragonGrowl = "mob.enderdragon.growl";
 
-    public const string MobEnderdragonHit = "mob.enderdragon.hit";
+    public const string MobEnderDragonHit = "mob.enderdragon.hit";
 
-    public const string MobEnderdragonWings = "mob.enderdragon.wings";
+    public const string MobEnderDragonWings = "mob.enderdragon.wings";
 
     public const string MobEndermenDeath = "mob.endermen.death";
 
@@ -235,19 +235,19 @@ public static class Sounds
 
     public const string MobHorseZombieIdle = "mob.horse.zombie.idle";
 
-    public const string MobIrongolemDeath = "mob.irongolem.death";
+    public const string MobIronGolemDeath = "mob.irongolem.death";
 
-    public const string MobIrongolemHit = "mob.irongolem.hit";
+    public const string MobIronGolemHit = "mob.irongolem.hit";
 
-    public const string MobIrongolemThrow = "mob.irongolem.throw";
+    public const string MobIronGolemThrow = "mob.irongolem.throw";
 
-    public const string MobIrongolemWalk = "mob.irongolem.walk";
+    public const string MobIronGolemWalk = "mob.irongolem.walk";
 
-    public const string MobMagmacubeBig = "mob.magmacube.big";
+    public const string MobMagmaCubeBig = "mob.magmacube.big";
 
-    public const string MobMagmacubeJump = "mob.magmacube.jump";
+    public const string MobMagmaCubeJump = "mob.magmacube.jump";
 
-    public const string MobMagmacubeSmall = "mob.magmacube.small";
+    public const string MobMagmaCubeSmall = "mob.magmacube.small";
 
     public const string MobPigDeath = "mob.pig.death";
 
@@ -355,19 +355,19 @@ public static class Sounds
 
     public const string MobZombieWood = "mob.zombie.wood";
 
-    public const string MobZombieWoodbreak = "mob.zombie.woodbreak";
+    public const string MobZombieWoodBreak = "mob.zombie.woodbreak";
 
-    public const string MobZombiepigZpig = "mob.zombiepig.zpig";
+    public const string MobZombiePigZPig = "mob.zombiepig.zpig";
 
-    public const string MobZombiepigZpigangry = "mob.zombiepig.zpigangry";
+    public const string MobZombiePigZPigAngry = "mob.zombiepig.zpigangry";
 
-    public const string MobZombiepigZpigdeath = "mob.zombiepig.zpigdeath";
+    public const string MobZombiePigZPigDeath = "mob.zombiepig.zpigdeath";
 
-    public const string MobZombiepigZpighurt = "mob.zombiepig.zpighurt";
+    public const string MobZombiePigZPigHurt = "mob.zombiepig.zpighurt";
 
     public const string NoteBass = "note.bass";
 
-    public const string NoteBassattack = "note.bassattack";
+    public const string NoteBassAttack = "note.bassattack";
 
     public const string NoteBd = "note.bd";
 
@@ -393,15 +393,15 @@ public static class Sounds
 
     public const string RandomBow = "random.bow";
 
-    public const string RandomBowhit = "random.bowhit";
+    public const string RandomBowHit = "random.bowhit";
 
     public const string RandomBreak = "random.break";
 
     public const string RandomBurp = "random.burp";
 
-    public const string RandomChestclosed = "random.chestclosed";
+    public const string RandomChestClosed = "random.chestclosed";
 
-    public const string RandomChestopen = "random.chestopen";
+    public const string RandomChestOpen = "random.chestopen";
 
     public const string GuiButtonPress = "gui.button.press";
 
@@ -427,7 +427,7 @@ public static class Sounds
 
     public const string GamePotionSmash = "game.potion.smash";
 
-    public const string RandomLevelup = "random.levelup";
+    public const string RandomLevelUp = "random.levelup";
 
     public const string RandomOrb = "random.orb";
 

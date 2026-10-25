@@ -28,7 +28,8 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
 
     public SingleChunkPacket Build()
     {
-        var parts = new List<byte[]>();
+        var parts = new byte[sections.Length][];
+        var count = 0;
         var bitmask = 0;
 
         // Sections can have gaps between them, the bitmask tells the client which heights are present.
@@ -39,19 +40,25 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
                 continue;
             }
 
-            parts.Add(section.Build());
+            parts[count++] = section.Build();
             bitmask |= 1 << index;
         }
 
         // Use array pools for this.
-        var final = Enumerable.Repeat<byte>(255, (8192 + 2048 + 2048) * parts.Count + 256).ToArray();
+        var final = Enumerable.Repeat<byte>(255, (8192 + 2048 + 2048) * count + 256).ToArray();
 
         var offset = 0;
 
-        foreach (var part in parts)
+        foreach (var part in parts.AsSpan(0, count))
         {
             part.CopyTo(final, offset);
             offset += 8192;
+        }
+
+        // The biomes come last, after the block and light data.
+        for (var index = 0; index < biomes.Length; index++)
+        {
+            final[final.Length - biomes.Length + index] = (byte) biomes[index];
         }
 
         return new SingleChunkPacket(horizontal, vertical, final, (ushort) bitmask);

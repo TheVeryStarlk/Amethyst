@@ -15,6 +15,9 @@ public interface IWorld
 
     public IGenerator Generator { get; }
 
+    /// <summary>
+    /// The players in this world, keyed by their username ignoring case.
+    /// </summary>
     public IReadOnlyDictionary<string, IPlayer> Players { get; }
 
     public Block this[Position position] { get; set; }

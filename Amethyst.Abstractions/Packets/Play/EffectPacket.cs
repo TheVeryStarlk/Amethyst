@@ -2,7 +2,7 @@
 
 namespace Amethyst.Abstractions.Packets.Play;
 
-public sealed class EffectPacket(int effect, Position position, int data, bool global = false) : IOutgoingPacket
+public sealed class EffectPacket(int effect, Position position, int metadata, bool isGlobal = false) : IOutgoingPacket
 {
     public int Identifier => 40;
 
@@ -10,10 +10,10 @@ public sealed class EffectPacket(int effect, Position position, int data, bool g
 
     public Position Position => position;
 
-    public int Data => data;
+    public int Metadata => metadata;
 
     /// <summary>
     /// Whether the effect is heard at the same volume no matter how far away it is.
     /// </summary>
-    public bool Global => global;
+    public bool IsGlobal => isGlobal;
 }
