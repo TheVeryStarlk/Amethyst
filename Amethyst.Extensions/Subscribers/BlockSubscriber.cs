@@ -22,9 +22,21 @@ public sealed class BlockSubscriber : ISubscriber
                 // Creative clients break blocks instantly, so they never send a finished status.
                 var broken = dig.Status is Digging.Finished || source.GameMode is GameMode.Creative && dig.Status is Digging.Started;
 
-                if (broken)
+                if (!broken)
                 {
-                    source.World.Set(dig.Position, Blocks.Air, source);
+                    return;
+                }
+
+                var block = source.World[dig.Position];
+                source.World.Set(dig.Position, Blocks.Air, source);
+
+                // Clients play the sound and particles of blocks they break, so only the other players need them.
+                // Unlike in chunks, the block's state here keeps the metadata in the upper bits.
+                var packet = new EffectPacket(Effects.BlockBreak, dig.Position, block.Type | (block.Metadata & 15) << 12);
+
+                foreach (var pair in source.World.Players.Where(pair => pair.Value != source))
+                {
+                    pair.Value.Client.Write(packet);
                 }
             });
 
