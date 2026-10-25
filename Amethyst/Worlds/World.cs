@@ -2,7 +2,6 @@
 using Amethyst.Abstractions.Entities.Player;
 using System.Collections.Concurrent;
 using Amethyst.Abstractions.Worlds;
-using Amethyst.Entities;
 
 namespace Amethyst.Worlds;
 
@@ -20,8 +19,6 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
 
     public IReadOnlyDictionary<string, IPlayer> Players => players;
 
-    public IReadOnlyDictionary<int, ISpawnable> Entities => entities;
-
     public Block this[Position position]
     {
         get => this[(int) position.X, (int) position.Y, (int) position.Z];
@@ -30,7 +27,6 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
 
     // Vanilla treats usernames case-insensitively, players still keep the casing they logged in with.
     private readonly ConcurrentDictionary<string, IPlayer> players = new(StringComparer.OrdinalIgnoreCase);
-    private readonly ConcurrentDictionary<int, ISpawnable> entities = [];
     private readonly ConcurrentDictionary<long, IChunk> chunks = [];
 
     // Chunks still being generated, only touched while holding the gate.
@@ -47,21 +43,6 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
     {
         // Only remove this exact player, not another one sharing the username.
         players.TryRemove(new KeyValuePair<string, IPlayer>(player.Username, player));
-    }
-
-    public T Create<T>(Position position) where T : ISpawnable
-    {
-        var entity = Spawner.Create(typeof(T), this);
-
-        entity.Position = position;
-        entities[entity.Unique] = entity;
-
-        return (T) (ISpawnable) entity;
-    }
-
-    public void Remove(ISpawnable entity)
-    {
-        entities.TryRemove(new KeyValuePair<int, ISpawnable>(entity.Unique, entity));
     }
 
     public Block this[int x, int y, int z]
