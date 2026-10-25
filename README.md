@@ -87,6 +87,9 @@ zombie.Despawn();
 `Amethyst.Example` is a small creative server built on top of Amethyst. It generates an endless overworld with oceans, rivers, beaches, plains, forests, deserts, savannas, taigas and snowy mountains, decorated with ores, flowers and trees.
 Players join with a hotbar of wands that grow trees, blast craters, blink forward and cover meadows in flowers, and can use `/help` to find their way around.
 
+Every entity is a command away: `/summon` any of them, ring yourself with every mob in a `/zoo`, adopt any mob with `/pet`, or build a horse `/carousel`, an armor stand `/dance` floor and a `/gallery` of every painting.
+The hotbar also calls down lightning, hurls ghast fireballs, looses volleys of arrows, throws snowballs and hatches spawn eggs, and placed TNT lights itself. Since Amethyst runs no AI or physics, the example animates its own mobs and follows projectiles to where they land.
+
 ```
 dotnet run --project Amethyst.Example -- --seed 1234 --port 25565
 ```
