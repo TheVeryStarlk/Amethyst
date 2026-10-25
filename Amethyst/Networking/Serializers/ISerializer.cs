@@ -49,7 +49,6 @@ internal static class OutgoingPacketExtensions
             DestroyEntitiesPacket packet => DestroyEntitiesSerializer.Create(packet),
             EntityTeleportPacket packet => EntityTeleportSerializer.Create(packet),
             EntityHeadLookPacket packet => EntityHeadLookSerializer.Create(packet),
-            EntityMetadataPacket packet => EntityMetadataSerializer.Create(packet),
             EntityVelocityPacket packet => EntityVelocitySerializer.Create(packet),
             EntityEquipmentPacket packet => EntityEquipmentSerializer.Create(packet),
             SingleChunkPacket packet => SingleChunkSerializer.Create(packet),
