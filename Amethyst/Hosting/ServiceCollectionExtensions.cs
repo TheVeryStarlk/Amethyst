@@ -9,28 +9,31 @@ namespace Amethyst.Hosting;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
+    extension(IServiceCollection services)
     {
-        services.AddSubscriber<T>();
+        public IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber
+        {
+            services.AddSubscriber<T>();
 
-        services.AddSingleton<EventDispatcher>();
+            services.AddSingleton<EventDispatcher>();
 
-        services.AddSingleton<IWorldFactory, WorldFactory>();
+            services.AddSingleton<IWorldFactory, WorldFactory>();
 
-        services.AddTransient<Server>();
+            services.AddTransient<Server>();
 
-        services.AddHostedService<AmethystService>();
-        services.AddHostedService<KeepAliveService>();
+            services.AddHostedService<AmethystService>();
+            services.AddHostedService<KeepAliveService>();
 
-        return services;
-    }
+            return services;
+        }
 
-    /// <summary>
-    /// Registers an additional <see cref="ISubscriber"/>, subscribers run in the order they were registered.
-    /// </summary>
-    public static IServiceCollection AddSubscriber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, ISubscriber
-    {
-        services.AddTransient<ISubscriber, T>();
-        return services;
+        /// <summary>
+        /// Registers an additional <see cref="ISubscriber"/>, subscribers run in the order they were registered.
+        /// </summary>
+        public IServiceCollection AddSubscriber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber
+        {
+            services.AddTransient<ISubscriber, T>();
+            return services;
+        }
     }
 }

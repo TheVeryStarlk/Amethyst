@@ -19,19 +19,10 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
 
     private CancellationTokenSource? source;
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         source = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        return ListeningAsync();
-    }
 
-    public void Dispose()
-    {
-        source?.Dispose();
-    }
-
-    private async Task ListeningAsync()
-    {
         var starting = eventDispatcher.Dispatch(this, new Starting());
 
         using var listener = new Socket(starting.EndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -105,5 +96,10 @@ internal sealed class Server(ILoggerFactory loggerFactory, EventDispatcher event
                 logger.LogWarning("Failed to remove client");
             }
         }
+    }
+
+    public void Dispose()
+    {
+        source?.Dispose();
     }
 }
