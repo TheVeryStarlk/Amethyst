@@ -1,4 +1,5 @@
 using Amethyst.Example;
+using Amethyst.Example.Creatures;
 using Amethyst.Example.Subscribers;
 using Amethyst.Example.Time;
 using Amethyst.Extensions.Subscribers;
@@ -14,6 +15,11 @@ builder.Services
     .AddSingleton<Clock>()
     .AddHostedService<ClockService>();
 
+// Amethyst runs no AI or physics, so the example animates its own entities.
+builder.Services
+    .AddSingleton<Animator>()
+    .AddHostedService<AnimatorService>();
+
 // Subscribers run in the order they were registered, so the bedrock protection in ServerSubscriber
 // gets to cancel digging before BlockSubscriber applies it to the world.
 builder.Services
@@ -26,6 +32,7 @@ builder.Services
     .AddSubscriber<ChunkSubscriber>()
     .AddSubscriber<ListSubscriber>()
     .AddSubscriber<VisibilitySubscriber>()
+    .AddSubscriber<EntitySubscriber>()
     .AddSubscriber<BlockSubscriber>();
 
 var host = builder.Build();
