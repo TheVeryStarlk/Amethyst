@@ -14,7 +14,7 @@ internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldIte
         return new HeldItemChangePacket(reader.ReadShort());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
@@ -23,6 +23,6 @@ internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldIte
             return;
         }
 
-        eventDispatcher.Dispatch(client.Player, new Selected(index));
+        dispatcher.Dispatch(client.Player, new Selected(index));
     }
 }
