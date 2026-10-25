@@ -25,14 +25,15 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
         set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
     }
 
-    private readonly ConcurrentDictionary<string, IPlayer> players = [];
+    // Vanilla treats usernames case-insensitively, players still keep the casing they logged in with.
+    private readonly ConcurrentDictionary<string, IPlayer> players = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<long, IChunk> chunks = [];
 
     // Chunks still being generated, only touched while holding the gate.
     private readonly Dictionary<long, IChunk> pending = [];
     private readonly Lock gate = new();
 
-    /// <returns>False if a player with the same username is already in this world.</returns>
+    /// <returns>False if a player with the same username, ignoring case, is already in this world.</returns>
     public bool TryAdd(IPlayer player)
     {
         return players.TryAdd(player.Username, player);
