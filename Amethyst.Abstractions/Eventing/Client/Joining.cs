@@ -14,6 +14,11 @@ public sealed class Joining(string username) : IEvent<IClient>, ICancellable
     public GameMode GameMode { get; set; }
 
     /// <summary>
+    /// Packets at least this long are compressed, a negative threshold disables compression.
+    /// </summary>
+    public int Threshold { get; set; } = -1;
+
+    /// <summary>
     /// The reason sent to the client if the event was cancelled.
     /// </summary>
     public Message Message { get; set; } = Message.Simple("Disconnected!");

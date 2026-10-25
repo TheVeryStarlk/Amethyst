@@ -34,6 +34,7 @@ internal static class OutgoingPacketExtensions
             // Login.
             FailurePacket packet => FailureSerializer.Create(packet),
             SuccessPacket packet => SuccessSerializer.Create(packet),
+            CompressionPacket packet => CompressionSerializer.Create(packet),
 
             // Play.
             KeepAlivePacket packet => KeepAliveSerializer.Create(packet),

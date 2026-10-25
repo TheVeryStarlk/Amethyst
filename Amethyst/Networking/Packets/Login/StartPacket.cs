@@ -48,6 +48,7 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         }
 
         client.Player = player;
+        client.Compress(joining.Threshold);
 
         client.Write(
             new SuccessPacket(player),

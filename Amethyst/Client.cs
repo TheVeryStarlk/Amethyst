@@ -3,11 +3,11 @@ using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Packets;
+using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets;
-using Amethyst.Networking.Serializers;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -21,6 +21,8 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
     private readonly NetworkStream stream = new(socket);
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
+
+    private int threshold = -1;
 
     public async Task StartAsync()
     {
@@ -52,6 +54,21 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
         }
     }
 
+    /// <summary>
+    /// Sends the threshold to the client, every packet after it is sent and expected in the compressed format.
+    /// A negative threshold leaves compression disabled.
+    /// </summary>
+    public void Compress(int value)
+    {
+        if (value < 0)
+        {
+            return;
+        }
+
+        Write(new CompressionPacket(value));
+        threshold = value;
+    }
+
     public void Stop()
     {
         source.Cancel();
@@ -77,7 +94,7 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
                 var consumed = sequence.Start;
                 var examined = sequence.End;
 
-                if (Protocol.TryRead(ref sequence, out var packet))
+                if (Protocol.TryRead(ref sequence, threshold, out var packet))
                 {
                     packet.Create(State).Process(this, eventDispatcher);
                     examined = consumed = sequence.Start;
@@ -106,19 +123,20 @@ internal sealed class Client(ILogger<Client> logger, EventDispatcher eventDispat
     {
         var output = PipeWriter.Create(stream);
 
-        // Serializers return the packet's length without accounting for the identifier and the total packet length,
-        // which are both encoded as variable integers that take at most five bytes.
-        const int extra = sizeof(int) + sizeof(int) + sizeof(short);
+        // Tracked apart from the reading threshold, as the compression packet itself is sent uncompressed.
+        var compression = -1;
 
         await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
         {
             try
             {
-                var serializer = packet.Create();
-                var span = output.GetSpan(serializer.Length + extra);
-
-                output.Advance(Protocol.Write(span, packet, serializer));
+                Protocol.Write(output, packet, compression);
                 await output.FlushAsync().ConfigureAwait(false);
+
+                if (packet is CompressionPacket current)
+                {
+                    compression = current.Threshold;
+                }
             }
             catch (Exception exception)
             {
