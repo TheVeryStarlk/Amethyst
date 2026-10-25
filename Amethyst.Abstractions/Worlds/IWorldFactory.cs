@@ -1,6 +1,4 @@
-﻿using Amethyst.Abstractions.Entities.Player;
-
-namespace Amethyst.Abstractions.Worlds;
+﻿namespace Amethyst.Abstractions.Worlds;
 
 /// <summary>
 /// Provides support for creating <see cref="IWorld"/> instances.
@@ -11,11 +9,6 @@ public interface IWorldFactory
     /// Every <see cref="IWorld"/> created by this factory.
     /// </summary>
     public IReadOnlyCollection<IWorld> Worlds { get; }
-
-    /// <summary>
-    /// Every player in any <see cref="IWorld"/>, keyed by their username ignoring case.
-    /// </summary>
-    public IReadOnlyDictionary<string, IPlayer> Players { get; }
 
     /// <summary>
     /// Creates a new <see cref="IWorld"/> instance.

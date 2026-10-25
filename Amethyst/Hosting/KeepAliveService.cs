@@ -17,10 +17,13 @@ internal sealed class KeepAliveService(IWorldFactory worldFactory) : BackgroundS
             {
                 var alive = new KeepAlivePacket(Environment.TickCount);
 
-                // Every player in the play state is tracked by the factory, once even while changing worlds.
-                foreach (var pair in worldFactory.Players)
+                // Every player in the play state is tracked by a world.
+                foreach (var world in worldFactory.Worlds)
                 {
-                    pair.Value.Client.Write(alive);
+                    foreach (var pair in world.Players)
+                    {
+                        pair.Value.Client.Write(alive);
+                    }
                 }
             }
         }

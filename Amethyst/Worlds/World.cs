@@ -5,7 +5,7 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Worlds;
 
-internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator, WorldFactory factory) : IWorld
+internal sealed class World(string name, WorldType type, Dimension dimension, Difficulty difficulty, IGenerator generator) : IWorld
 {
     public string Name => name;
 
@@ -24,6 +24,9 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
         get => this[(int) position.X, (int) position.Y, (int) position.Z];
         set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
     }
+
+    // Shared by every world and claimed in one step, so usernames stay unique across worlds even when two players join at once.
+    private static readonly ConcurrentDictionary<string, IPlayer> usernames = new(StringComparer.OrdinalIgnoreCase);
 
     // Vanilla treats usernames case-insensitively, players still keep the casing they logged in with.
     private readonly ConcurrentDictionary<string, IPlayer> players = new(StringComparer.OrdinalIgnoreCase);
@@ -51,7 +54,7 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
     /// <returns>False if a player with the same username, ignoring case, is already in any world.</returns>
     public bool TryJoin(IPlayer player)
     {
-        if (!factory.TryAdd(player))
+        if (!usernames.TryAdd(player.Username, player))
         {
             return false;
         }
@@ -62,7 +65,7 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
         }
 
         // Cannot happen while the claim is held, but the username must never stay claimed by a player that did not join.
-        factory.Remove(player);
+        Release(player);
         return false;
     }
 
@@ -73,7 +76,13 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
     {
         // Released last, so a new player with the same username never finds this one still in a world.
         Remove(player);
-        factory.Remove(player);
+        Release(player);
+    }
+
+    private static void Release(IPlayer player)
+    {
+        // Only release this exact player's claim, not a newer one that claimed the username since.
+        usernames.TryRemove(new KeyValuePair<string, IPlayer>(player.Username, player));
     }
 
     public Block this[int x, int y, int z]
