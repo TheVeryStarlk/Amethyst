@@ -43,8 +43,6 @@ internal static class OutgoingPacketExtensions
             RespawnPacket packet => RespawnSerializer.Create(packet),
             PositionLookPacket packet => PositionLookSerializer.Create(packet),
             SpawnPlayerPacket packet => SpawnPlayerSerializer.Create(packet),
-            SpawnObjectPacket packet => SpawnObjectSerializer.Create(packet),
-            SpawnMobPacket packet => SpawnMobSerializer.Create(packet),
             SpawnPaintingPacket packet => SpawnPaintingSerializer.Create(packet),
             SpawnExperienceOrbPacket packet => SpawnExperienceOrbSerializer.Create(packet),
             SpawnGlobalEntityPacket packet => SpawnGlobalEntitySerializer.Create(packet),
