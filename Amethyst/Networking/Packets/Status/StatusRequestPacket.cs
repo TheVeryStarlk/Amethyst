@@ -13,9 +13,9 @@ internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>,
         return new StatusRequestPacket();
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
-        var request = eventDispatcher.Dispatch(client, new Request());
+        var request = dispatcher.Dispatch(client, new Request());
         client.Write(new StatusResponsePacket(request.Name, request.Numerical, request.Maximum, request.Online, request.Description, request.Favicon));
     }
 }
