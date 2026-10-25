@@ -11,7 +11,7 @@ internal sealed class Player(IClient client, World world, Guid guid, GameMode ga
 {
     public IClient Client => client;
 
-    public IWorld World => world;
+    public override IWorld World => world;
 
     public Guid Guid => guid;
 

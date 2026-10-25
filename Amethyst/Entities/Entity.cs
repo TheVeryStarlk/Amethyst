@@ -1,10 +1,13 @@
 ﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Entities;
 
 internal abstract class Entity : IEntity
 {
     public int Unique { get; } = Tracker.Instance.Next();
+
+    public abstract IWorld World { get; }
 
     public Position Position { get; set; }
 
