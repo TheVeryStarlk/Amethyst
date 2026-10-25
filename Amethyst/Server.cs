@@ -12,9 +12,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Server(ILoggerFactory loggerFactory, Dispatcher dispatcher) : IServer, IDisposable
+internal sealed class Server(ILogger<Server> logger, Dispatcher dispatcher, ClientFactory clientFactory) : IServer, IDisposable
 {
-    private readonly ILogger<Server> logger = loggerFactory.CreateLogger<Server>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];
 
     private CancellationTokenSource? source;
@@ -39,7 +38,7 @@ internal sealed class Server(ILoggerFactory loggerFactory, Dispatcher dispatcher
             try
             {
                 var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
-                var client = new Client(loggerFactory.CreateLogger<Client>(), dispatcher, socket);
+                var client = clientFactory.Create(socket);
 
                 clients[client] = ExecuteAsync(client);
                 logger.LogDebug("Started client");
