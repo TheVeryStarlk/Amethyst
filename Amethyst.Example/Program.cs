@@ -20,6 +20,8 @@ builder.Services
     .AddSingleton<Animator>()
     .AddSingleton<Ballistics>()
     .AddSingleton<Bestiary>()
+    .AddSingleton<Showcase>()
+    .AddSingleton<Pets>()
     .AddHostedService<AnimatorService>();
 
 // Subscribers run in the order they were registered, so the bedrock protection in ServerSubscriber
