@@ -1,8 +1,12 @@
-﻿namespace Amethyst.Abstractions.Entities;
+﻿using Amethyst.Abstractions.Worlds;
+
+namespace Amethyst.Abstractions.Entities;
 
 public interface IEntity
 {
     public int Unique { get; }
+
+    public IWorld World { get; }
 
     public Position Position { get; }
 
