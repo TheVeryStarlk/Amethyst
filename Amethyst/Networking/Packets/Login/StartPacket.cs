@@ -37,9 +37,9 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
         var player = new Player(client, world, Guid.NewGuid(), joining.GameMode, joining.Username);
 
-        // Usernames are unique across every world ignoring case, claimed only once every subscriber let the player join.
+        // Usernames are only unique within a world ignoring case, unless UsernameSubscriber is registered.
         // The player is only assigned to the client once added, so a rejected player never dispatches a left event.
-        if (!world.TryJoin(player))
+        if (!world.TryAdd(player))
         {
             client.Write(new FailurePacket(taken));
             client.Stop();

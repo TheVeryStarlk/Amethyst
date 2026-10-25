@@ -56,10 +56,10 @@ internal sealed class Player(IClient client, World world, Guid guid, GameMode ga
     }
 
     /// <summary>
-    /// Stops the player's world from tracking it and releases its username.
+    /// Stops the player's world from tracking it.
     /// </summary>
     public void Leave()
     {
-        world.Leave(this);
+        world.Remove(this);
     }
 }
