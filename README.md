@@ -59,27 +59,7 @@ services
     .AddSubscriber<ChunkSubscriber>() // Streams chunks around players.
     .AddSubscriber<ListSubscriber>() // Keeps the tab list in sync.
     .AddSubscriber<VisibilitySubscriber>() // Spawns and moves players for each other.
-    .AddSubscriber<BlockSubscriber>() // Applies broken and placed blocks to the world.
-    .AddSubscriber<EntitySubscriber>(); // Shows the entities of a world to players joining it.
-```
-
-### Entities
-
-Every 1.8 mob and object can be spawned, from zombies and horses to armor stands, minecarts and paintings. Entities are created by their interface, and their metadata is set through properties.
-Amethyst runs no AI or physics, entities only move when told to. Changing an entity does not show the change to players until it is sent to them.
-
-```csharp
-var zombie = world.Spawn<IZombie>(new Position(0, 64, 0), zombie =>
-{
-    zombie.CustomName = "Bob";
-    zombie.Helmet = new Item((short) ItemType.DiamondHelmet, 1, 0);
-});
-
-zombie.IsChild = true;
-zombie.Update(); // Sends the changed metadata and equipment.
-
-zombie.Teleport(new Position(0, 70, 0));
-zombie.Despawn();
+    .AddSubscriber<BlockSubscriber>(); // Applies broken and placed blocks to the world.
 ```
 
 ## Credits
