@@ -1,9 +1,11 @@
+using Amethyst.Abstractions.Entities;
 using Amethyst.Abstractions.Entities.Player;
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Abstractions.Worlds;
+using Amethyst.Example.Creatures;
 using Amethyst.Example.Generation;
 using Amethyst.Example.Time;
 using Amethyst.Extensions;
@@ -13,7 +15,7 @@ namespace Amethyst.Example.Subscribers;
 /// <summary>
 /// Chat commands, with tab completion for their names and arguments.
 /// </summary>
-internal sealed class CommandSubscriber(Realm realm, Clock clock, IWorldFactory worldFactory) : ISubscriber
+internal sealed class CommandSubscriber(Realm realm, Clock clock, IWorldFactory worldFactory, Bestiary bestiary, Ballistics ballistics, Showcase showcase, Pets pets) : ISubscriber
 {
     private static readonly (string Name, string Usage, string Description)[] commands =
     [
@@ -28,7 +30,17 @@ internal sealed class CommandSubscriber(Realm realm, Clock clock, IWorldFactory 
         ("tp", "/tp <player>", "Takes you to another explorer."),
         ("kit", "/kit", "Refills your hotbar with the wands."),
         ("seed", "/seed", "Shows the world's seed."),
-        ("list", "/list", "Lists everyone online.")
+        ("list", "/list", "Lists everyone online."),
+        ("summon", "/summon <entity> [count]", "Summons any entity where you look."),
+        ("zoo", "/zoo", "Surrounds you with every mob, name tags included."),
+        ("pet", "/pet <mob|dismiss>", "Adopts any mob as a companion."),
+        ("carousel", "/carousel", "Builds a merry-go-round of horses ahead."),
+        ("dance", "/dance", "Opens a dance floor of armor stands ahead."),
+        ("gallery", "/gallery", "Hangs every painting on a wall ahead."),
+        ("party", "/party", "Rains rainbow sheep, fireworks and experience."),
+        ("smite", "/smite [player]", "Strikes lightning on a player, or where you look."),
+        ("entities", "/entities", "Counts the entities in the world."),
+        ("clear", "/clear [radius]", "Despawns the entities around you, except pets.")
     ];
 
     private static readonly Dictionary<string, long> times = new()
@@ -86,6 +98,9 @@ internal sealed class CommandSubscriber(Realm realm, Clock clock, IWorldFactory 
             "time" => times.Keys,
             "weather" => ["clear", "rain"],
             "tp" => Usernames(),
+            "summon" => bestiary.Names,
+            "pet" => ["dismiss", .. bestiary.Mobs],
+            "smite" => Usernames(),
             _ => []
         };
     }
@@ -156,6 +171,50 @@ internal sealed class CommandSubscriber(Realm realm, Clock clock, IWorldFactory 
                 var names = players.SelectMany((other, index) => new[] { other.Username.Paint(ChatSubscriber.Tint(other)), (index < players.Length - 1 ? ", " : string.Empty).Paint(Color.Gray) });
 
                 player.Send(Chat.Of([$"Online ({players.Length}): ".Paint(Color.Gray), .. names]));
+                break;
+
+            case "summon":
+                Summon(player, argument, arguments.Length > 2 ? arguments[2] : null);
+                break;
+
+            case "zoo":
+                Reply(player, $"Welcome to the zoo, all {showcase.Zoo(player)} mobs are here!", Color.Green);
+                break;
+
+            case "pet":
+                Adopt(player, argument);
+                break;
+
+            case "carousel":
+                showcase.Carousel(player);
+                Reply(player, "Step right up, the carousel is spinning!", Color.Green);
+                break;
+
+            case "dance":
+                showcase.Dance(player);
+                Reply(player, "The dance floor is open!", Color.Green);
+                break;
+
+            case "gallery":
+                showcase.Gallery(player);
+                Reply(player, "The gallery is open, every painting is on the wall.", Color.Green);
+                break;
+
+            case "party":
+                showcase.Party(player);
+                worldFactory.Broadcast(Chat.Of(player.Username.Paint(ChatSubscriber.Tint(player)), " is throwing a party!".Paint(Color.LightPurple)));
+                break;
+
+            case "smite":
+                Smite(player, argument);
+                break;
+
+            case "entities":
+                Census(player);
+                break;
+
+            case "clear":
+                Clear(player, argument);
                 break;
 
             default:
@@ -256,6 +315,110 @@ internal sealed class CommandSubscriber(Realm realm, Clock clock, IWorldFactory 
         }
 
         Reply(player, $"Visiting {target.Username}.", Color.Green);
+    }
+
+    private void Summon(IPlayer player, string? argument, string? amount)
+    {
+        if (argument is null || !bestiary.Names.Contains(argument))
+        {
+            Reply(player, "Usage: /summon <entity> [count], press tab to see them all.", Color.Red);
+            return;
+        }
+
+        var count = Math.Clamp(int.TryParse(amount, out var parsed) ? parsed : 1, 1, 16);
+        var direction = Motion.Direction(player.Yaw, player.Pitch);
+
+        // Where the player looks, or a few blocks ahead on the ground if they look at the sky.
+        var target = Motion.Trace(player.World, Motion.Eye(player), direction, 32) ?? Ahead(player, 6);
+
+        for (var index = 0; index < count; index++)
+        {
+            // Crowds spread out around the first one.
+            var spot = index is 0 ? target : target with { X = target.X + Random.Shared.NextDouble() * 4 - 2, Z = target.Z + Random.Shared.NextDouble() * 4 - 2 };
+            bestiary.Summon(argument, new Summoning(player.World, spot, player.Yaw, player.Pitch, player));
+        }
+
+        player.Send(Chat.Of("Summoned ".Paint(Color.Gray), $"{count} × ".Paint(Color.Aqua), Bestiary.Humanize(argument).Paint(Color.Green), ".".Paint(Color.Gray)), MessagePosition.HotBar);
+    }
+
+    private void Adopt(IPlayer player, string? argument)
+    {
+        if (argument is "dismiss")
+        {
+            Reply(player, pets.Dismiss(player) ? "Your pet went home." : "You have no pet to send home.", Color.Gray);
+            return;
+        }
+
+        if (argument is null || pets.Adopt(player, argument) is null)
+        {
+            Reply(player, "Usage: /pet <mob|dismiss>, press tab to see every mob.", Color.Red);
+            return;
+        }
+
+        player.Send(Chat.Of("Meet your new ".Paint(Color.Gray), Bestiary.Humanize(argument).Paint(Color.Green), ", it will follow you everywhere.".Paint(Color.Gray)));
+    }
+
+    private void Smite(IPlayer player, string? argument)
+    {
+        if (argument is null)
+        {
+            var target = Motion.Trace(player.World, Motion.Eye(player), Motion.Direction(player.Yaw, player.Pitch), 128);
+
+            if (target is null)
+            {
+                Reply(player, "The storm cannot reach that far.", Color.Red);
+                return;
+            }
+
+            ballistics.Strike(player.World, target.Value);
+            return;
+        }
+
+        var victim = worldFactory.Players().FirstOrDefault(other => other.Username.Equals(argument, StringComparison.OrdinalIgnoreCase));
+
+        if (victim is null)
+        {
+            Reply(player, "Usage: /smite [player], press tab to see who is online.", Color.Red);
+            return;
+        }
+
+        ballistics.Strike(victim.World, victim.Position);
+        worldFactory.Broadcast(Chat.Of(player.Username.Paint(ChatSubscriber.Tint(player)), " smote ".Paint(Color.Gray), victim.Username.Paint(ChatSubscriber.Tint(victim)), "!".Paint(Color.Gray)));
+    }
+
+    private void Census(IPlayer player)
+    {
+        var census = showcase.Census(player.World);
+        var total = census.Sum(pair => pair.Count);
+
+        if (total is 0)
+        {
+            Reply(player, "There are no entities in this world, try /summon or /zoo.", Color.Gray);
+            return;
+        }
+
+        var parts = census.SelectMany((pair, index) => new[]
+        {
+            $"{pair.Count} ".Paint(Color.Aqua),
+            pair.Kind.Paint(Color.Green),
+            (index < census.Length - 1 ? ", " : string.Empty).Paint(Color.Gray)
+        });
+
+        player.Send(Chat.Of([$"Entities ({total}): ".Paint(Color.Gray), .. parts]));
+    }
+
+    private void Clear(IPlayer player, string? argument)
+    {
+        var radius = Math.Clamp(double.TryParse(argument, out var parsed) ? parsed : 48, 1, 512);
+        var cleared = showcase.Clear(player.World, player.Position, radius, pets.IsPet);
+
+        Reply(player, $"Despawned {cleared} {(cleared is 1 ? "entity" : "entities")} within {radius} blocks.", Color.Green);
+    }
+
+    private Position Ahead(IPlayer player, double distance)
+    {
+        var ahead = Motion.Along(player.Position, Motion.Direction(player.Yaw, 0), distance);
+        return realm.Surface((int) Math.Floor(ahead.X), (int) Math.Floor(ahead.Z));
     }
 
     private IEnumerable<string> Usernames()

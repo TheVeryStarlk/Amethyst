@@ -46,6 +46,8 @@ internal sealed class ClockService(Clock clock, Realm realm, IWorldFactory world
         return Chat.Of(
             $"{online} {(online is 1 ? "explorer" : "explorers")} online".Paint(Color.Yellow),
             "  |  ".Paint(Color.DarkGray),
+            $"{realm.World.Entities.Count} entities".Paint(Color.LightPurple),
+            "  |  ".Paint(Color.DarkGray),
             $"Day {clock.Age / Clock.Day + 1}, {clock.Display()}".Paint(Color.Aqua),
             "  |  ".Paint(Color.DarkGray),
             $"Seed {realm.Seed}".Paint(Color.Gray));

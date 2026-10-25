@@ -25,13 +25,14 @@ builder.Services
     .AddHostedService<AnimatorService>();
 
 // Subscribers run in the order they were registered, so the bedrock protection in ServerSubscriber
-// gets to cancel digging before BlockSubscriber applies it to the world.
+// gets to cancel digging before BlockSubscriber applies it to the world, and CreatureSubscriber turns placed TNT into primed TNT.
 builder.Services
     .AddAmethyst<ServerSubscriber>()
     .AddSubscriber<ChatSubscriber>()
     .AddSubscriber<CommandSubscriber>()
     .AddSubscriber<WandSubscriber>()
     .AddSubscriber<CompassSubscriber>()
+    .AddSubscriber<CreatureSubscriber>()
     .AddSubscriber<UsernameSubscriber>()
     .AddSubscriber<ChunkSubscriber>()
     .AddSubscriber<ListSubscriber>()

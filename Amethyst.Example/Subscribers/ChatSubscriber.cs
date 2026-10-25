@@ -23,7 +23,7 @@ internal sealed class ChatSubscriber(IWorldFactory worldFactory) : ISubscriber
                 player.Send(Chat.Of(
                     "Welcome to the expedition, ".Paint(Color.Gray),
                     player.Username.Paint(Tint(player)),
-                    "! Your hotbar holds four wands, type ".Paint(Color.Gray),
+                    "! Your hotbar holds nine toys and every entity of the game is a command away, type ".Paint(Color.Gray),
                     "/help".Paint(Color.LightPurple),
                     " to see what else you can do.".Paint(Color.Gray)));
 
