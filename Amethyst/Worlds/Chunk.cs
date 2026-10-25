@@ -13,7 +13,11 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
     {
         // Reading must not allocate, otherwise every empty section read would be sent to clients.
         get => sections[y.ToChunk()]?[x, y, z] ?? Blocks.Air;
-        set => Section(y)[x, y, z] = value;
+        set
+        {
+            var section = sections[y.ToChunk()] ?? (sections[y.ToChunk()] = new Section());
+            section[x, y, z] = value;
+        }
     }
 
     public Biome this[int x, int z]
@@ -51,10 +55,5 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
         }
 
         return new SingleChunkPacket(horizontal, vertical, final, (ushort) bitmask);
-    }
-
-    private Section Section(int y)
-    {
-        return sections[y.ToChunk()] ?? (sections[y.ToChunk()] = new Section());
     }
 }
