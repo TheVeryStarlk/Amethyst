@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
             services.AddSubscriber<T>();
 
             services.AddSingleton<Dispatcher>();
+            services.AddSingleton<ClientFactory>();
 
             services.AddSingleton<IWorldFactory, WorldFactory>();
 
