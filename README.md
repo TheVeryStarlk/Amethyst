@@ -62,6 +62,23 @@ services
     .AddSubscriber<BlockSubscriber>(); // Applies broken and placed blocks to the world.
 ```
 
+## Docker
+
+`Amethyst.Standalone` is a minimal server with every subscriber above and a single flat world, ready to run in a container.
+
+```sh
+docker compose up -d
+```
+
+Or without Compose:
+
+```sh
+docker build -t amethyst .
+docker run -d -p 25565:25565 amethyst
+```
+
+The server listens on port `25565` by default, set the `Port` environment variable to change it.
+
 ## Credits
 
 * [Minecraft Wiki](https://minecraft.wiki/w/Protocol?oldid=2772100) for the amazing documentations about the game's internal technical details.
