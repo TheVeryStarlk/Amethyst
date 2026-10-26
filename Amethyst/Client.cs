@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
+using Amethyst.Abstractions.Eventing.Client;
 using Amethyst.Abstractions.Packets;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
@@ -18,7 +19,12 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
 
     public State State { get; set; }
 
-    private readonly NetworkStream stream = new(socket);
+    /// <summary>
+    /// The login waiting for the client to respond to the encryption request.
+    /// </summary>
+    public Verification? Verification { get; set; }
+
+    private readonly CipherStream stream = new(new NetworkStream(socket));
     private readonly CancellationTokenSource source = new();
     private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
@@ -52,6 +58,11 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
         }
     }
 
+    public void Encrypt(byte[] secret)
+    {
+        stream.Encrypt(secret);
+    }
+
     public void Stop()
     {
         source.Cancel();
@@ -60,6 +71,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
     public void Dispose()
     {
         source.Dispose();
+        stream.Dispose();
         socket.Dispose();
     }
 
@@ -128,6 +140,8 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
         }
     }
 }
+
+internal sealed record Verification(Joining Joining, byte[] Token);
 
 internal enum State
 {

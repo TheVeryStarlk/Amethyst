@@ -39,6 +39,7 @@ internal static class PacketExtensions
             
             // Login.
             { (State.Login, StartPacket.Identifier), static packet => packet.Create<StartPacket>() },
+            { (State.Login, EncryptionResponsePacket.Identifier), static packet => packet.Create<EncryptionResponsePacket>() },
             
             // Play.
             { (State.Play, MessagePacket.Identifier), static packet => packet.Create<MessagePacket>() },
