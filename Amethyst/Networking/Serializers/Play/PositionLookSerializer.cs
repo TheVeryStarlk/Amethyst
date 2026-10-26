@@ -1,26 +1,12 @@
-﻿using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Packets.Play;
+﻿using Amethyst.Abstractions.Packets.Play;
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class PositionLookSerializer(Position position, float yaw, float pitch) : ISerializer<PositionLookPacket, PositionLookSerializer>
+internal sealed partial class PositionLookSerializer(double x, double y, double z, float yaw, float pitch, byte flags) : ISerializer<PositionLookPacket, PositionLookSerializer>
 {
-    public int Length => sizeof(double) * 3 + sizeof(float) * 2 + sizeof(bool);
-
     public static PositionLookSerializer Create(PositionLookPacket packet)
     {
-        return new PositionLookSerializer(packet.Position, packet.Yaw, packet.Pitch);
-    }
-
-    public void Write(Span<byte> span)
-    {
-        SpanWriter
-            .Create(span)
-            .WriteDouble(position.X)
-            .WriteDouble(position.Y)
-            .WriteDouble(position.Z)
-            .WriteFloat(yaw)
-            .WriteFloat(pitch)
-            .WriteBoolean(false);
+        // No flags are set, so every value is absolute.
+        return new PositionLookSerializer(packet.Position.X, packet.Position.Y, packet.Position.Z, packet.Yaw, packet.Pitch, 0);
     }
 }

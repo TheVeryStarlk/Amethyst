@@ -4,17 +4,11 @@ using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoingPacket<LookPacket>, IProcessor
+internal sealed partial class LookPacket(float yaw, float pitch, bool ground) : IIngoingPacket<LookPacket>, IProcessor
 {
     public static State State => State.Play;
 
     public static int Identifier => 5;
-
-    public static LookPacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-        return new LookPacket(reader.ReadFloat(), reader.ReadFloat(), reader.ReadBoolean());
-    }
 
     public void Process(Client client, Dispatcher dispatcher)
     {

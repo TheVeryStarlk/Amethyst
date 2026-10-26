@@ -2,24 +2,11 @@
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class SingleChunkSerializer(int x, int z, byte[] sections, ushort bitmask) : ISerializer<SingleChunkPacket, SingleChunkSerializer>
+internal sealed partial class SingleChunkSerializer(int x, int z, bool continuous, ushort bitmask, byte[] sections) : ISerializer<SingleChunkPacket, SingleChunkSerializer>
 {
-    public int Length => sizeof(int) * 2 + sizeof(bool) + sizeof(ushort) + Variable.GetByteCount(sections.Length) + sections.Length;
-
     public static SingleChunkSerializer Create(SingleChunkPacket packet)
     {
-        return new SingleChunkSerializer(packet.X, packet.Z, packet.Sections, packet.Bitmask);
-    }
-
-    public void Write(Span<byte> span)
-    {
-        SpanWriter
-            .Create(span)
-            .WriteInteger(x)
-            .WriteInteger(z)
-            .WriteBoolean(true)
-            .WriteUnsignedShort(bitmask)
-            .WriteVariableInteger(sections.Length)
-            .Write(sections);
+        // Chunks are always sent whole, along with their biomes.
+        return new SingleChunkSerializer(packet.X, packet.Z, true, packet.Bitmask, packet.Sections);
     }
 }

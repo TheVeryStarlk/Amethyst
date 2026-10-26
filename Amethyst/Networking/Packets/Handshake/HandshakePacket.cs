@@ -4,22 +4,11 @@ using Amethyst.Abstractions.Eventing.Client;
 
 namespace Amethyst.Networking.Packets.Handshake;
 
-internal sealed class HandshakePacket(int version, string address, ushort port, State state) : IIngoingPacket<HandshakePacket>, IProcessor
+internal sealed partial class HandshakePacket([Variable] int version, string address, ushort port, [Variable] State state) : IIngoingPacket<HandshakePacket>, IProcessor
 {
     public static State State => State.Handshake;
 
     public static int Identifier => 0;
-
-    public static HandshakePacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-
-        return new HandshakePacket(
-            reader.ReadVariableInteger(),
-            reader.ReadVariableString(),
-            reader.ReadUnsignedShort(),
-            (State) reader.ReadVariableInteger());
-    }
 
     public void Process(Client client, Dispatcher dispatcher)
     {

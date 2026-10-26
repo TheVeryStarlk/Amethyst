@@ -4,16 +4,11 @@ using Amethyst.Abstractions.Eventing.Client;
 
 namespace Amethyst.Networking.Packets.Status;
 
-internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>, IProcessor
+internal sealed partial class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>, IProcessor
 {
     public static State State => State.Status;
 
     public static int Identifier => 0;
-
-    public static StatusRequestPacket Create(ReadOnlySpan<byte> span)
-    {
-        return new StatusRequestPacket();
-    }
 
     public void Process(Client client, Dispatcher dispatcher)
     {

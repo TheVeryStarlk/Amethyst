@@ -3,10 +3,8 @@ using Amethyst.Abstractions.Packets.Status;
 
 namespace Amethyst.Networking.Serializers.Status;
 
-internal sealed class StatusResponseSerializer(string status) : ISerializer<StatusResponsePacket, StatusResponseSerializer>
+internal sealed partial class StatusResponseSerializer(string status) : ISerializer<StatusResponsePacket, StatusResponseSerializer>
 {
-    public int Length => Variable.GetByteCount(status);
-
     public static StatusResponseSerializer Create(StatusResponsePacket packet)
     {
         var version = new JsonObject
@@ -30,10 +28,5 @@ internal sealed class StatusResponseSerializer(string status) : ISerializer<Stat
         };
 
         return new StatusResponseSerializer(parent.ToJsonString());
-    }
-
-    public void Write(Span<byte> span)
-    {
-        SpanWriter.Create(span).WriteVariableString(status);
     }
 }

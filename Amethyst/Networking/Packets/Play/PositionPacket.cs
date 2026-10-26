@@ -5,29 +5,18 @@ using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class PositionPacket(Position position, bool ground) : IIngoingPacket<PositionPacket>, IProcessor
+internal sealed partial class PositionPacket(double x, double y, double z, bool ground) : IIngoingPacket<PositionPacket>, IProcessor
 {
     public static State State => State.Play;
 
     public static int Identifier => 4;
-
-    public static PositionPacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-
-        return new PositionPacket(
-            new Position(
-                reader.ReadDouble(),
-                reader.ReadDouble(),
-                reader.ReadDouble()),
-            reader.ReadBoolean());
-    }
 
     public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
         var player = client.Player;
+        var position = new Position(x, y, z);
 
         player.Position = position;
         player.Ground = ground;

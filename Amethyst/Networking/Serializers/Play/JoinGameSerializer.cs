@@ -2,7 +2,7 @@
 
 namespace Amethyst.Networking.Serializers.Play;
 
-internal sealed class JoinGameSerializer(
+internal sealed partial class JoinGameSerializer(
     int unique,
     byte gameMode,
     byte dimension,
@@ -11,8 +11,6 @@ internal sealed class JoinGameSerializer(
     string type,
     bool reducedDebugInformation) : ISerializer<JoinGamePacket, JoinGameSerializer>
 {
-    public int Length => sizeof(int) + sizeof(byte) * 4 + Variable.GetByteCount(type) + sizeof(bool);
-
     public static JoinGameSerializer Create(JoinGamePacket packet)
     {
         return new JoinGameSerializer(
@@ -23,18 +21,5 @@ internal sealed class JoinGameSerializer(
             packet.List,
             packet.World.Type.ToString(),
             packet.ReducedDebugInformation);
-    }
-
-    public void Write(Span<byte> span)
-    {
-        SpanWriter
-            .Create(span)
-            .WriteInteger(unique)
-            .WriteByte(gameMode)
-            .WriteByte(dimension)
-            .WriteByte(difficulty)
-            .WriteByte(players)
-            .WriteVariableString(type)
-            .WriteBoolean(reducedDebugInformation);
     }
 }

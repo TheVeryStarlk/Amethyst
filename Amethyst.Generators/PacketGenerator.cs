@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,21 +13,30 @@ public sealed class PacketGenerator : IIncrementalGenerator
         var ingoing = context.SyntaxProvider
             .CreateSyntaxProvider(
                 static (node, _) => Implements(node, "IIngoingPacket"),
-                static (context, token) => GetIngoing(context, token))
-            .Where(static packet => packet is not null)
-            .Select(static (packet, _) => packet!)
-            .Collect();
+                static (context, token) => GetTarget(context, "IIngoingPacket", "Amethyst.Networking.Packets", true, token))
+            .Where(static target => target is not null)
+            .Select(static (target, _) => target!);
 
         var serializers = context.SyntaxProvider
             .CreateSyntaxProvider(
                 static (node, _) => Implements(node, "ISerializer"),
-                static (context, token) => GetSerializer(context, token))
-            .Where(static serializer => serializer is not null)
-            .Select(static (serializer, _) => serializer!.Value)
+                static (context, token) => GetTarget(context, "ISerializer", "Amethyst.Networking.Serializers", false, token))
+            .Where(static target => target is not null)
+            .Select(static (target, _) => target!);
+
+        var packets = ingoing
+            .Select(static (target, _) => target.Type)
             .Collect();
 
-        context.RegisterSourceOutput(ingoing, static (context, packets) => context.AddSource("PacketExtensions.g.cs", WriteIngoing(packets)));
-        context.RegisterSourceOutput(serializers, static (context, pairs) => context.AddSource("OutgoingPacketExtensions.g.cs", WriteOutgoing(pairs)));
+        var pairs = serializers
+            .Select(static (target, _) => (Packet: target.Packet!, Serializer: target.Type))
+            .Collect();
+
+        context.RegisterSourceOutput(packets, static (context, packets) => context.AddSource("PacketExtensions.g.cs", Source.WriteCreators(packets)));
+        context.RegisterSourceOutput(pairs, static (context, pairs) => context.AddSource("OutgoingPacketExtensions.g.cs", Source.WriteSerializers(pairs)));
+
+        context.RegisterSourceOutput(ingoing, static (context, target) => AddMembers(context, target));
+        context.RegisterSourceOutput(serializers, static (context, target) => AddMembers(context, target));
     }
 
     // Only a syntactic check, so the semantic model is never touched for most classes.
@@ -47,97 +55,90 @@ public sealed class PacketGenerator : IIncrementalGenerator
         };
     }
 
-    private static string? GetIngoing(GeneratorSyntaxContext context, CancellationToken token)
+    private static Target? GetTarget(GeneratorSyntaxContext context, string name, string space, bool reading, CancellationToken token)
     {
-        var symbol = context.SemanticModel.GetDeclaredSymbol((ClassDeclarationSyntax) context.Node, token);
+        var declaration = (ClassDeclarationSyntax) context.Node;
+        var symbol = context.SemanticModel.GetDeclaredSymbol(declaration, token);
 
-        if (symbol is null || symbol.IsAbstract || !symbol.Interfaces.Any(type => Is(type, "IIngoingPacket", "Amethyst.Networking.Packets")))
+        // Partial classes are found once per declaration, so only the first one is kept.
+        if (symbol is null || symbol.IsAbstract || symbol.DeclaringSyntaxReferences[0].GetSyntax(token) != declaration)
         {
             return null;
         }
 
-        return symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-    }
+        var contract = symbol.Interfaces.FirstOrDefault(type => type.Name == name
+                                                                && type.IsGenericType
+                                                                && type.ContainingNamespace.ToDisplayString() == space);
 
-    private static (string Packet, string Serializer)? GetSerializer(GeneratorSyntaxContext context, CancellationToken token)
-    {
-        var symbol = context.SemanticModel.GetDeclaredSymbol((ClassDeclarationSyntax) context.Node, token);
-
-        if (symbol is null || symbol.IsAbstract)
+        if (contract is null)
         {
             return null;
         }
 
-        var serializer = symbol.Interfaces.FirstOrDefault(type => Is(type, "ISerializer", "Amethyst.Networking.Serializers") && type.Arity is 2);
+        var members = Members.None;
 
-        if (serializer is null)
+        // Only partial classes are generated, everything they already declare is left alone.
+        if (declaration.Modifiers.Any(SyntaxKind.PartialKeyword) && symbol.ContainingType is null)
         {
-            return null;
+            members = reading
+                ? GetMissing(symbol, "Create", Members.Create)
+                : GetMissing(symbol, "Length", Members.Length) | GetMissing(symbol, "Write", Members.Write);
         }
 
-        return (
-            serializer.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
-    }
+        var fields = ImmutableArray.CreateBuilder<Field>();
+        var problems = ImmutableArray.CreateBuilder<Problem>();
 
-    private static bool Is(INamedTypeSymbol type, string name, string space)
-    {
-        return type.Name == name && type.ContainingNamespace.ToDisplayString() == space;
-    }
-
-    private static string WriteIngoing(ImmutableArray<string> packets)
-    {
-        var builder = new StringBuilder();
-
-        // Partial classes are found once per declaration.
-        foreach (var packet in packets.Distinct().OrderBy(packet => packet, StringComparer.Ordinal))
+        if (members is not Members.None)
         {
-            builder.Append($"            {{ ({packet}.State, {packet}.Identifier), static packet => packet.Create<{packet}>() }},\n");
+            foreach (var parameter in GetParameters(symbol, token))
+            {
+                if (Field.TryCreate(parameter, reading, out var field))
+                {
+                    fields.Add(field);
+                }
+                else
+                {
+                    problems.Add(Problem.Create(parameter, reading));
+                }
+            }
         }
 
-        return $$"""
-                 // <auto-generated/>
-                 #nullable enable
-
-                 namespace Amethyst.Networking.Packets;
-
-                 internal static partial class PacketExtensions
-                 {
-                     private static partial global::System.Collections.Generic.Dictionary<(global::Amethyst.State State, int Identifier), global::System.Func<global::Amethyst.Networking.Packets.Packet, global::Amethyst.Networking.Packets.IProcessor>> Creators()
-                     {
-                         return new global::System.Collections.Generic.Dictionary<(global::Amethyst.State State, int Identifier), global::System.Func<global::Amethyst.Networking.Packets.Packet, global::Amethyst.Networking.Packets.IProcessor>>
-                         {
-                 {{builder}}        };
-                     }
-                 }
-                 """;
+        return new Target(
+            symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            reading ? null : contract.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            symbol.ContainingNamespace.IsGlobalNamespace ? null : symbol.ContainingNamespace.ToDisplayString(),
+            symbol.Name,
+            members,
+            new EquatableArray<Field>(fields.ToImmutable()),
+            new EquatableArray<Problem>(problems.ToImmutable()));
     }
 
-    private static string WriteOutgoing(ImmutableArray<(string Packet, string Serializer)> pairs)
+    private static Members GetMissing(INamedTypeSymbol symbol, string name, Members member)
     {
-        var builder = new StringBuilder();
+        return symbol.GetMembers(name).IsEmpty ? member : Members.None;
+    }
 
-        foreach (var (packet, serializer) in pairs.Distinct().OrderBy(pair => pair.Packet, StringComparer.Ordinal))
+    // The primary constructor declares the fields in the order they are sent.
+    private static ImmutableArray<IParameterSymbol> GetParameters(INamedTypeSymbol symbol, CancellationToken token)
+    {
+        var constructor = symbol.InstanceConstructors.FirstOrDefault(constructor => constructor.DeclaringSyntaxReferences
+            .Any(reference => reference.GetSyntax(token) is TypeDeclarationSyntax));
+
+        return constructor?.Parameters ?? ImmutableArray<IParameterSymbol>.Empty;
+    }
+
+    private static void AddMembers(SourceProductionContext context, Target target)
+    {
+        foreach (var problem in target.Problems)
         {
-            builder.Append($"            {packet} packet => {serializer}.Create(packet),\n");
+            context.ReportDiagnostic(problem.ToDiagnostic());
         }
 
-        return $$"""
-                 // <auto-generated/>
-                 #nullable enable
+        if (target.Members is Members.None || !target.Problems.IsEmpty)
+        {
+            return;
+        }
 
-                 namespace Amethyst.Networking.Serializers;
-
-                 internal static partial class OutgoingPacketExtensions
-                 {
-                     public static partial global::Amethyst.Networking.Serializers.ISerializer Create(this global::Amethyst.Abstractions.Packets.IOutgoingPacket instance)
-                     {
-                         return instance switch
-                         {
-                 {{builder}}            _ => throw new global::System.ArgumentOutOfRangeException(nameof(instance), instance, "Unknown packet.")
-                         };
-                     }
-                 }
-                 """;
+        context.AddSource($"{target.Type.Replace("global::", string.Empty)}.g.cs", Source.WriteMembers(target));
     }
 }

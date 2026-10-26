@@ -4,17 +4,11 @@ using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Play;
 
-internal sealed class MessagePacket(string message) : IIngoingPacket<MessagePacket>, IProcessor
+internal sealed partial class MessagePacket(string message) : IIngoingPacket<MessagePacket>, IProcessor
 {
     public static State State => State.Play;
 
     public static int Identifier => 1;
-
-    public static MessagePacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-        return new MessagePacket(reader.ReadVariableString());
-    }
 
     public void Process(Client client, Dispatcher dispatcher)
     {

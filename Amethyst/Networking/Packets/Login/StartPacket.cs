@@ -10,7 +10,7 @@ using Amethyst.Abstractions.Eventing.Player;
 
 namespace Amethyst.Networking.Packets.Login;
 
-internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>, IProcessor
+internal sealed partial class StartPacket(string username) : IIngoingPacket<StartPacket>, IProcessor
 {
     public static State State => State.Login;
 
@@ -18,12 +18,6 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 
     private readonly Message taken = Message.Simple("Username already taken!");
     
-    public static StartPacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-        return new StartPacket(reader.ReadVariableString());
-    }
-
     public void Process(Client client, Dispatcher dispatcher)
     {
         var joining = dispatcher.Dispatch(client, new Joining(username));
