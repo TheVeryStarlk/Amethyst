@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystService(ILogger<AmethystService> logger, Server server) : BackgroundService
+internal sealed class AmethystService(ILogger<AmethystService> logger, IHostApplicationLifetime lifetime, Server server) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
@@ -14,6 +14,9 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
         catch (Exception exception)
         {
             logger.LogError(exception, "An unexpected exception occurred");
+
+            // Exit with a failure so supervisors like Docker know the server crashed.
+            Environment.ExitCode = 1;
         }
         finally
         {
@@ -21,5 +24,8 @@ internal sealed class AmethystService(ILogger<AmethystService> logger, Server se
         }
 
         logger.LogInformation("Server stopped");
+
+        // The host has nothing left to do without the server, for example when the port could not be bound.
+        lifetime.StopApplication();
     }
 }
