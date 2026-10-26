@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using Amethyst.Abstractions;
 using Amethyst.Abstractions.Eventing.Client;
 using Amethyst.Abstractions.Packets;
+using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking;
@@ -19,7 +20,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
     public State State { get; set; }
 
     /// <summary>
-    /// Set once when joining, packets at least this long are compressed.
+    /// Set once when joining, the threshold incoming packets are read with.
     /// A negative threshold disables compression.
     /// </summary>
     public int Threshold { get; set; } = -1;
@@ -31,7 +32,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
 
     private readonly CipherStream stream = new(new NetworkStream(socket));
     private readonly CancellationTokenSource source = new();
-    private readonly Channel<Outgoing> outgoing = Channel.CreateUnbounded<Outgoing>();
+    private readonly Channel<IOutgoingPacket> outgoing = Channel.CreateUnbounded<IOutgoingPacket>();
 
     public async Task StartAsync()
     {
@@ -56,8 +57,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
 
         foreach (var packet in packets)
         {
-            // Captured when queued, as the threshold is set before the earlier packets are written.
-            if (!outgoing.Writer.TryWrite(new Outgoing(packet, Threshold)))
+            if (!outgoing.Writer.TryWrite(packet))
             {
                 break;
             }
@@ -124,12 +124,20 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
     {
         var output = PipeWriter.Create(stream);
 
-        await foreach (var item in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
+        // Tracked apart from the reading threshold, as the compression packet itself is sent uncompressed.
+        var compression = -1;
+
+        await foreach (var packet in outgoing.Reader.ReadAllAsync().ConfigureAwait(false))
         {
             try
             {
-                Protocol.Write(output, item.Packet, item.Threshold);
+                Protocol.Write(output, packet, compression);
                 await output.FlushAsync().ConfigureAwait(false);
+
+                if (packet is CompressionPacket current)
+                {
+                    compression = current.Threshold;
+                }
             }
             catch (Exception exception)
             {
@@ -141,13 +149,6 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
 }
 
 internal sealed record Verification(Joining Joining, byte[] Token);
-
-internal readonly struct Outgoing(IOutgoingPacket packet, int threshold)
-{
-    public IOutgoingPacket Packet => packet;
-
-    public int Threshold => threshold;
-}
 
 internal enum State
 {
