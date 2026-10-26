@@ -1,0 +1,7 @@
+services:
+  amethyst:
+    build: .
+    image: amethyst
+    ports:
+      - "25565:25565"
+    restart: unless-stopped
