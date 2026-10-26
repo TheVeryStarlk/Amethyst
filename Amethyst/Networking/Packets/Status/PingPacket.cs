@@ -5,6 +5,8 @@ namespace Amethyst.Networking.Packets.Status;
 
 internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>, IProcessor
 {
+    public static State State => State.Status;
+
     public static int Identifier => 1;
 
     public static PingPacket Create(ReadOnlySpan<byte> span)

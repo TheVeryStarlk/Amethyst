@@ -7,6 +7,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class PositionPacket(Position position, bool ground) : IIngoingPacket<PositionPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 4;
 
     public static PositionPacket Create(ReadOnlySpan<byte> span)

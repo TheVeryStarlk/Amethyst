@@ -9,6 +9,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class DiggingPacket(Digging digging, Position position, BlockFace face) : IIngoingPacket<DiggingPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 7;
 
     public static DiggingPacket Create(ReadOnlySpan<byte> span)

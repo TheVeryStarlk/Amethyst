@@ -7,6 +7,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class TabRequestPacket(string behind) : IIngoingPacket<TabRequestPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 20;
 
     public static TabRequestPacket Create(ReadOnlySpan<byte> span)

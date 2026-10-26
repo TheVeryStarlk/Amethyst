@@ -9,6 +9,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPacket<InventoryActionPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 16;
 
     public static InventoryActionPacket Create(ReadOnlySpan<byte> span)

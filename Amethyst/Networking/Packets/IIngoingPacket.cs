@@ -4,6 +4,8 @@ namespace Amethyst.Networking.Packets;
 
 internal interface IIngoingPacket<out T> where T : IIngoingPacket<T>
 {
+    public static abstract State State { get; }
+
     public static abstract int Identifier { get; }
 
     public static abstract T Create(ReadOnlySpan<byte> span);

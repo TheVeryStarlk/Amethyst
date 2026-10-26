@@ -12,6 +12,8 @@ namespace Amethyst.Networking.Packets.Login;
 
 internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>, IProcessor
 {
+    public static State State => State.Login;
+
     public static int Identifier => 0;
 
     private readonly Message taken = Message.Simple("Username already taken!");

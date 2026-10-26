@@ -6,6 +6,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class ConfigurationPacket(string locale, byte viewDistance) : IIngoingPacket<ConfigurationPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 21;
 
     public static ConfigurationPacket Create(ReadOnlySpan<byte> span)

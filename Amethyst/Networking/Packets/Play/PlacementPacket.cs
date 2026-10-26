@@ -11,6 +11,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class PlacementPacket(Position position, BlockFace face, Item item) : IIngoingPacket<PlacementPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 8;
 
     public static PlacementPacket Create(ReadOnlySpan<byte> span)

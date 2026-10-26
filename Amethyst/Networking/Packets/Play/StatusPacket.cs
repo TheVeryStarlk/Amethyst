@@ -4,6 +4,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class StatusPacket(Status status) : IIngoingPacket<StatusPacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 22;
 
     public static StatusPacket Create(ReadOnlySpan<byte> span)

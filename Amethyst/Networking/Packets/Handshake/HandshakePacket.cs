@@ -6,6 +6,8 @@ namespace Amethyst.Networking.Packets.Handshake;
 
 internal sealed class HandshakePacket(int version, string address, ushort port, State state) : IIngoingPacket<HandshakePacket>, IProcessor
 {
+    public static State State => State.Handshake;
+
     public static int Identifier => 0;
 
     public static HandshakePacket Create(ReadOnlySpan<byte> span)

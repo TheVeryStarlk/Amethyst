@@ -6,6 +6,8 @@ namespace Amethyst.Networking.Packets.Play;
 
 internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldItemChangePacket>, IProcessor
 {
+    public static State State => State.Play;
+
     public static int Identifier => 9;
 
     public static HeldItemChangePacket Create(ReadOnlySpan<byte> span)

@@ -6,6 +6,8 @@ namespace Amethyst.Networking.Packets.Status;
 
 internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>, IProcessor
 {
+    public static State State => State.Status;
+
     public static int Identifier => 0;
 
     public static StatusRequestPacket Create(ReadOnlySpan<byte> span)
