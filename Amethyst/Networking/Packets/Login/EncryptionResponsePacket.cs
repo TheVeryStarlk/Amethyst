@@ -16,7 +16,7 @@ internal sealed class EncryptionResponsePacket(byte[] secret, byte[] token) : II
             reader.Read(reader.ReadVariableInteger()).ToArray());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         // Both are encrypted with the public key, the shared secret is a 128 bit key.
         if (client.Verification is not { } verification
@@ -30,6 +30,6 @@ internal sealed class EncryptionResponsePacket(byte[] secret, byte[] token) : II
         client.Verification = null;
         client.Encrypt(decrypted);
 
-        StartPacket.Join(client, eventDispatcher, verification.Joining);
+        StartPacket.Join(client, dispatcher, verification.Joining);
     }
 }

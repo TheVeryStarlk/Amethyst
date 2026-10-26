@@ -41,7 +41,7 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
         return new InventoryActionPacket(index, new Item(type, amount, durability, tag));
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
@@ -51,6 +51,6 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
             return;
         }
 
-        eventDispatcher.Dispatch(client.Player, new SlotChanged(index, item));
+        dispatcher.Dispatch(client.Player, new SlotChanged(index, item));
     }
 }

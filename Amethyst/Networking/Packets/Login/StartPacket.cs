@@ -23,9 +23,9 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         return new StartPacket(reader.ReadVariableString());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
-        var joining = eventDispatcher.Dispatch(client, new Joining(username));
+        var joining = dispatcher.Dispatch(client, new Joining(username));
 
         if (joining.IsCancelled)
         {
@@ -37,7 +37,7 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 
         if (!joining.Encrypted)
         {
-            Join(client, eventDispatcher, joining);
+            Join(client, dispatcher, joining);
             return;
         }
 
@@ -48,7 +48,7 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         client.Write(new EncryptionRequestPacket(KeyPair.Public, token));
     }
 
-    public static void Join(Client client, EventDispatcher eventDispatcher, Joining joining)
+    public static void Join(Client client, Dispatcher dispatcher, Joining joining)
     {
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
         var player = new Player(client, world, Guid.NewGuid(), joining.GameMode, joining.Username);
@@ -72,6 +72,6 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
             new PositionLookPacket(new Position(), 0, 0));
 
         client.State = State.Play;
-        eventDispatcher.Dispatch(player, new Joined());
+        dispatcher.Dispatch(player, new Joined());
     }
 }

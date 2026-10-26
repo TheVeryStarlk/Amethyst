@@ -17,7 +17,7 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
         return new DiggingPacket((Digging) reader.ReadByte(), reader.ReadPosition(), (BlockFace) reader.ReadByte());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
@@ -27,7 +27,7 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
             return;
         }
 
-        var dig = eventDispatcher.Dispatch(client.Player, new Dig(digging, position, face));
+        var dig = dispatcher.Dispatch(client.Player, new Dig(digging, position, face));
 
         if (dig.IsCancelled)
         {

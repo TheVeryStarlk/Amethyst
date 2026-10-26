@@ -9,14 +9,14 @@ namespace Amethyst.Networking.Packets;
 
 internal interface IProcessor
 {
-    public void Process(Client client, EventDispatcher eventDispatcher);
+    public void Process(Client client, Dispatcher dispatcher);
 }
 
 internal sealed class EmptyProcessor : IProcessor
 {
     public static EmptyProcessor Instance { get; } = new();
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         // Will remove this later.
     }
