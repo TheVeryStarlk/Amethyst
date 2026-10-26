@@ -48,14 +48,12 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         }
 
         client.Player = player;
-
-        // Queued before the threshold is set, as every packet after it is compressed, starting from the login success.
-        if (joining.Threshold >= 0)
-        {
-            client.Write(new CompressionPacket(joining.Threshold));
-        }
-
         client.Threshold = joining.Threshold;
+
+        if (client.Threshold >= 0)
+        {
+            client.Write(new CompressionPacket(client.Threshold));
+        }
 
         client.Write(
             new SuccessPacket(player),
