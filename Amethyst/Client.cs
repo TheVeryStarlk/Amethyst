@@ -18,7 +18,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
     public State State { get; set; }
 
     /// <summary>
-    /// Set once when joining, packets at least this long are compressed while playing.
+    /// Set once when joining, packets at least this long are compressed.
     /// A negative threshold disables compression.
     /// </summary>
     public int Threshold { get; set; } = -1;
@@ -50,8 +50,8 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
 
         foreach (var packet in packets)
         {
-            // Captured when queued, as the state changes before the earlier packets are written.
-            if (!outgoing.Writer.TryWrite(new Outgoing(packet, State is State.Play ? Threshold : -1)))
+            // Captured when queued, as the threshold is set before the earlier packets are written.
+            if (!outgoing.Writer.TryWrite(new Outgoing(packet, Threshold)))
             {
                 break;
             }
@@ -83,7 +83,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
                 var consumed = sequence.Start;
                 var examined = sequence.End;
 
-                if (Protocol.TryRead(ref sequence, State is State.Play ? Threshold : -1, out var packet))
+                if (Protocol.TryRead(ref sequence, Threshold, out var packet))
                 {
                     packet.Create(State).Process(this, dispatcher);
                     examined = consumed = sequence.Start;
