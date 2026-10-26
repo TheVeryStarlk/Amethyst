@@ -6,8 +6,6 @@ public interface IPlayer : IEntity
 {
     public IClient Client { get; }
 
-    public IWorld World { get; }
-
     public Guid Guid { get; }
 
     public GameMode GameMode { get; }

@@ -14,11 +14,11 @@ internal sealed class ConfigurationPacket(string locale, byte viewDistance) : II
         return new ConfigurationPacket(reader.ReadVariableString(), reader.ReadByte());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         Debug.Assert(client.Player is not null);
 
-        var configuration = eventDispatcher.Dispatch(client.Player, new Configuration(locale, viewDistance));
+        var configuration = dispatcher.Dispatch(client.Player, new Configuration(locale, viewDistance));
 
         client.Player.Locale = configuration.Locale;
         client.Player.ViewDistance = byte.Min(configuration.ViewDistance, 32);

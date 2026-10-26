@@ -13,7 +13,7 @@ internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>, IProc
         return new PingPacket(reader.ReadLong());
     }
 
-    public void Process(Client client, EventDispatcher eventDispatcher)
+    public void Process(Client client, Dispatcher dispatcher)
     {
         client.Write(new PongPacket(magic));
         client.Stop();
