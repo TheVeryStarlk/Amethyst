@@ -64,21 +64,21 @@ internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
         }
 
         client.Player = player;
-        client.Threshold = joining.Threshold;
 
-        // Sent before switching to play, as every packet after it is compressed, starting from the login success.
-        if (client.Threshold >= 0)
+        // Queued before the threshold is set, as every packet after it is compressed, starting from the login success.
+        if (joining.Threshold >= 0)
         {
-            client.Write(new CompressionPacket(client.Threshold));
+            client.Write(new CompressionPacket(joining.Threshold));
         }
 
-        client.State = State.Play;
+        client.Threshold = joining.Threshold;
 
         client.Write(
             new SuccessPacket(player),
             new JoinGamePacket(player, world, byte.MaxValue, false),
             new PositionLookPacket(new Position(), 0, 0));
 
+        client.State = State.Play;
         dispatcher.Dispatch(player, new Joined());
     }
 }
