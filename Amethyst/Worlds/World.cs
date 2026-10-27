@@ -41,8 +41,7 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
 
     public void Remove(IPlayer player)
     {
-        // Only remove this exact player, not another one sharing the username.
-        players.TryRemove(new KeyValuePair<string, IPlayer>(player.Username, player));
+        _ = players.TryRemove(new KeyValuePair<string, IPlayer>(player.Username, player));
     }
 
     public Block this[int x, int y, int z]
