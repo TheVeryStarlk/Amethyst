@@ -9,8 +9,8 @@ Amethyst is customizable and sacrifices many of the vanilla features in favor of
 
 ## Getting Started
 
-Implementing [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst.Abstractions/Eventing/ISubscriber.cs) and registering Amethyst by `services.AddAmethyst<FooSubscriber>();` is all you need to get a running Amethyst server.
-However, you need to create a world for players to join to.
+Implementing [ISubscriber](https://github.com/TheVeryStarlk/Amethyst/blob/rewrite/Amethyst.Abstractions/Eventing/ISubscriber.cs) and registering Amethyst by `services.AddAmethyst();` is all you need to get a running Amethyst server.
+However, you need a world for players to join to.
 
 ```cs
 // Create the world once, players are tracked by the world they are in.
@@ -54,7 +54,8 @@ Without `ChunkSubscriber`, players receive no chunks. Without `BlockSubscriber`,
 
 ```csharp
 services
-    .AddAmethyst<FooSubscriber>()
+    .AddAmethyst()
+    .AddSubscriber<WorldSubscriber>() // Gives players a world to join to.
     .AddSubscriber<UsernameSubscriber>() // Keeps usernames unique across worlds, ignoring case.
     .AddSubscriber<ChunkSubscriber>() // Streams chunks around players.
     .AddSubscriber<ListSubscriber>() // Keeps the tab list in sync.

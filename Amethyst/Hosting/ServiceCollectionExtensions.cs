@@ -11,15 +11,11 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(Action<AmethystOptions> configure) where T : class, ISubscriber
+        public IServiceCollection AddAmethyst()
         {
-            services.Configure(configure);
-
-            services.AddSubscriber<T>();
+            services.AddOptions<AmethystOptions>();
 
             services.AddSingleton<Dispatcher>();
-            services.AddSingleton<ClientFactory>();
-
             services.AddSingleton<IWorldFactory, WorldFactory>();
 
             services.AddHostedService<AmethystService>();
@@ -28,9 +24,18 @@ public static class ServiceCollectionExtensions
             return services;
         }
 
+        public IServiceCollection AddAmethyst(Action<AmethystOptions> configure)
+        {
+            services.Configure(configure);
+            return services.AddAmethyst();
+        }
+
         /// <summary>
-        /// Registers an additional <see cref="ISubscriber"/>, subscribers run in the order they were registered.
+        /// Registers a <see cref="ISubscriber"/>.
         /// </summary>
+        /// <remarks>
+        /// <see cref="ISubscriber"/>s run in the order they were registered.
+        /// </remarks>
         public IServiceCollection AddSubscriber<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber
         {
             services.AddTransient<ISubscriber, T>();

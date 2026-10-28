@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Amethyst.Hosting;
 
-// Clients disconnect if they do not receive a keep alive in time.
+// This is not a "complete" implementation.
 internal sealed class KeepAliveService(IWorldFactory worldFactory) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -17,7 +17,6 @@ internal sealed class KeepAliveService(IWorldFactory worldFactory) : BackgroundS
             {
                 var alive = new KeepAlivePacket(Environment.TickCount);
 
-                // Every player in the play state is tracked by a world.
                 foreach (var world in worldFactory.Worlds)
                 {
                     foreach (var pair in world.Players)
