@@ -1,6 +1,5 @@
 ﻿namespace Amethyst.Abstractions.Entities.Objects;
 
-/// <remarks>Its position is the block it hangs in, clients only read it when the entity is spawned.</remarks>
 public interface IHanging : ISpawnable
 {
     /// <summary>

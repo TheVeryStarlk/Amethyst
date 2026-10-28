@@ -29,10 +29,8 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
         var amount = reader.ReadByte();
         var durability = reader.ReadShort();
 
-        // The cursor position that follows the NBT is not read.
         var remaining = span[reader.Position..];
 
-        // Items without NBT only have a single end tag.
         if (remaining[0] is Tag.End)
         {
             return new PlacementPacket(position, face, new Item(type, amount, durability));
@@ -73,7 +71,6 @@ internal sealed class PlacementPacket(Position position, BlockFace face, Item it
 
         if (placed.IsCancelled)
         {
-            // The client has already placed the block on its side.
             client.Write(new BlockPacket(where, client.Player.World[where]));
         }
     }

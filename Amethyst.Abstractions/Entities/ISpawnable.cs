@@ -1,9 +1,5 @@
 ﻿namespace Amethyst.Abstractions.Entities;
 
-/// <summary>
-/// An entity controlled by the server rather than by a client, created through <see cref="Worlds.IWorld.Create{T}"/>.
-/// </summary>
-/// <remarks>Changing the entity does not show the change to players, it has to be sent to them.</remarks>
 public interface ISpawnable : IEntity
 {
     public new Position Position { get; set; }

@@ -15,7 +15,6 @@ internal sealed class Dispatcher(ILogger<Dispatcher> logger, IEnumerable<ISubscr
             return original;
         }
 
-        // Callbacks are registered as Action<TAbstraction, TEvent>, which is contravariant in the source.
         foreach (var callback in callbacks)
         {
             try

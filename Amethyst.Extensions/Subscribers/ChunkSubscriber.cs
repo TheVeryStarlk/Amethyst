@@ -68,7 +68,6 @@ public sealed class ChunkSubscriber : ISubscriber
         });
     }
 
-    // Only ever touched by the player's own client, so it does not need to be thread-safe.
     private sealed class Tracker
     {
         public IWorld? World { get; set; }

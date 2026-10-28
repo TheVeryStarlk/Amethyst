@@ -11,7 +11,6 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
 
     public Block this[int x, int y, int z]
     {
-        // Reading must not allocate, otherwise every empty section read would be sent to clients.
         get => sections[y.ToChunk()]?[x, y, z] ?? Blocks.Air;
         set
         {
@@ -55,7 +54,6 @@ internal sealed class Chunk(int horizontal, int vertical) : IChunk
             offset += 8192;
         }
 
-        // The biomes come last, after the block and light data.
         for (var index = 0; index < biomes.Length; index++)
         {
             final[final.Length - biomes.Length + index] = (byte) biomes[index];

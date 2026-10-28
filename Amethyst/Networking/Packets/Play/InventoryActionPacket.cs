@@ -27,7 +27,6 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
         var durability = reader.ReadShort();
         var remaining = span[reader.Position..];
 
-        // Items without NBT only have a single end tag.
         if (remaining[0] is Tag.End)
         {
             return new InventoryActionPacket(index, new Item(type, amount, durability));

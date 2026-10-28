@@ -3,7 +3,4 @@ using Amethyst.Abstractions.Worlds;
 
 namespace Amethyst.Entities;
 
-internal abstract class Mob(IWorld world, float health) : Living(world, health), IMob
-{
-    public bool HasAi { get; set; } = true;
-}
+internal abstract class Mob(IWorld world, float health) : Living(world, health), IMob;

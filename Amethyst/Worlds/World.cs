@@ -25,15 +25,15 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
         set => this[(int) position.X, (int) position.Y, (int) position.Z] = value;
     }
 
-    // Vanilla treats usernames case-insensitively, players still keep the casing they logged in with.
     private readonly ConcurrentDictionary<string, IPlayer> players = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<long, IChunk> chunks = [];
 
-    // Chunks still being generated, only touched while holding the gate.
     private readonly Dictionary<long, IChunk> pending = [];
     private readonly Lock gate = new();
 
-    /// <returns>False if a player with the same username, ignoring case, is already in this world.</returns>
+    /// <returns>
+    /// False if a player with the same username, ignoring case, is already in this world.
+    /// </returns>
     public bool TryAdd(IPlayer player)
     {
         return players.TryAdd(player.Username, player);
@@ -61,10 +61,8 @@ internal sealed class World(string name, WorldType type, Dimension dimension, Di
                 return chunk;
             }
 
-            // Players load chunks from their own threads, so each chunk must only be generated once.
             lock (gate)
             {
-                // The generator may read the chunk it is generating back through the world, the gate allows re-entry.
                 if (chunks.TryGetValue(key, out chunk) || pending.TryGetValue(key, out chunk))
                 {
                     return chunk;

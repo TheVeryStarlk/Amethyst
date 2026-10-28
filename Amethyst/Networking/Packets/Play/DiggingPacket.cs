@@ -21,7 +21,6 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
     {
         Debug.Assert(client.Player is not null);
 
-        // Dropping items and shooting arrows share this packet, but are not related to blocks.
         if (digging is not (Digging.Started or Digging.Cancelled or Digging.Finished))
         {
             return;
@@ -31,7 +30,6 @@ internal sealed class DiggingPacket(Digging digging, Position position, BlockFac
 
         if (dig.IsCancelled)
         {
-            // The client might have already removed the block on its side.
             client.Write(new BlockPacket(position, client.Player.World[position]));
         }
     }

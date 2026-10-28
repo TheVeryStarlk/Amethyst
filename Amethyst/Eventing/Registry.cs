@@ -5,7 +5,6 @@ namespace Amethyst.Eventing;
 
 internal sealed class Registry(Dictionary<Type, List<Delegate>> events) : IRegistry
 {
-    // Callbacks are kept in registration order.
     public static FrozenDictionary<Type, Delegate[]> Create(IEnumerable<ISubscriber> subscribers)
     {
         var dictionary = new Dictionary<Type, List<Delegate>>();
