@@ -11,16 +11,16 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : class, ISubscriber
+        public IServiceCollection AddAmethyst<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(Action<AmethystOptions> configure) where T : class, ISubscriber
         {
+            services.Configure(configure);
+
             services.AddSubscriber<T>();
 
             services.AddSingleton<Dispatcher>();
             services.AddSingleton<ClientFactory>();
 
             services.AddSingleton<IWorldFactory, WorldFactory>();
-
-            services.AddTransient<Server>();
 
             services.AddHostedService<AmethystService>();
             services.AddHostedService<KeepAliveService>();

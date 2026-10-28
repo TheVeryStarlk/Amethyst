@@ -2,12 +2,14 @@
 using System.Net.Sockets;
 using System.Threading.Channels;
 using Amethyst.Abstractions;
+using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Abstractions.Packets;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking;
 using Amethyst.Networking.Packets;
 using Amethyst.Networking.Serializers;
+using Amethyst.Worlds;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
@@ -55,6 +57,12 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
     public void Stop()
     {
         source.Cancel();
+
+        if (Player?.World is World world)
+        {
+            world.Remove(Player);
+            dispatcher.Dispatch(Player, new Left());
+        }
     }
 
     public void Dispose()

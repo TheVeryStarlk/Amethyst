@@ -42,7 +42,6 @@ internal sealed class Player(IClient client, World world, Guid guid, GameMode ga
             throw new InvalidOperationException("A player with the same username is already in that world.");
         }
 
-        
         world.Remove(this);
         world = instance;
 
@@ -53,13 +52,5 @@ internal sealed class Player(IClient client, World world, Guid guid, GameMode ga
     {
         Position = position;
         Client.Write(new PositionLookPacket(position, Yaw, Pitch));
-    }
-
-    /// <summary>
-    /// Stops the player's world from tracking it.
-    /// </summary>
-    public void Leave()
-    {
-        world.Remove(this);
     }
 }
