@@ -1,19 +1,15 @@
-﻿using Amethyst.Eventing;
+﻿namespace Amethyst.Networking.Ingoing.Packets.Play;
 
-namespace Amethyst.Networking.Packets.Play;
-
-internal sealed class StatusPacket(Status status) : IIngoingPacket<StatusPacket>, IProcessor
+internal sealed class StatusPacket(Status status) : IIngoingPacket<StatusPacket>
 {
     public static int Identifier => 22;
+
+    public Status Status => status;
 
     public static StatusPacket Create(ReadOnlySpan<byte> span)
     {
         var reader = new SpanReader(span);
         return new StatusPacket((Status) reader.ReadVariableInteger());
-    }
-
-    public void Process(Client client, Dispatcher dispatcher)
-    {
     }
 }
 

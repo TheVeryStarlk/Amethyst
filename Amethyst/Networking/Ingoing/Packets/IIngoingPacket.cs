@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 
-namespace Amethyst.Networking.Packets;
+namespace Amethyst.Networking.Ingoing.Packets;
 
 internal interface IIngoingPacket<out T> where T : IIngoingPacket<T>
 {

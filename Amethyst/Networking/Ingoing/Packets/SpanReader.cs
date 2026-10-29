@@ -2,7 +2,7 @@
 using System.Text;
 using Amethyst.Abstractions.Entities;
 
-namespace Amethyst.Networking.Packets;
+namespace Amethyst.Networking.Ingoing.Packets;
 
 internal ref struct SpanReader(ReadOnlySpan<byte> span)
 {

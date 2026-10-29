@@ -1,15 +1,16 @@
-﻿using System.Diagnostics;
-using Amethyst.Abstractions.Entities;
-using Amethyst.Abstractions.Eventing.Player;
-using Amethyst.Eventing;
+﻿using Amethyst.Abstractions.Entities;
 using Raspite;
 using Raspite.Tags;
 
-namespace Amethyst.Networking.Packets.Play;
+namespace Amethyst.Networking.Ingoing.Packets.Play;
 
-internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPacket<InventoryActionPacket>, IProcessor
+internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPacket<InventoryActionPacket>
 {
     public static int Identifier => 16;
+
+    public short Index => index;
+
+    public Item Item => item;
 
     public static InventoryActionPacket Create(ReadOnlySpan<byte> span)
     {
@@ -38,18 +39,5 @@ internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPa
         }
 
         return new InventoryActionPacket(index, new Item(type, amount, durability, tag));
-    }
-
-    public void Process(Client client, Dispatcher dispatcher)
-    {
-        Debug.Assert(client.Player is not null);
-
-        // A slot of -1 means the item was dropped outside the window, which is not handled yet.
-        if (index is < 0 or > 44)
-        {
-            return;
-        }
-
-        dispatcher.Dispatch(client.Player, new SlotChanged(index, item));
     }
 }

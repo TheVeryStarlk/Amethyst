@@ -2,14 +2,13 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using Amethyst.Abstractions.Packets.Play;
-using Amethyst.Eventing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Amethyst.Hosting;
 
-internal sealed class AmethystService(ILoggerFactory loggerFactory, IOptions<AmethystOptions> options, Dispatcher dispatcher) : BackgroundService
+internal sealed class AmethystService(ILoggerFactory loggerFactory, IOptions<AmethystOptions> options, ClientFactory clientFactory) : BackgroundService
 {
     private readonly ILogger<AmethystService> logger =  loggerFactory.CreateLogger<AmethystService>();
     private readonly ConcurrentDictionary<Client, Task> clients = [];
@@ -34,7 +33,7 @@ internal sealed class AmethystService(ILoggerFactory loggerFactory, IOptions<Ame
             try
             {
                 var socket = await listener.AcceptAsync(source.Token).ConfigureAwait(false);
-                var client = new Client(loggerFactory.CreateLogger<Client>(), dispatcher, socket);
+                var client = clientFactory.Create(socket);
 
                 clients[client] = InstantiateAsync(client);
                 logger.LogDebug("Started client");

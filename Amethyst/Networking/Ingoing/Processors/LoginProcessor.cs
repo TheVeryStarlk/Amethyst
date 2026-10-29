@@ -1,30 +1,23 @@
-﻿using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Entities;
+using Amethyst.Abstractions.Eventing.Client;
+using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
 using Amethyst.Entities.Players;
-using Amethyst.Worlds;
 using Amethyst.Eventing;
-using Amethyst.Abstractions.Eventing.Client;
-using Amethyst.Abstractions.Eventing.Player;
+using Amethyst.Networking.Ingoing.Packets.Login;
+using Amethyst.Worlds;
 
-namespace Amethyst.Networking.Packets.Login;
+namespace Amethyst.Networking.Ingoing.Processors;
 
-internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>, IProcessor
+internal sealed class LoginProcessor(Dispatcher dispatcher) : IProcessor<StartPacket>
 {
-    public static int Identifier => 0;
-
     private readonly Message taken = Message.Simple("Username already taken!");
-    
-    public static StartPacket Create(ReadOnlySpan<byte> span)
-    {
-        var reader = new SpanReader(span);
-        return new StartPacket(reader.ReadVariableString());
-    }
 
-    public void Process(Client client, Dispatcher dispatcher)
+    public void Process(Client client, StartPacket packet)
     {
-        var joining = dispatcher.Dispatch(client, new Joining(username));
+        var joining = dispatcher.Dispatch(client, new Joining(packet.Username));
 
         if (joining.IsCancelled)
         {

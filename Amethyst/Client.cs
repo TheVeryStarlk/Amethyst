@@ -7,14 +7,14 @@ using Amethyst.Abstractions.Packets;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking;
-using Amethyst.Networking.Packets;
+using Amethyst.Networking.Ingoing.Processors;
 using Amethyst.Networking.Serializers;
 using Amethyst.Worlds;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;
 
-internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Socket socket) : IClient, IDisposable
+internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Router router, Socket socket) : IClient, IDisposable
 {
     public Player? Player { get; set; }
 
@@ -87,7 +87,7 @@ internal sealed class Client(ILogger<Client> logger, Dispatcher dispatcher, Sock
 
                 if (Protocol.TryRead(ref sequence, out var packet))
                 {
-                    packet.Create(State).Process(this, dispatcher);
+                    router.Route(this, packet);
                     examined = consumed = sequence.Start;
                 }
 
