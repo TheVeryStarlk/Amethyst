@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
             services.AddOptions<AmethystOptions>();
 
             services.AddSingleton<Dispatcher>();
+
             services.AddSingleton<IWorldFactory, WorldFactory>();
 
             services.AddHostedService<AmethystService>();
