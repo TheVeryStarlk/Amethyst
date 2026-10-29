@@ -2,6 +2,7 @@
 using Amethyst.Abstractions.Eventing;
 using Amethyst.Abstractions.Worlds;
 using Amethyst.Eventing;
+using Amethyst.Networking.Ingoing;
 using Amethyst.Networking.Ingoing.Processors;
 using Amethyst.Worlds;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,6 @@ public static class ServiceCollectionExtensions
         {
             services.AddOptions<AmethystOptions>();
 
-            services.AddSingleton<Dispatcher>();
 
             services.AddSingleton<HandshakeProcessor>();
             services.AddSingleton<StatusProcessor>();
@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<Router>();
             services.AddSingleton<ClientFactory>();
 
+            services.AddSingleton<Dispatcher>();
             services.AddSingleton<IWorldFactory, WorldFactory>();
 
             services.AddHostedService<AmethystService>();

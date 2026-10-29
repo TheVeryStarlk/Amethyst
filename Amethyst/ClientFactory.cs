@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 using Amethyst.Eventing;
-using Amethyst.Networking.Ingoing.Processors;
+using Amethyst.Networking.Ingoing;
 using Microsoft.Extensions.Logging;
 
 namespace Amethyst;

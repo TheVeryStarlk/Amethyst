@@ -2,7 +2,7 @@
 
 internal sealed class ConfigurationPacket(string locale, byte viewDistance) : IIngoingPacket<ConfigurationPacket>
 {
-    public static int Identifier => 21;
+    public const int Identifier = 21;
 
     public string Locale => locale;
 

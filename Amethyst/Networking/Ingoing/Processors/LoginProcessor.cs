@@ -4,6 +4,7 @@ using Amethyst.Abstractions.Eventing.Player;
 using Amethyst.Abstractions.Messages;
 using Amethyst.Abstractions.Packets.Login;
 using Amethyst.Abstractions.Packets.Play;
+using Amethyst.Abstractions.Worlds;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking.Ingoing.Packets.Login;
@@ -11,9 +12,10 @@ using Amethyst.Worlds;
 
 namespace Amethyst.Networking.Ingoing.Processors;
 
-internal sealed class LoginProcessor(Dispatcher dispatcher) : IProcessor<StartPacket>
+internal sealed class LoginProcessor(Dispatcher dispatcher, IWorldFactory worldFactory) : IProcessor<StartPacket>
 {
     private readonly Message taken = Message.Simple("Username already taken!");
+    private readonly Lock gate = new();
 
     public void Process(Client client, StartPacket packet)
     {
@@ -30,7 +32,16 @@ internal sealed class LoginProcessor(Dispatcher dispatcher) : IProcessor<StartPa
         var world = joining.World as World ?? throw new InvalidOperationException("No world was set.");
         var player = new Player(client, world, Guid.NewGuid(), joining.GameMode, joining.Username);
 
-        if (!world.TryAdd(player))
+        bool added;
+
+        // Usernames are unique across every world, checking and adding under the same lock
+        // keeps two players logging in at the same instant into different worlds from both getting in.
+        lock (gate)
+        {
+            added = worldFactory.Worlds.All(other => !other.Players.ContainsKey(player.Username)) && world.TryAdd(player);
+        }
+
+        if (!added)
         {
             client.Write(new FailurePacket(taken));
             client.Stop();

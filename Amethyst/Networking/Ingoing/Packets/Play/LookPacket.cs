@@ -2,7 +2,7 @@
 
 internal sealed class LookPacket(float yaw, float pitch, bool ground) : IIngoingPacket<LookPacket>
 {
-    public static int Identifier => 5;
+    public const int Identifier = 5;
 
     public float Yaw => yaw;
 

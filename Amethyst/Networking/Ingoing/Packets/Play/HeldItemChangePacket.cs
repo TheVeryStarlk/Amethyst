@@ -2,7 +2,7 @@
 
 internal sealed class HeldItemChangePacket(short index) : IIngoingPacket<HeldItemChangePacket>
 {
-    public static int Identifier => 9;
+    public const int Identifier = 9;
 
     public short Index => index;
 

@@ -6,7 +6,7 @@ namespace Amethyst.Networking.Ingoing.Packets.Play;
 
 internal sealed class InventoryActionPacket(short index, Item item) : IIngoingPacket<InventoryActionPacket>
 {
-    public static int Identifier => 16;
+    public const int Identifier = 16;
 
     public short Index => index;
 

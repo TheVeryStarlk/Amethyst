@@ -4,7 +4,7 @@ namespace Amethyst.Networking.Ingoing.Packets.Play;
 
 internal sealed class PositionPacket(Position position, bool ground) : IIngoingPacket<PositionPacket>
 {
-    public static int Identifier => 4;
+    public const int Identifier = 4;
 
     public Position Position => position;
 

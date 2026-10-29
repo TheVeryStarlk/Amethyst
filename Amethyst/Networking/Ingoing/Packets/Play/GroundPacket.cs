@@ -2,7 +2,7 @@
 
 internal sealed class GroundPacket(bool value) : IIngoingPacket<GroundPacket>
 {
-    public static int Identifier => 3;
+    public const int Identifier = 3;
 
     public bool Value => value;
 

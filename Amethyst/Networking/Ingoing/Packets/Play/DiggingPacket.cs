@@ -5,7 +5,7 @@ namespace Amethyst.Networking.Ingoing.Packets.Play;
 
 internal sealed class DiggingPacket(Digging digging, Position position, BlockFace face) : IIngoingPacket<DiggingPacket>
 {
-    public static int Identifier => 7;
+    public const int Identifier = 7;
 
     public Digging Digging => digging;
 

@@ -2,7 +2,7 @@
 
 internal sealed class StatusPacket(Status status) : IIngoingPacket<StatusPacket>
 {
-    public static int Identifier => 22;
+    public const int Identifier = 22;
 
     public Status Status => status;
 

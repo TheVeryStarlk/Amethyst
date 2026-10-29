@@ -2,7 +2,7 @@
 
 internal sealed class HandshakePacket(int version, string address, ushort port, State state) : IIngoingPacket<HandshakePacket>
 {
-    public static int Identifier => 0;
+    public const int Identifier = 0;
 
     public int Version => version;
 

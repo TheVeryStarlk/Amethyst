@@ -2,7 +2,7 @@
 
 internal sealed class MessagePacket(string message) : IIngoingPacket<MessagePacket>
 {
-    public static int Identifier => 1;
+    public const int Identifier = 1;
 
     public string Message => message;
 

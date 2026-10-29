@@ -2,7 +2,7 @@
 
 internal sealed class StatusRequestPacket : IIngoingPacket<StatusRequestPacket>
 {
-    public static int Identifier => 0;
+    public const int Identifier = 0;
 
     public static StatusRequestPacket Create(ReadOnlySpan<byte> span)
     {

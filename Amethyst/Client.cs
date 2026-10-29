@@ -7,7 +7,7 @@ using Amethyst.Abstractions.Packets;
 using Amethyst.Entities.Players;
 using Amethyst.Eventing;
 using Amethyst.Networking;
-using Amethyst.Networking.Ingoing.Processors;
+using Amethyst.Networking.Ingoing;
 using Amethyst.Networking.Serializers;
 using Amethyst.Worlds;
 using Microsoft.Extensions.Logging;

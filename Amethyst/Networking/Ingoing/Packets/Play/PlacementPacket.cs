@@ -7,7 +7,7 @@ namespace Amethyst.Networking.Ingoing.Packets.Play;
 
 internal sealed class PlacementPacket(Position position, BlockFace face, Item item) : IIngoingPacket<PlacementPacket>
 {
-    public static int Identifier => 8;
+    public const int Identifier = 8;
 
     public Position Position => position;
 

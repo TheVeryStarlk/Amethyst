@@ -2,7 +2,7 @@
 
 internal sealed class StartPacket(string username) : IIngoingPacket<StartPacket>
 {
-    public static int Identifier => 0;
+    public const int Identifier = 0;
 
     public string Username => username;
 

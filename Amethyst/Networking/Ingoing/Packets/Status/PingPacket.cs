@@ -2,7 +2,7 @@
 
 internal sealed class PingPacket(long magic) : IIngoingPacket<PingPacket>
 {
-    public static int Identifier => 1;
+    public const int Identifier = 1;
 
     public long Magic => magic;
 
